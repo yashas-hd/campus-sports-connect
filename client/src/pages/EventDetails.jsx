@@ -6,6 +6,8 @@ import toast from 'react-hot-toast';
 import AuthContext from '../context/AuthContext';
 import Navbar from '../components/Navbar';
 
+const API = import.meta.env.VITE_API_URL;
+
 const EventDetails = () => {
   const { id } = useParams();
   const [event, setEvent] = useState(null);
@@ -27,7 +29,7 @@ const EventDetails = () => {
             Authorization: `Bearer ${user.token}`,
           },
         };
-        const { data } = await axios.get(`http://localhost:5000/api/events/${id}`, config);
+        const { data } = await axios.get(`${API}/api/events/${id}`, config);
         setEvent(data);
       } catch (err) {
         setError(err.response?.data?.message || 'Event not found');
@@ -39,7 +41,7 @@ const EventDetails = () => {
     fetchEventDetails();
 
     // Socket.io integration
-    const socket = io('http://localhost:5000');
+    const socket = io(API);
     socket.emit('join_user_room', user._id);
 
     socket.on('new_notification', (notification) => {
@@ -58,10 +60,10 @@ const EventDetails = () => {
   const handleRSVP = async () => {
     try {
       const config = { headers: { Authorization: `Bearer ${user.token}` } };
-      const { data } = await axios.post(`http://localhost:5000/api/events/${event._id}/join`, {}, config);
+      const { data } = await axios.post(`${API}/api/events/${event._id}/join`, {}, config);
       
       // Update local state by refetching to get populated participants
-      const updatedEvent = await axios.get(`http://localhost:5000/api/events/${event._id}`, config);
+      const updatedEvent = await axios.get(`${API}/api/events/${event._id}`, config);
       setEvent(updatedEvent.data);
       toast.success('Successfully joined the event!');
     } catch (err) {

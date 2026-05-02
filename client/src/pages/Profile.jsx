@@ -5,6 +5,8 @@ import toast from 'react-hot-toast';
 import AuthContext from '../context/AuthContext';
 import Navbar from '../components/Navbar';
 
+const API = import.meta.env.VITE_API_URL;
+
 const Profile = () => {
   const { user, login } = useContext(AuthContext);
   const [profileData, setProfileData] = useState(null);
@@ -21,7 +23,7 @@ const Profile = () => {
     const fetchProfile = async () => {
       try {
         const config = { headers: { Authorization: `Bearer ${user.token}` } };
-        const { data } = await axios.get('http://localhost:5000/api/users/profile', config);
+        const { data } = await axios.get(`${API}/api/users/profile`, config);
         setProfileData(data);
         setFormData({
           name: data.name,
@@ -53,7 +55,7 @@ const Profile = () => {
         sportsInterests: formData.sportsInterests.split(',').map(s => s.trim()).filter(s => s !== ''),
       };
 
-      const { data } = await axios.put('http://localhost:5000/api/users/profile', payload, config);
+      const { data } = await axios.put(`${API}/api/users/profile`, payload, config);
       
       // Update local context and state
       login({ ...user, name: data.name });

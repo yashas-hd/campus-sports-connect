@@ -3,6 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import AuthContext from '../context/AuthContext';
 
+const API = import.meta.env.VITE_API_URL;
+
 const Login = () => {
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
@@ -20,7 +22,7 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const { data } = await axios.post('http://localhost:5000/api/auth/login', formData);
+      const { data } = await axios.post(`${API}/api/auth/login`, formData);
       login(data);
       navigate('/dashboard');
     } catch (err) {

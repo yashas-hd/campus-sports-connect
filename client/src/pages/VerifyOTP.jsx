@@ -3,6 +3,8 @@ import { useLocation, useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import AuthContext from '../context/AuthContext';
 
+const API = import.meta.env.VITE_API_URL;
+
 const VerifyOTP = () => {
   const [otp, setOtp] = useState('');
   const [error, setError] = useState('');
@@ -26,7 +28,7 @@ const VerifyOTP = () => {
     setLoading(true);
 
     try {
-      const { data } = await axios.post('http://localhost:5000/api/auth/verify-otp', {
+      const { data } = await axios.post(`${API}/api/auth/verify-otp`, {
         userId,
         otp
       });
