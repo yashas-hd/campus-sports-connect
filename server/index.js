@@ -11,8 +11,6 @@ const userRoutes = require('./routes/userRoutes');
 
 dotenv.config();
 
-connectDB();
-
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
@@ -73,6 +71,12 @@ io.on('connection', (socket) => {
 // Pass io to routes if needed
 app.set('io', io);
 
-server.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+const startServer = async () => {
+  await connectDB();
+
+  server.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+};
+
+startServer();
