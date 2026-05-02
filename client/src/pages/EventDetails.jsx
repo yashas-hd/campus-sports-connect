@@ -1,10 +1,10 @@
 import { useState, useEffect, useContext } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import axios from 'axios';
 import { io } from 'socket.io-client';
 import toast from 'react-hot-toast';
 import AuthContext from '../context/AuthContext';
 import Navbar from '../components/Navbar';
+import axiosInstance from '../utils/axiosInstance';
 
 const API = import.meta.env.VITE_API_URL;
 
@@ -24,12 +24,7 @@ const EventDetails = () => {
 
     const fetchEventDetails = async () => {
       try {
-        const config = {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
-        };
-        const { data } = await axios.get(`${API}/api/events/${id}`, config);
+        const { data } = await axiosInstance.get(`/api/events/${id}`);
         setEvent(data);
       } catch (err) {
         setError(err.response?.data?.message || 'Event not found');
@@ -59,11 +54,10 @@ const EventDetails = () => {
 
   const handleRSVP = async () => {
     try {
-      const config = { headers: { Authorization: `Bearer ${user.token}` } };
-      const { data } = await axios.post(`${API}/api/events/${event._id}/join`, {}, config);
+      const { data } = await axiosInstance.post(`/api/events/${event._id}/join`, {});
       
       // Update local state by refetching to get populated participants
-      const updatedEvent = await axios.get(`${API}/api/events/${event._id}`, config);
+      const updatedEvent = await axiosInstance.get(`/api/events/${event._id}`);
       setEvent(updatedEvent.data);
       toast.success('Successfully joined the event!');
     } catch (err) {

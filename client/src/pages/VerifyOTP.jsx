@@ -1,14 +1,17 @@
 import { useState, useContext, useEffect } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
-import axios from 'axios';
+import toast from 'react-hot-toast';
 import AuthContext from '../context/AuthContext';
-
-const API = import.meta.env.VITE_API_URL;
+import axiosInstance from '../utils/axiosInstance';
 
 const VerifyOTP = () => {
   const [otp, setOtp] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [resendLoading, setResendLoading] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(300); // 5 minutes
+  const [resendCooldown, setResendCooldown] = useState(30);
+
   const location = useLocation();
   const navigate = useNavigate();
   const { login } = useContext(AuthContext);
@@ -17,10 +20,46 @@ const VerifyOTP = () => {
   const email = location.state?.email;
 
   useEffect(() => {
-    if (!userId) {
+    if (!userId || !email) {
       navigate('/login');
     }
-  }, [userId, navigate]);
+  }, [userId, email, navigate]);
+
+  // Timers
+  useEffect(() => {
+    if (timeLeft > 0) {
+      const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [timeLeft]);
+
+  useEffect(() => {
+    if (resendCooldown > 0) {
+      const timer = setTimeout(() => setResendCooldown(resendCooldown - 1), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [resendCooldown]);
+
+  const formatTime = (seconds) => {
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return `${m}:${s < 10 ? '0' : ''}${s}`;
+  };
+
+  const handleResend = async () => {
+    setResendLoading(true);
+    setError('');
+    try {
+      await axiosInstance.post('/api/auth/resend-otp', { email });
+      toast.success('OTP resent successfully');
+      setTimeLeft(300); // Reset 5 min timer
+      setResendCooldown(30); // Reset 30s cooldown
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to resend OTP');
+    } finally {
+      setResendLoading(false);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -28,10 +67,11 @@ const VerifyOTP = () => {
     setLoading(true);
 
     try {
-      const { data } = await axios.post(`${API}/api/auth/verify-otp`, {
+      const { data } = await axiosInstance.post('/api/auth/verify-otp', {
         userId,
         otp
       });
+      localStorage.setItem("token", data.token);
       login(data);
       navigate('/dashboard');
     } catch (err) {
@@ -50,6 +90,9 @@ const VerifyOTP = () => {
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
             We sent a 6-digit code to <span className="font-medium text-indigo-600">{email || 'your email'}</span>
+          </p>
+          <p className="mt-1 text-center text-xs font-semibold text-gray-500">
+            Expires in {formatTime(timeLeft)}
           </p>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
@@ -71,6 +114,7 @@ const VerifyOTP = () => {
                 placeholder="------"
                 value={otp}
                 onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
+                disabled={timeLeft === 0}
               />
             </div>
           </div>
@@ -78,14 +122,28 @@ const VerifyOTP = () => {
           <div>
             <button
               type="submit"
-              disabled={loading || otp.length !== 6}
+              disabled={loading || otp.length !== 6 || timeLeft === 0}
               className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
             >
-              {loading ? 'Verifying...' : 'Verify Email'}
+              {loading ? (
+                 <span className="flex items-center">
+                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                   Verifying...
+                 </span>
+              ) : 'Verify Email'}
             </button>
           </div>
-          <div className="text-center mt-4">
-             <Link to="/login" className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">
+          
+          <div className="text-center mt-4 flex flex-col gap-2">
+            <button
+              type="button"
+              onClick={handleResend}
+              disabled={resendCooldown > 0 || resendLoading}
+              className="text-sm font-medium text-indigo-600 hover:text-indigo-500 transition-colors disabled:text-gray-400 disabled:cursor-not-allowed"
+            >
+              {resendLoading ? 'Sending...' : resendCooldown > 0 ? `Resend OTP in ${resendCooldown}s` : 'Resend OTP'}
+            </button>
+            <Link to="/login" className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">
               Back to Login
             </Link>
           </div>

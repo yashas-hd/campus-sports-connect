@@ -10,6 +10,10 @@ const registerUser = async (req, res) => {
   try {
     const { name, email, password, college } = req.body;
 
+    if (!email.endsWith(".edu")) {
+      return res.status(400).json({ message: "Only college email allowed" });
+    }
+
     const userExists = await User.findOne({ email });
 
     if (userExists) {
@@ -18,7 +22,9 @@ const registerUser = async (req, res) => {
 
     // Generate OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    const otpExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
+    const otpExpires = Date.now() + 5 * 60 * 1000; // 5 minutes
+    
+    console.log("OTP:", otp);
 
     const user = await User.create({
       name,
@@ -27,6 +33,7 @@ const registerUser = async (req, res) => {
       college,
       otp,
       otpExpires,
+      otpAttempts: 0,
     });
 
     // Send OTP via email
@@ -59,7 +66,7 @@ const verifyOTP = async (req, res) => {
   try {
     const { userId, otp } = req.body;
 
-    const user = await User.findById(userId).select('+otp +otpExpires');
+    const user = await User.findById(userId).select('+otp +otpExpires +otpAttempts');
 
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
@@ -69,21 +76,33 @@ const verifyOTP = async (req, res) => {
       return res.status(400).json({ message: 'User already verified' });
     }
 
-    if (user.otp !== otp || user.otpExpires < Date.now()) {
-      return res.status(400).json({ message: 'Invalid or expired OTP' });
+    if (user.otpExpires < Date.now()) {
+      return res.status(400).json({ message: "OTP expired" });
+    }
+
+    if (user.otpAttempts >= 5) {
+      return res.status(403).json({ message: "Too many attempts. Request new OTP." });
+    }
+
+    if (user.otp !== otp) {
+      user.otpAttempts += 1;
+      await user.save();
+      return res.status(400).json({ message: "Invalid OTP" });
     }
 
     user.isVerified = true;
-    user.otp = undefined;
-    user.otpExpires = undefined;
+    user.otp = null;
+    user.otpExpires = null;
+    user.otpAttempts = 0;
     await user.save();
 
     res.json({
+      message: "Login successful",
       _id: user._id,
       name: user.name,
       email: user.email,
       isVerified: user.isVerified,
-      token: generateToken(user._id),
+      token: generateToken(user._id, user.email),
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -110,10 +129,55 @@ const loginUser = async (req, res) => {
         email: user.email,
         college: user.college,
         isVerified: user.isVerified,
-        token: generateToken(user._id),
+        token: generateToken(user._id, user.email),
       });
     } else {
       res.status(401).json({ message: 'Invalid email or password' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// @desc    Resend OTP
+// @route   POST /api/auth/resend-otp
+// @access  Public
+const resendOTP = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    if (user.isVerified) {
+      return res.status(400).json({ message: 'User already verified' });
+    }
+
+    const newOtp = Math.floor(100000 + Math.random() * 900000).toString();
+    
+    user.otp = newOtp;
+    user.otpExpires = Date.now() + 5 * 60 * 1000;
+    user.otpAttempts = 0;
+    await user.save();
+
+    console.log("Resent OTP:", newOtp);
+
+    try {
+      const message = `Your new OTP for Campus Sports Connect is: ${newOtp}. It is valid for 5 minutes.`;
+      await sendEmail({
+        email: user.email,
+        subject: 'Campus Sports Connect - New OTP',
+        message,
+      });
+      res.json({ message: 'OTP resent successfully' });
+    } catch (error) {
+      user.otp = undefined;
+      user.otpExpires = undefined;
+      await user.save({ validateBeforeSave: false });
+      return res.status(500).json({ message: 'Email could not be sent' });
     }
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -124,4 +188,5 @@ module.exports = {
   registerUser,
   verifyOTP,
   loginUser,
+  resendOTP,
 };

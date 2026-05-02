@@ -1,8 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
-
-const API = import.meta.env.VITE_API_URL;
+import axiosInstance from '../utils/axiosInstance';
 
 const Register = () => {
   const [formData, setFormData] = useState({ name: '', email: '', password: '', college: '' });
@@ -20,7 +18,7 @@ const Register = () => {
     setLoading(true);
 
     try {
-      const { data } = await axios.post(`${API}/api/auth/register`, formData);
+      const { data } = await axiosInstance.post('/api/auth/register', formData);
       // Redirect to OTP verification
       navigate('/verify-otp', { state: { userId: data.userId, email: formData.email } });
     } catch (err) {

@@ -12,7 +12,8 @@ import './App.css';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
-  const { user, loading } = useContext(AuthContext);
+  const { loading } = useContext(AuthContext);
+  const token = localStorage.getItem('token');
 
   if (loading) {
     return (
@@ -22,7 +23,7 @@ const ProtectedRoute = ({ children }) => {
     );
   }
 
-  if (!user) {
+  if (!token) {
     return <Navigate to="/login" replace />;
   }
 
@@ -30,7 +31,8 @@ const ProtectedRoute = ({ children }) => {
 };
 
 function App() {
-  const { user, loading } = useContext(AuthContext);
+  const { loading } = useContext(AuthContext);
+  const token = localStorage.getItem('token');
 
   if (loading) {
     return (
@@ -44,9 +46,9 @@ function App() {
     <>
       <Toaster position="top-right" />
       <Routes>
-        <Route path="/" element={user ? <Navigate to="/dashboard" /> : <Navigate to="/login" />} />
-        <Route path="/login" element={user ? <Navigate to="/dashboard" /> : <Login />} />
-        <Route path="/register" element={user ? <Navigate to="/dashboard" /> : <Register />} />
+        <Route path="/" element={token ? <Navigate to="/dashboard" /> : <Navigate to="/login" />} />
+        <Route path="/login" element={token ? <Navigate to="/dashboard" /> : <Login />} />
+        <Route path="/register" element={token ? <Navigate to="/dashboard" /> : <Register />} />
         <Route path="/verify-otp" element={<VerifyOTP />} />
         <Route 
           path="/dashboard" 

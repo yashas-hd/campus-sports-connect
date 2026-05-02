@@ -1,10 +1,10 @@
 import { useState, useEffect, useContext } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import axios from 'axios';
 import { io } from 'socket.io-client';
 import toast from 'react-hot-toast';
 import AuthContext from '../context/AuthContext';
 import Navbar from '../components/Navbar';
+import axiosInstance from '../utils/axiosInstance';
 
 const API = import.meta.env.VITE_API_URL;
 
@@ -34,12 +34,7 @@ const Dashboard = () => {
 
     const fetchEvents = async () => {
       try {
-        const config = {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
-        };
-        const { data } = await axios.get(`${API}/api/events`, config);
+        const { data } = await axiosInstance.get('/api/events');
         setEvents(data);
       } catch (error) {
         console.error('Error fetching events:', error);
@@ -88,18 +83,12 @@ const Dashboard = () => {
     setError('');
 
     try {
-      const config = {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      };
-
       const eventData = {
         ...formData,
         maxParticipants: formData.maxParticipants ? parseInt(formData.maxParticipants) : 0
       };
 
-      const { data } = await axios.post(`${API}/api/events`, eventData, config);
+      const { data } = await axiosInstance.post('/api/events', eventData);
 
       // Update local state (socket will also broadcast, but we can update optimistically or rely on the response)
       setEvents((prev) => {
@@ -207,8 +196,7 @@ const Dashboard = () => {
                       <button
                         onClick={async () => {
                           try {
-                            const config = { headers: { Authorization: `Bearer ${user.token}` } };
-                            const { data } = await axios.post(`${API}/api/events/${event._id}/join`, {}, config);
+                            const { data } = await axiosInstance.post(`/api/events/${event._id}/join`, {});
                             // Update local state
                             setEvents(events.map(e => e._id === data._id ? data : e));
                             toast.success('Successfully joined the event!');

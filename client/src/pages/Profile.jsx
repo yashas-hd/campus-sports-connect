@@ -1,11 +1,9 @@
 import { useState, useEffect, useContext } from 'react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
 import toast from 'react-hot-toast';
 import AuthContext from '../context/AuthContext';
 import Navbar from '../components/Navbar';
-
-const API = import.meta.env.VITE_API_URL;
+import axiosInstance from '../utils/axiosInstance';
 
 const Profile = () => {
   const { user, login } = useContext(AuthContext);
@@ -22,8 +20,7 @@ const Profile = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const config = { headers: { Authorization: `Bearer ${user.token}` } };
-        const { data } = await axios.get(`${API}/api/users/profile`, config);
+        const { data } = await axiosInstance.get('/api/users/profile');
         setProfileData(data);
         setFormData({
           name: data.name,
@@ -47,15 +44,13 @@ const Profile = () => {
   const handleUpdateProfile = async (e) => {
     e.preventDefault();
     try {
-      const config = { headers: { Authorization: `Bearer ${user.token}` } };
-      
       const payload = {
         name: formData.name,
         bio: formData.bio,
         sportsInterests: formData.sportsInterests.split(',').map(s => s.trim()).filter(s => s !== ''),
       };
 
-      const { data } = await axios.put(`${API}/api/users/profile`, payload, config);
+      const { data } = await axiosInstance.put('/api/users/profile', payload);
       
       // Update local context and state
       login({ ...user, name: data.name });

@@ -1,9 +1,7 @@
 import { useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import AuthContext from '../context/AuthContext';
-
-const API = import.meta.env.VITE_API_URL;
+import axiosInstance from '../utils/axiosInstance';
 
 const Login = () => {
   const [formData, setFormData] = useState({ email: '', password: '' });
@@ -22,13 +20,14 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const { data } = await axios.post(`${API}/api/auth/login`, formData);
+      const { data } = await axiosInstance.post('/api/auth/login', formData);
+      localStorage.setItem("token", data.token);
       login(data);
       navigate('/dashboard');
     } catch (err) {
       if (err.response?.status === 401 && err.response?.data?.userId) {
         // Redirect to OTP verification if not verified
-        navigate('/verify-otp', { state: { userId: err.response.data.userId } });
+        navigate('/verify-otp', { state: { userId: err.response.data.userId, email: formData.email } });
       } else {
         setError(err.response?.data?.message || 'Login failed');
       }
