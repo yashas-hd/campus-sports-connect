@@ -2,7 +2,6 @@ const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
-const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:5173";
 const http = require('http');
 const { Server } = require('socket.io');
 const connectDB = require('./config/db');
@@ -11,6 +10,7 @@ const eventRoutes = require('./routes/eventRoutes');
 const userRoutes = require('./routes/userRoutes');
 
 dotenv.config();
+const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:5173";
 
 connectDB();
 
