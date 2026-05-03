@@ -72,10 +72,6 @@ const verifyOTP = async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    if (user.isVerified) {
-      return res.status(400).json({ message: 'User already verified' });
-    }
-
     if (user.otpExpires < Date.now()) {
       return res.status(400).json({ message: "OTP expired" });
     }
@@ -152,10 +148,6 @@ const resendOTP = async (req, res) => {
 
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
-    }
-
-    if (user.isVerified) {
-      return res.status(400).json({ message: 'User already verified' });
     }
 
     const newOtp = Math.floor(100000 + Math.random() * 900000).toString();
