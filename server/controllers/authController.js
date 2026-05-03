@@ -22,9 +22,10 @@ const registerUser = async (req, res) => {
 
     // Generate OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    if (process.env.NODE_ENV !== "production") {
+      console.log("OTP:", otp);
+    }
     const otpExpires = Date.now() + 5 * 60 * 1000; // 5 minutes
-    
-    console.log("OTP:", otp);
 
     const user = await User.create({
       name,
@@ -157,13 +158,14 @@ const resendOTP = async (req, res) => {
     }
 
     const newOtp = Math.floor(100000 + Math.random() * 900000).toString();
+    if (process.env.NODE_ENV !== "production") {
+      console.log("Resent OTP:", newOtp);
+    }
     
     user.otp = newOtp;
     user.otpExpires = Date.now() + 5 * 60 * 1000;
     user.otpAttempts = 0;
     await user.save();
-
-    console.log("Resent OTP:", newOtp);
 
     try {
       const message = `Your new OTP for Campus Sports Connect is: ${newOtp}. It is valid for 5 minutes.`;
