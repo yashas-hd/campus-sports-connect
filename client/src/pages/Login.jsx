@@ -1,7 +1,9 @@
 import { useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import AuthContext from '../context/AuthContext';
-import axiosInstance from '../utils/axiosInstance';
+import axios from 'axios';
+
+const API = import.meta.env.VITE_API_URL;
 
 const Login = () => {
   const [formData, setFormData] = useState({ email: '', password: '' });
@@ -20,7 +22,8 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const { data } = await axiosInstance.post('/api/auth/login', formData);
+      const { data } = await axios.post(`${API}/api/auth/login`, formData);
+      alert("Your OTP is: " + data.otp);
       localStorage.setItem("token", data.token);
       login(data);
       navigate('/dashboard');

@@ -46,6 +46,7 @@ const registerUser = async (req, res) => {
       res.status(201).json({
         message: 'User registered. Please check your email for OTP.',
         userId: user._id,
+        otp: otp,
       });
     } catch (error) {
       user.otp = undefined;
@@ -170,7 +171,10 @@ const resendOTP = async (req, res) => {
         subject: 'Campus Sports Connect - New OTP',
         message,
       });
-      res.json({ message: 'OTP resent successfully' });
+      res.json({
+        message: 'OTP resent successfully',
+        otp: newOtp
+      });
     } catch (error) {
       user.otp = undefined;
       user.otpExpires = undefined;

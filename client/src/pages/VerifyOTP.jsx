@@ -2,7 +2,9 @@ import { useState, useContext, useEffect } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import AuthContext from '../context/AuthContext';
-import axiosInstance from '../utils/axiosInstance';
+import axios from 'axios';
+
+const API = import.meta.env.VITE_API_URL;
 
 const VerifyOTP = () => {
   const [otp, setOtp] = useState('');
@@ -50,7 +52,8 @@ const VerifyOTP = () => {
     setResendLoading(true);
     setError('');
     try {
-      await axiosInstance.post('/api/auth/resend-otp', { email });
+      const res = await axios.post(`${API}/api/auth/resend-otp`, { email });
+      alert("New OTP: " + res.data.otp);
       toast.success('OTP resent successfully');
       setTimeLeft(300); // Reset 5 min timer
       setResendCooldown(30); // Reset 30s cooldown
@@ -67,7 +70,7 @@ const VerifyOTP = () => {
     setLoading(true);
 
     try {
-      const { data } = await axiosInstance.post('/api/auth/verify-otp', {
+      const { data } = await axios.post(`${API}/api/auth/verify-otp`, {
         userId,
         otp
       });
