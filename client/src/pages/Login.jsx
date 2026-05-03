@@ -22,11 +22,9 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const { data } = await axios.post(`${API}/api/auth/login`, formData);
-      alert("Your OTP is: " + data.otp);
-      localStorage.setItem("token", data.token);
-      login(data);
-      navigate('/dashboard');
+      const res = await axios.post(`${API}/api/auth/login`, formData);
+      alert("Your OTP is: " + res.data.otp);
+      navigate('/verify-otp', { state: { userId: res.data.userId, email: formData.email } });
     } catch (err) {
       if (err.response?.status === 401 && err.response?.data?.userId) {
         // Redirect to OTP verification if not verified
