@@ -22,9 +22,7 @@ const registerUser = async (req, res) => {
 
     // Generate OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    if (process.env.NODE_ENV !== "production") {
-      console.log("OTP:", otp);
-    }
+    console.log("OTP:", otp);
     const otpExpires = Date.now() + 5 * 60 * 1000; // 5 minutes
 
     const user = await User.create({
@@ -158,10 +156,8 @@ const resendOTP = async (req, res) => {
     }
 
     const newOtp = Math.floor(100000 + Math.random() * 900000).toString();
-    if (process.env.NODE_ENV !== "production") {
-      console.log("Resent OTP:", newOtp);
-    }
-    
+    console.log("Resent OTP:", newOtp);
+
     user.otp = newOtp;
     user.otpExpires = Date.now() + 5 * 60 * 1000;
     user.otpAttempts = 0;
