@@ -52,22 +52,30 @@ const Profile = () => {
 
       const { data } = await axiosInstance.put('/api/users/profile', payload);
       
-      // Update local context and state
       login({ ...user, name: data.name });
       setProfileData({ ...profileData, name: data.name, bio: data.bio, sportsInterests: data.sportsInterests });
       setIsEditing(false);
-      toast.success('Profile updated successfully!');
+      toast.success('Profile updated successfully!', { icon: '✨' });
     } catch (error) {
       toast.error(error.response?.data?.message || 'Failed to update profile');
     }
   };
 
+  const getSportBadgeColor = (sport) => {
+    const s = sport.toLowerCase();
+    if (s.includes('basket')) return 'text-orange-400 border-orange-400 bg-orange-400/10';
+    if (s.includes('foot') || s.includes('soccer')) return 'text-neon-green border-neon-green bg-neon-green/10';
+    if (s.includes('tennis')) return 'text-yellow-400 border-yellow-400 bg-yellow-400/10';
+    if (s.includes('volley')) return 'text-neon-pink border-neon-pink bg-neon-pink/10';
+    return 'text-neon-blue border-neon-blue bg-neon-blue/10';
+  };
+
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 font-sans flex flex-col">
+      <div className="min-h-screen bg-dark-900 font-sans flex flex-col relative">
         <Navbar />
-        <div className="flex-1 flex justify-center items-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+        <div className="flex-1 flex justify-center items-center relative z-10">
+          <div className="animate-spin rounded-full h-14 w-14 border-b-2 border-neon-pink shadow-[0_0_15px_rgba(255,0,255,0.5)]"></div>
         </div>
       </div>
     );
@@ -76,40 +84,48 @@ const Profile = () => {
   const eventsToDisplay = activeTab === 'hosting' ? profileData.hostedEvents : profileData.joinedEvents;
 
   return (
-    <div className="min-h-screen bg-gray-50 font-sans pb-12">
+    <div className="min-h-screen bg-dark-900 text-gray-100 font-sans pb-12 relative overflow-hidden">
+      {/* Background Blobs */}
+      <div className="absolute -top-20 -left-20 w-96 h-96 bg-neon-pink rounded-full mix-blend-multiply filter blur-[128px] opacity-10 animate-blob"></div>
+      <div className="absolute top-1/2 -right-20 w-96 h-96 bg-neon-blue rounded-full mix-blend-multiply filter blur-[128px] opacity-10 animate-blob" style={{ animationDelay: '2s' }}></div>
+
       <Navbar />
       
-      <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 relative z-10">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           
           {/* Left Column: Profile Info */}
-          <div className="md:col-span-1 space-y-6">
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 text-center">
-              <div className="h-24 w-24 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 text-4xl font-bold uppercase mx-auto mb-4">
+          <div className="lg:col-span-1 space-y-6">
+            <div className="bg-dark-800/60 backdrop-blur-xl p-8 rounded-3xl shadow-2xl border border-dark-700 text-center relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-full h-24 bg-gradient-to-r from-neon-pink/20 to-neon-blue/20"></div>
+              <div className="relative h-28 w-28 rounded-full bg-dark-900 border-4 border-dark-800 flex items-center justify-center text-white text-5xl font-extrabold uppercase mx-auto mb-6 shadow-[0_0_20px_rgba(0,0,0,0.5)] z-10">
                 {profileData.name.charAt(0)}
+                <div className="absolute inset-0 rounded-full border border-neon-pink/50 shadow-[inset_0_0_10px_rgba(255,0,255,0.3)]"></div>
               </div>
               
               {!isEditing ? (
-                <>
-                  <h2 className="text-xl font-bold text-gray-900">{profileData.name}</h2>
-                  <p className="text-sm text-gray-500 mb-4">{profileData.college}</p>
+                <div className="relative z-10 animate-fade-in-up">
+                  <h2 className="text-2xl font-extrabold text-white">{profileData.name}</h2>
+                  <p className="text-sm font-medium text-neon-blue mt-1 mb-6">{profileData.college}</p>
                   
-                  <div className="text-left mt-6 space-y-4">
+                  <div className="text-left mt-6 space-y-6">
                     <div>
-                      <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">About Me</h3>
-                      <p className="text-sm text-gray-700">{profileData.bio || 'No bio added yet.'}</p>
+                      <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Mission Briefing</h3>
+                      <p className="text-sm text-gray-300 leading-relaxed bg-dark-900/50 p-4 rounded-xl border border-dark-700">
+                        {profileData.bio || 'No bio provided. Update your profile to tell others about yourself.'}
+                      </p>
                     </div>
                     <div>
-                      <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Sports Interests</h3>
-                      <div className="flex flex-wrap gap-2 mt-2">
+                      <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Combat Expertise (Sports)</h3>
+                      <div className="flex flex-wrap gap-2">
                         {profileData.sportsInterests?.length > 0 ? (
                           profileData.sportsInterests.map((sport, idx) => (
-                            <span key={idx} className="bg-indigo-50 text-indigo-700 text-xs px-2.5 py-1 rounded-full font-medium">
+                            <span key={idx} className="bg-dark-900 border border-dark-600 text-gray-300 text-xs font-bold px-3 py-1.5 rounded-lg">
                               {sport}
                             </span>
                           ))
                         ) : (
-                          <span className="text-sm text-gray-500">None specified.</span>
+                          <span className="text-sm text-gray-500 italic">None specified.</span>
                         )}
                       </div>
                     </div>
@@ -117,58 +133,58 @@ const Profile = () => {
                   
                   <button 
                     onClick={() => setIsEditing(true)}
-                    className="mt-8 w-full bg-gray-50 text-gray-700 border border-gray-200 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-100 transition-colors"
+                    className="mt-8 w-full bg-dark-700 text-white border border-dark-600 px-4 py-3 rounded-xl text-sm font-bold hover:bg-dark-600 hover:border-gray-500 transition-all duration-300"
                   >
-                    Edit Profile
+                    Edit Credentials
                   </button>
-                </>
+                </div>
               ) : (
-                <form onSubmit={handleUpdateProfile} className="text-left space-y-4 mt-4">
+                <form onSubmit={handleUpdateProfile} className="text-left space-y-5 mt-4 relative z-10 animate-fade-in-up">
                   <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">Name</label>
+                    <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5">Name</label>
                     <input
                       type="text"
                       name="name"
                       required
                       value={formData.name}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-indigo-500 text-sm"
+                      className="w-full px-4 py-2.5 bg-dark-900 border border-dark-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-neon-pink focus:border-neon-pink text-white transition-all text-sm"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">Bio</label>
+                    <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5">Bio</label>
                     <textarea
                       name="bio"
-                      rows="3"
+                      rows="4"
                       value={formData.bio}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-indigo-500 text-sm resize-none"
+                      className="w-full px-4 py-2.5 bg-dark-900 border border-dark-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-neon-blue focus:border-neon-blue text-white transition-all text-sm resize-none"
                     ></textarea>
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">Sports Interests (comma separated)</label>
+                    <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5">Sports (comma separated)</label>
                     <input
                       type="text"
                       name="sportsInterests"
                       value={formData.sportsInterests}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-indigo-500 text-sm"
+                      className="w-full px-4 py-2.5 bg-dark-900 border border-dark-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-neon-green focus:border-neon-green text-white transition-all text-sm"
                       placeholder="e.g., Basketball, Tennis"
                     />
                   </div>
-                  <div className="flex gap-2 pt-2">
+                  <div className="flex gap-3 pt-4">
                     <button
                       type="button"
                       onClick={() => setIsEditing(false)}
-                      className="flex-1 px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+                      className="flex-1 px-4 py-2.5 text-sm font-bold text-gray-300 bg-dark-700 border border-dark-600 rounded-lg hover:bg-dark-600 transition-all"
                     >
-                      Cancel
+                      Abort
                     </button>
                     <button
                       type="submit"
-                      className="flex-1 px-3 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md hover:bg-indigo-700"
+                      className="flex-1 px-4 py-2.5 text-sm font-bold text-dark-900 bg-gradient-to-r from-neon-pink to-neon-blue rounded-lg hover:shadow-[0_0_15px_rgba(255,0,255,0.4)] transition-all"
                     >
-                      Save
+                      Save Data
                     </button>
                   </div>
                 </form>
@@ -177,66 +193,68 @@ const Profile = () => {
           </div>
 
           {/* Right Column: Events */}
-          <div className="md:col-span-2 space-y-6">
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-              <div className="flex border-b border-gray-100">
+          <div className="lg:col-span-2 space-y-6">
+            <div className="bg-dark-800/60 backdrop-blur-xl rounded-3xl shadow-2xl border border-dark-700 overflow-hidden">
+              <div className="flex border-b border-dark-700">
                 <button
                   onClick={() => setActiveTab('hosting')}
-                  className={`flex-1 py-4 text-sm font-medium text-center transition-colors ${
-                    activeTab === 'hosting' ? 'text-indigo-600 border-b-2 border-indigo-600 bg-indigo-50/50' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                  className={`flex-1 py-5 text-sm font-bold text-center transition-all duration-300 uppercase tracking-wider ${
+                    activeTab === 'hosting' ? 'text-neon-blue border-b-2 border-neon-blue bg-dark-700/50' : 'text-gray-500 hover:text-gray-300 hover:bg-dark-800'
                   }`}
                 >
-                  Events I'm Hosting ({profileData.hostedEvents?.length || 0})
+                  Deployed Events ({profileData.hostedEvents?.length || 0})
                 </button>
                 <button
                   onClick={() => setActiveTab('joined')}
-                  className={`flex-1 py-4 text-sm font-medium text-center transition-colors ${
-                    activeTab === 'joined' ? 'text-indigo-600 border-b-2 border-indigo-600 bg-indigo-50/50' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                  className={`flex-1 py-5 text-sm font-bold text-center transition-all duration-300 uppercase tracking-wider ${
+                    activeTab === 'joined' ? 'text-neon-pink border-b-2 border-neon-pink bg-dark-700/50' : 'text-gray-500 hover:text-gray-300 hover:bg-dark-800'
                   }`}
                 >
-                  Events I've Joined ({profileData.joinedEvents?.length || 0})
+                  Joined Events ({profileData.joinedEvents?.length || 0})
                 </button>
               </div>
 
-              <div className="p-6">
+              <div className="p-8">
                 {eventsToDisplay?.length === 0 ? (
-                  <div className="text-center py-12">
-                    <div className="text-4xl mb-3">🏅</div>
-                    <h3 className="text-gray-900 font-medium mb-1">No events yet</h3>
-                    <p className="text-gray-500 text-sm">
+                  <div className="text-center py-16">
+                    <div className="text-6xl mb-6 opacity-50 drop-shadow-[0_0_15px_rgba(255,255,255,0.2)]">🏅</div>
+                    <h3 className="text-xl text-white font-bold mb-2">Radar Clear</h3>
+                    <p className="text-gray-400 text-base max-w-sm mx-auto mb-6">
                       {activeTab === 'hosting' 
-                        ? "You haven't created any events yet." 
-                        : "You haven't joined any events yet."}
+                        ? "You haven't initiated any operations yet." 
+                        : "You haven't enlisted in any operations yet."}
                     </p>
                     {activeTab === 'hosting' && (
-                      <Link to="/dashboard" className="inline-block mt-4 text-indigo-600 text-sm font-medium hover:text-indigo-800">
-                        Create one now &rarr;
+                      <Link to="/dashboard" className="inline-flex items-center justify-center px-6 py-2.5 rounded-lg text-sm font-bold text-neon-blue border border-neon-blue hover:bg-neon-blue/10 transition-all duration-300 shadow-[0_0_10px_rgba(0,243,255,0.2)]">
+                        Initialize One Now &rarr;
                       </Link>
                     )}
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    {eventsToDisplay.map((event) => (
+                    {eventsToDisplay.map((event, index) => (
                       <Link 
                         key={event._id} 
                         to={`/events/${event._id}`}
-                        className="block bg-gray-50 rounded-xl p-4 border border-gray-100 hover:border-indigo-200 hover:bg-indigo-50/30 transition-all group"
+                        className="block bg-dark-900/80 rounded-2xl p-5 border border-dark-700 hover:border-dark-500 transition-all duration-300 group hover:-translate-y-1 shadow-lg hover:shadow-[0_5px_15px_rgba(0,0,0,0.5)] animate-fade-in-up"
+                        style={{ animationDelay: `${index * 0.1}s` }}
                       >
-                        <div className="flex justify-between items-start">
+                        <div className="flex justify-between items-start md:items-center flex-col md:flex-row gap-4">
                           <div>
-                            <div className="flex items-center gap-2 mb-1">
-                              <span className="bg-indigo-100 text-indigo-700 text-[10px] font-bold px-2 py-0.5 rounded-sm uppercase tracking-wider">
+                            <div className="flex items-center gap-3 mb-2">
+                              <span className={`text-[10px] font-bold px-2.5 py-1 rounded-md uppercase tracking-widest border ${getSportBadgeColor(event.sport)}`}>
                                 {event.sport}
                               </span>
-                              <h4 className="font-bold text-gray-900 group-hover:text-indigo-600 transition-colors">{event.title}</h4>
+                              <h4 className="font-extrabold text-lg text-white group-hover:text-neon-blue transition-colors line-clamp-1">{event.title}</h4>
                             </div>
-                            <p className="text-xs text-gray-500 flex items-center gap-1">
-                              📅 {new Date(event.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                            <p className="text-sm text-gray-400 flex items-center gap-2 font-medium">
+                              <span className="text-neon-pink">📅</span> {new Date(event.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                             </p>
                           </div>
-                          <div className="text-right">
-                            <span className="text-xs font-medium text-gray-500 bg-white px-2 py-1 rounded-md border border-gray-200 shadow-sm">
-                              {event.participants?.length} / {event.maxParticipants || '∞'} px
+                          <div className="self-start md:self-center">
+                            <span className="text-xs font-bold text-gray-300 bg-dark-800 px-3 py-1.5 rounded-lg border border-dark-600 shadow-inner flex items-center gap-2">
+                              <span className="text-neon-blue">👥</span>
+                              {event.participants?.length || 1} / {event.maxParticipants || '∞'}
                             </span>
                           </div>
                         </div>

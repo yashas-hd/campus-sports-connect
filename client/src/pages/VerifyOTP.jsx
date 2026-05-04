@@ -8,7 +8,6 @@ const API = import.meta.env.VITE_API_URL;
 
 const VerifyOTP = () => {
   const [otp, setOtp] = useState('');
-  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [resendLoading, setResendLoading] = useState(false);
   const [timeLeft, setTimeLeft] = useState(300); // 5 minutes
@@ -50,11 +49,10 @@ const VerifyOTP = () => {
 
   const handleResend = async () => {
     setResendLoading(true);
-    setError('');
     try {
       const res = await axios.post(`${API}/api/auth/resend-otp`, { email });
-      alert("New OTP: " + res.data.otp);
       toast.success('OTP resent successfully');
+      toast("Demo OTP: " + res.data.otp, { icon: '🔑', duration: 8000 });
       setTimeLeft(300); // Reset 5 min timer
       setResendCooldown(30); // Reset 30s cooldown
     } catch (err) {
@@ -66,7 +64,6 @@ const VerifyOTP = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
     setLoading(true);
 
     try {
@@ -76,35 +73,36 @@ const VerifyOTP = () => {
       });
       localStorage.setItem("token", data.token);
       login(data);
+      toast.success("Verification successful!");
       navigate('/dashboard');
     } catch (err) {
-      setError(err.response?.data?.message || 'Verification failed');
+      toast.error(err.response?.data?.message || 'Verification failed');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8 bg-white p-10 rounded-2xl shadow-xl">
+    <div className="min-h-screen flex items-center justify-center bg-dark-900 relative overflow-hidden py-12 px-4 sm:px-6 lg:px-8">
+      {/* Animated Background Blobs */}
+      <div className="absolute top-10 -left-10 w-96 h-96 bg-neon-blue rounded-full mix-blend-multiply filter blur-[128px] opacity-20 animate-blob"></div>
+      <div className="absolute top-0 -right-10 w-96 h-96 bg-neon-pink rounded-full mix-blend-multiply filter blur-[128px] opacity-20 animate-blob" style={{ animationDelay: '2s' }}></div>
+      <div className="absolute -bottom-8 left-1/2 w-96 h-96 bg-neon-green rounded-full mix-blend-multiply filter blur-[128px] opacity-20 animate-blob" style={{ animationDelay: '4s' }}></div>
+
+      <div className="relative max-w-md w-full space-y-8 bg-dark-800/60 backdrop-blur-xl p-10 rounded-2xl shadow-2xl border border-dark-700 z-10 animate-fade-in-up">
         <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 tracking-tight">
-            Verify your email
+          <h2 className="mt-6 text-center text-4xl font-extrabold text-white tracking-tight">
+            Verify Email
           </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            We sent a 6-digit code to <span className="font-medium text-indigo-600">{email || 'your email'}</span>
+          <p className="mt-2 text-center text-sm text-gray-400">
+            We sent a 6-digit code to <span className="font-medium text-neon-blue">{email || 'your email'}</span>
           </p>
           <p className="mt-1 text-center text-xs font-semibold text-gray-500">
             Expires in {formatTime(timeLeft)}
           </p>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          {error && (
-            <div className="bg-red-50 text-red-500 p-3 rounded-lg text-sm text-center border border-red-100">
-              {error}
-            </div>
-          )}
-          <div className="rounded-md shadow-sm space-y-4">
+          <div className="space-y-4">
             <div>
               <label htmlFor="otp" className="sr-only">OTP Code</label>
               <input
@@ -113,7 +111,7 @@ const VerifyOTP = () => {
                 type="text"
                 required
                 maxLength="6"
-                className="appearance-none rounded-lg relative block w-full px-3 py-4 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-center text-2xl tracking-widest transition-all"
+                className="appearance-none rounded-lg relative block w-full px-3 py-4 bg-dark-900/50 border border-dark-700 placeholder-gray-500 text-white focus:outline-none focus:ring-2 focus:ring-neon-green focus:border-neon-green text-center text-3xl tracking-[1em] font-mono transition-all disabled:opacity-50"
                 placeholder="------"
                 value={otp}
                 onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
@@ -126,27 +124,27 @@ const VerifyOTP = () => {
             <button
               type="submit"
               disabled={loading || otp.length !== 6 || timeLeft === 0}
-              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
+              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-bold rounded-lg text-dark-900 bg-gradient-to-r from-neon-green to-neon-blue hover:from-neon-blue hover:to-neon-green focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-dark-900 focus:ring-neon-green transition-all duration-500 hover:shadow-[0_0_20px_rgba(57,255,20,0.4)] disabled:opacity-70 disabled:cursor-not-allowed"
             >
               {loading ? (
                  <span className="flex items-center">
-                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-dark-900 mr-2"></div>
                    Verifying...
                  </span>
-              ) : 'Verify Email'}
+              ) : 'Verify Code'}
             </button>
           </div>
           
-          <div className="text-center mt-4 flex flex-col gap-2">
+          <div className="text-center mt-6 flex flex-col gap-3">
             <button
               type="button"
               onClick={handleResend}
               disabled={resendCooldown > 0 || resendLoading}
-              className="text-sm font-medium text-indigo-600 hover:text-indigo-500 transition-colors disabled:text-gray-400 disabled:cursor-not-allowed"
+              className="text-sm font-medium text-neon-pink hover:text-neon-blue transition-colors disabled:text-gray-600 disabled:cursor-not-allowed"
             >
               {resendLoading ? 'Sending...' : resendCooldown > 0 ? `Resend OTP in ${resendCooldown}s` : 'Resend OTP'}
             </button>
-            <Link to="/login" className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">
+            <Link to="/login" className="text-sm font-medium text-gray-500 hover:text-white transition-colors">
               Back to Login
             </Link>
           </div>

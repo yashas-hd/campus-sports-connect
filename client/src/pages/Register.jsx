@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { toast } from 'react-hot-toast';
 
 const API = import.meta.env.VITE_API_URL;
 
 const Register = () => {
   const [formData, setFormData] = useState({ name: '', email: '', password: '', college: '' });
-  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -16,48 +16,48 @@ const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
     setLoading(true);
 
     try {
       const { data } = await axios.post(`${API}/api/auth/register`, formData);
-      alert("Your OTP is: " + data.otp);
+      toast.success("OTP Sent successfully!");
+      toast("Demo OTP: " + data.otp, { icon: '🔑', duration: 8000 });
       // Redirect to OTP verification
       navigate('/verify-otp', { state: { userId: data.userId, email: formData.email } });
     } catch (err) {
-      setError(err.response?.data?.message || 'Registration failed');
+      toast.error(err.response?.data?.message || 'Registration failed');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8 bg-white p-10 rounded-2xl shadow-xl">
+    <div className="min-h-screen flex items-center justify-center bg-dark-900 relative overflow-hidden py-12 px-4 sm:px-6 lg:px-8">
+      {/* Animated Background Blobs */}
+      <div className="absolute top-10 -left-10 w-96 h-96 bg-neon-blue rounded-full mix-blend-multiply filter blur-[128px] opacity-20 animate-blob"></div>
+      <div className="absolute top-0 -right-10 w-96 h-96 bg-neon-pink rounded-full mix-blend-multiply filter blur-[128px] opacity-20 animate-blob" style={{ animationDelay: '2s' }}></div>
+      <div className="absolute -bottom-8 left-1/2 w-96 h-96 bg-neon-green rounded-full mix-blend-multiply filter blur-[128px] opacity-20 animate-blob" style={{ animationDelay: '4s' }}></div>
+
+      <div className="relative max-w-md w-full space-y-8 bg-dark-800/60 backdrop-blur-xl p-10 rounded-2xl shadow-2xl border border-dark-700 z-10 animate-fade-in-up">
         <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 tracking-tight">
-            Create an account
+          <h2 className="mt-6 text-center text-4xl font-extrabold text-white tracking-tight">
+            Create an Account
           </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
+          <p className="mt-2 text-center text-sm text-gray-400">
             Already have an account?{' '}
-            <Link to="/login" className="font-medium text-indigo-600 hover:text-indigo-500 transition-colors">
+            <Link to="/login" className="font-medium text-neon-pink hover:text-neon-blue transition-colors duration-300">
               Sign in here
             </Link>
           </p>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          {error && (
-            <div className="bg-red-50 text-red-500 p-3 rounded-lg text-sm text-center border border-red-100">
-              {error}
-            </div>
-          )}
-          <div className="rounded-md shadow-sm space-y-4">
+          <div className="space-y-4">
             <div>
               <input
                 name="name"
                 type="text"
                 required
-                className="appearance-none rounded-lg relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition-all"
+                className="appearance-none rounded-lg relative block w-full px-4 py-3 bg-dark-900/50 border border-dark-700 placeholder-gray-500 text-white focus:outline-none focus:ring-2 focus:ring-neon-blue focus:border-neon-blue focus:bg-dark-900 transition-all sm:text-sm"
                 placeholder="Full Name"
                 value={formData.name}
                 onChange={handleChange}
@@ -68,7 +68,7 @@ const Register = () => {
                 name="email"
                 type="email"
                 required
-                className="appearance-none rounded-lg relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition-all"
+                className="appearance-none rounded-lg relative block w-full px-4 py-3 bg-dark-900/50 border border-dark-700 placeholder-gray-500 text-white focus:outline-none focus:ring-2 focus:ring-neon-blue focus:border-neon-blue focus:bg-dark-900 transition-all sm:text-sm"
                 placeholder="College Email address"
                 value={formData.email}
                 onChange={handleChange}
@@ -79,7 +79,7 @@ const Register = () => {
                 name="college"
                 type="text"
                 required
-                className="appearance-none rounded-lg relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition-all"
+                className="appearance-none rounded-lg relative block w-full px-4 py-3 bg-dark-900/50 border border-dark-700 placeholder-gray-500 text-white focus:outline-none focus:ring-2 focus:ring-neon-blue focus:border-neon-blue focus:bg-dark-900 transition-all sm:text-sm"
                 placeholder="College Name"
                 value={formData.college}
                 onChange={handleChange}
@@ -91,7 +91,7 @@ const Register = () => {
                 type="password"
                 required
                 minLength="6"
-                className="appearance-none rounded-lg relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition-all"
+                className="appearance-none rounded-lg relative block w-full px-4 py-3 bg-dark-900/50 border border-dark-700 placeholder-gray-500 text-white focus:outline-none focus:ring-2 focus:ring-neon-blue focus:border-neon-blue focus:bg-dark-900 transition-all sm:text-sm"
                 placeholder="Password (min 6 characters)"
                 value={formData.password}
                 onChange={handleChange}
@@ -103,9 +103,9 @@ const Register = () => {
             <button
               type="submit"
               disabled={loading}
-              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
+              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-bold rounded-lg text-dark-900 bg-gradient-to-r from-neon-pink to-neon-blue hover:from-neon-blue hover:to-neon-pink focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-dark-900 focus:ring-neon-pink transition-all duration-500 hover:shadow-[0_0_20px_rgba(255,0,255,0.4)] disabled:opacity-70 disabled:cursor-not-allowed"
             >
-              {loading ? 'Registering...' : 'Register'}
+              {loading ? 'Registering...' : 'Join Now'}
             </button>
           </div>
         </form>
