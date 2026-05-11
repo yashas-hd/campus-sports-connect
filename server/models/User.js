@@ -34,6 +34,10 @@ const userSchema = mongoose.Schema(
       type: [String],
       default: [],
     },
+    favoriteSports: {
+      type: [String],
+      default: [],
+    },
     isVerified: {
       type: Boolean,
       default: false, // Set to true after OTP verification

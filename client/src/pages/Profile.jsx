@@ -11,6 +11,8 @@ const Profile = () => {
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [activeTab, setActiveTab] = useState('hosting'); // 'hosting' or 'joined'
+  const [favoriteSports, setFavoriteSports] = useState([]);
+  const [isSavingFavorites, setIsSavingFavorites] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     bio: '',
@@ -22,6 +24,7 @@ const Profile = () => {
       try {
         const { data } = await axiosInstance.get('/api/users/profile');
         setProfileData(data);
+        setFavoriteSports(data.favoriteSports || []);
         setFormData({
           name: data.name,
           bio: data.bio || '',
@@ -39,6 +42,37 @@ const Profile = () => {
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const sportsOptions = [
+    "Cricket",
+    "Football",
+    "Volleyball",
+    "Basketball",
+    "Badminton"
+  ];
+
+  const toggleFavoriteSport = (sport) => {
+    setFavoriteSports((prev) =>
+      prev.includes(sport)
+        ? prev.filter((s) => s !== sport)
+        : [...prev, sport]
+    );
+  };
+
+  const handleSaveFavorites = async () => {
+    setIsSavingFavorites(true);
+    try {
+      const { data } = await axiosInstance.put('/api/users/favorite-sports', {
+        favoriteSports
+      });
+      setProfileData({ ...profileData, favoriteSports: data.favoriteSports });
+      toast.success('Favorite sports updated!', { icon: '⚡' });
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to update favorites');
+    } finally {
+      setIsSavingFavorites(false);
+    }
   };
 
   const handleUpdateProfile = async (e) => {
@@ -189,6 +223,41 @@ const Profile = () => {
                   </div>
                 </form>
               )}
+            </div>
+
+            {/* Favorite Sports Section */}
+            <div className="bg-dark-800/60 backdrop-blur-xl p-8 rounded-3xl shadow-2xl border border-dark-700 relative overflow-hidden">
+              <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
+                <span className="text-neon-pink">⚡</span> Favorite Sports
+              </h2>
+              <p className="text-sm text-gray-400 mb-6">
+                Select your favorite sports to receive personalized event recommendations on your dashboard.
+              </p>
+              <div className="flex flex-wrap gap-3 mb-6">
+                {sportsOptions.map(sport => {
+                  const isSelected = favoriteSports.includes(sport);
+                  return (
+                    <button
+                      key={sport}
+                      onClick={() => toggleFavoriteSport(sport)}
+                      className={`px-4 py-2 rounded-full text-sm font-bold transition-all duration-300 shadow-md border ${
+                        isSelected
+                          ? 'bg-neon-pink/10 text-neon-pink border-neon-pink shadow-[0_0_15px_rgba(255,0,255,0.3)]'
+                          : 'bg-dark-900 text-gray-400 border-dark-600 hover:text-white hover:border-gray-500'
+                      }`}
+                    >
+                      {sport}
+                    </button>
+                  );
+                })}
+              </div>
+              <button
+                onClick={handleSaveFavorites}
+                disabled={isSavingFavorites}
+                className="w-full bg-dark-700 text-white border border-dark-600 px-4 py-3 rounded-xl text-sm font-bold hover:bg-neon-pink hover:text-dark-900 hover:border-neon-pink transition-all duration-300 shadow-[0_0_10px_rgba(0,0,0,0.5)] hover:shadow-[0_0_20px_rgba(255,0,255,0.4)] disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isSavingFavorites ? 'Saving...' : 'Save Preferences'}
+              </button>
             </div>
           </div>
 

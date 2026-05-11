@@ -25,6 +25,7 @@ const getUserProfile = async (req, res) => {
         college: user.college,
         bio: user.bio,
         sportsInterests: user.sportsInterests,
+        favoriteSports: user.favoriteSports,
         hostedEvents,
         joinedEvents,
       });
@@ -72,7 +73,30 @@ const updateUserProfile = async (req, res) => {
   }
 };
 
+// @desc    Update user favorite sports
+// @route   PUT /api/users/favorite-sports
+// @access  Private
+const updateFavoriteSports = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+
+    if (user) {
+      user.favoriteSports = req.body.favoriteSports || user.favoriteSports;
+      const updatedUser = await user.save();
+
+      res.json({
+        favoriteSports: updatedUser.favoriteSports,
+      });
+    } else {
+      res.status(404).json({ message: 'User not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   getUserProfile,
   updateUserProfile,
+  updateFavoriteSports,
 };

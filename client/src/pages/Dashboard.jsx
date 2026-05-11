@@ -91,6 +91,7 @@ const Dashboard = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterSport, setFilterSport] = useState('All');
   const [filterStatus, setFilterStatus] = useState('All');
+  const [userProfile, setUserProfile] = useState(null);
   const [formData, setFormData] = useState({
     title: '',
     sport: '',
@@ -109,18 +110,22 @@ const Dashboard = () => {
       return;
     }
 
-    const fetchEvents = async () => {
+    const fetchData = async () => {
       try {
-        const { data } = await axiosInstance.get('/api/events');
-        setEvents(data);
+        const [eventsRes, profileRes] = await Promise.all([
+          axiosInstance.get('/api/events'),
+          axiosInstance.get('/api/users/profile')
+        ]);
+        setEvents(eventsRes.data);
+        setUserProfile(profileRes.data);
       } catch (error) {
-        toast.error('Error fetching events');
+        toast.error('Error fetching dashboard data');
       } finally {
         setLoading(false);
       }
     };
 
-    fetchEvents();
+    fetchData();
 
     // Socket.io integration
     const socket = io(API);
@@ -222,6 +227,13 @@ const Dashboard = () => {
   const filterSportsList = ["All", "Cricket", "Football", "Volleyball", "Basketball", "Badminton"];
   const filterStatusList = ["All", "Upcoming", "Ongoing", "Joined"];
 
+  const favoriteSports = userProfile?.favoriteSports || [];
+  const recommendedEvents = events.filter(event => 
+    event.status !== 'completed' &&
+    event.status !== 'cancelled' &&
+    favoriteSports.some(sport => event.sport?.toLowerCase().includes(sport.toLowerCase()))
+  );
+
   return (
     <div className="min-h-screen bg-dark-900 text-gray-100 font-sans relative">
       <Navbar />
@@ -288,6 +300,68 @@ const Dashboard = () => {
             ))}
           </div>
         </section>
+
+        {/* Recommended Events Section */}
+        {favoriteSports.length > 0 && (
+          <section className="mb-12">
+            <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
+              <span className="text-3xl">⭐</span> Recommended Events
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {loading ? (
+                <div className="col-span-full flex justify-center py-10">
+                  <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-neon-pink shadow-[0_0_15px_rgba(255,0,255,0.5)]"></div>
+                </div>
+              ) : recommendedEvents.length === 0 ? (
+                <div className="col-span-full text-center py-10 text-gray-400 bg-dark-800/40 backdrop-blur-md rounded-2xl border border-dark-700">
+                  <span className="text-4xl block mb-2 opacity-50">🤷‍♂️</span>
+                  No personalized recommendations yet for your favorite sports.
+                </div>
+              ) : (
+                recommendedEvents.slice(0, 3).map((event) => (
+                  <div key={event._id} className="bg-dark-800/80 backdrop-blur-sm rounded-2xl overflow-hidden border border-neon-pink/30 hover:border-neon-pink/70 transition-all duration-500 hover:-translate-y-2 shadow-[0_0_15px_rgba(255,0,255,0.1)] hover:shadow-[0_10px_30px_rgba(255,0,255,0.25)] flex flex-col group">
+                    <div className="p-6 flex-grow flex flex-col relative overflow-hidden">
+                      <div className="absolute -right-10 -bottom-10 w-40 h-40 bg-neon-pink/10 blur-[50px] rounded-full group-hover:bg-neon-pink/20 transition-colors duration-700 z-0"></div>
+                      
+                      <div className="relative z-10 mb-3 flex justify-between items-start">
+                        <span className={`text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider backdrop-blur-md ${getSportBadgeColor(event.sport)}`}>
+                          {event.sport}
+                        </span>
+                        <span className="text-[10px] font-bold bg-neon-pink/20 text-neon-pink px-2 py-1 rounded uppercase tracking-widest border border-neon-pink/30">
+                          Recommended
+                        </span>
+                      </div>
+
+                      <div className="relative z-10 mb-4">
+                        <h3 className="text-2xl font-extrabold text-white group-hover:text-neon-pink transition-colors line-clamp-2">{event.title}</h3>
+                      </div>
+                      
+                      <div className="relative z-10 space-y-3 mb-6 flex-grow">
+                        <div className="flex items-center text-sm text-gray-300 font-medium">
+                          <span className="mr-3 text-neon-pink drop-shadow-[0_0_5px_rgba(255,0,255,0.5)]">📅</span>
+                          {new Date(event.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                        </div>
+                        <div className="flex items-center text-sm text-gray-300 font-medium">
+                          <span className="mr-3 text-neon-green drop-shadow-[0_0_5px_rgba(57,255,20,0.5)]">📍</span>
+                          <span className="line-clamp-1">{event.location}</span>
+                        </div>
+                      </div>
+                      
+                      <div className="relative z-10 pt-5 border-t border-dark-700 mt-auto">
+                        <Link
+                          to={`/events/${event._id}`}
+                          className="block text-center w-full bg-dark-700 text-white font-bold py-3 rounded-lg hover:bg-neon-pink hover:text-dark-900 transition-all duration-300 shadow-[0_0_10px_rgba(0,0,0,0.5)] hover:shadow-[0_0_15px_rgba(255,0,255,0.4)]"
+                        >
+                          View Details
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </section>
+        )}
 
         {/* Radar & Search Section */}
         <section className="mb-12 bg-dark-800/50 backdrop-blur-sm p-6 rounded-3xl border border-dark-700 shadow-xl">
