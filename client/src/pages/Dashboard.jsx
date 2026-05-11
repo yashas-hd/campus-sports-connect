@@ -86,6 +86,11 @@ const Dashboard = () => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [selectedSport, setSelectedSport] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Search & Filter state
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterSport, setFilterSport] = useState('All');
+  const [filterStatus, setFilterStatus] = useState('All');
   const [formData, setFormData] = useState({
     title: '',
     sport: '',
@@ -194,6 +199,29 @@ const Dashboard = () => {
     return 'text-neon-blue border-neon-blue bg-neon-blue/10';
   };
 
+  const filteredEvents = events.filter(event => {
+    const searchMatch = 
+      event.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      event.sport?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      event.location?.toLowerCase().includes(searchQuery.toLowerCase());
+      
+    const sportMatch = filterSport === 'All' || event.sport?.toLowerCase() === filterSport.toLowerCase();
+    
+    let statusMatch = true;
+    if (filterStatus === 'Upcoming') {
+      statusMatch = event.status === 'upcoming' || !event.status; // fallback if status missing
+    } else if (filterStatus === 'Ongoing') {
+      statusMatch = event.status === 'ongoing';
+    } else if (filterStatus === 'Joined') {
+      statusMatch = event.participants?.some(p => p === user._id || p._id === user._id) || event.creator === user._id;
+    }
+    
+    return searchMatch && sportMatch && statusMatch;
+  });
+
+  const filterSportsList = ["All", "Cricket", "Football", "Volleyball", "Basketball", "Badminton"];
+  const filterStatusList = ["All", "Upcoming", "Ongoing", "Joined"];
+
   return (
     <div className="min-h-screen bg-dark-900 text-gray-100 font-sans relative">
       <Navbar />
@@ -261,23 +289,78 @@ const Dashboard = () => {
           </div>
         </section>
 
-        {/* Upcoming Events Section */}
+        {/* Radar & Search Section */}
+        <section className="mb-12 bg-dark-800/50 backdrop-blur-sm p-6 rounded-3xl border border-dark-700 shadow-xl">
+          <div className="flex flex-col md:flex-row gap-6 items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold text-white flex items-center gap-3 whitespace-nowrap">
+              <span className="text-3xl">🎯</span> Radar
+            </h2>
+            <div className="relative w-full max-w-md">
+              <span className="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-500">
+                🔍
+              </span>
+              <input
+                type="text"
+                placeholder="Search sports events..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full bg-dark-900 border border-dark-600 rounded-full py-3 pl-12 pr-4 text-white focus:outline-none focus:border-neon-blue focus:ring-1 focus:ring-neon-blue transition-all shadow-[0_0_15px_rgba(0,0,0,0.5)] placeholder-gray-500"
+              />
+            </div>
+          </div>
+          
+          <div className="flex flex-col lg:flex-row gap-6 justify-between items-start lg:items-center">
+            {/* Sport Category Filters */}
+            <div className="flex flex-wrap gap-2">
+              {filterSportsList.map(sport => (
+                <button
+                  key={sport}
+                  onClick={() => setFilterSport(sport)}
+                  className={`px-4 py-2 rounded-full text-sm font-bold transition-all duration-300 shadow-md ${
+                    filterSport === sport
+                      ? 'bg-neon-blue text-dark-900 shadow-[0_0_15px_rgba(0,243,255,0.4)]'
+                      : 'bg-dark-900 text-gray-400 border border-dark-600 hover:text-white hover:border-neon-blue/50'
+                  }`}
+                >
+                  {sport}
+                </button>
+              ))}
+            </div>
+            
+            {/* Status Filters */}
+            <div className="flex flex-wrap gap-2">
+              {filterStatusList.map(status => (
+                <button
+                  key={status}
+                  onClick={() => setFilterStatus(status)}
+                  className={`px-4 py-2 rounded-full text-sm font-bold transition-all duration-300 shadow-md ${
+                    filterStatus === status
+                      ? 'bg-neon-pink text-white shadow-[0_0_15px_rgba(255,0,255,0.4)] border border-neon-pink'
+                      : 'bg-dark-900 text-gray-400 border border-dark-600 hover:text-white hover:border-neon-pink/50'
+                  }`}
+                >
+                  {status}
+                </button>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Filtered Events List */}
         <section className="mb-12">
-          <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
-            <span className="text-3xl">🏆</span> Upcoming Events
-          </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {loading ? (
               <div className="col-span-full flex justify-center py-10">
                 <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-neon-blue shadow-[0_0_15px_rgba(0,243,255,0.5)]"></div>
               </div>
-            ) : events.length === 0 ? (
-              <div className="col-span-full text-center py-10 text-gray-400 bg-dark-800/40 backdrop-blur-md rounded-2xl border border-dark-700">
-                <span className="text-4xl block mb-2 opacity-50">📡</span>
-                No events on the radar. Be the first to create one!
+            ) : filteredEvents.length === 0 ? (
+              <div className="col-span-full text-center py-12 text-gray-400 bg-dark-800/40 backdrop-blur-md rounded-3xl border border-dark-700 shadow-inner">
+                <span className="text-5xl block mb-4 opacity-50">📭</span>
+                <p className="text-xl font-bold text-white mb-2">No matching events found</p>
+                <p className="text-sm">Try adjusting your search or filters.</p>
               </div>
             ) : (
-              events.map((event) => (
+              filteredEvents.map((event) => (
                 <div key={event._id} className="bg-dark-800/80 backdrop-blur-sm rounded-2xl overflow-hidden border border-dark-700 hover:border-neon-blue/50 transition-all duration-500 hover:-translate-y-2 shadow-lg hover:shadow-[0_10px_30px_rgba(0,243,255,0.15)] flex flex-col group">
                   <div className="p-6 flex-grow flex flex-col relative overflow-hidden">
                     <div className="absolute -right-10 -bottom-10 w-40 h-40 bg-neon-blue/10 blur-[50px] rounded-full group-hover:bg-neon-pink/20 transition-colors duration-700 z-0"></div>
