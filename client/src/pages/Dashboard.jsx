@@ -8,6 +8,45 @@ import axiosInstance from '../utils/axiosInstance';
 
 const API = import.meta.env.VITE_API_URL;
 
+const upcomingEvents = [
+  {
+    title: "Cricket Tournament",
+    time: "Tomorrow • 4:00 PM",
+    location: "College Ground"
+  },
+  {
+    title: "Football Practice",
+    time: "Saturday • 6:00 PM",
+    location: "Main Stadium"
+  },
+  {
+    title: "Volleyball Match",
+    time: "Sunday • 5:30 PM",
+    location: "Indoor Court"
+  }
+];
+
+const ongoingEvents = [
+  {
+    title: "Basketball Match",
+    status: "Live Now",
+    location: "Court 1"
+  },
+  {
+    title: "Badminton Doubles",
+    status: "Ongoing",
+    location: "Court 2"
+  }
+];
+
+const sports = [
+  "🏏 Cricket",
+  "⚽ Football",
+  "🏐 Volleyball",
+  "🏀 Basketball",
+  "🏸 Badminton"
+];
+
 const Dashboard = () => {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -126,12 +165,13 @@ const Dashboard = () => {
       <Navbar />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 relative z-10">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
+        {/* Welcome Banner */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-4 bg-dark-800/60 backdrop-blur-md p-8 rounded-3xl border border-dark-700 shadow-xl">
           <div>
-            <h1 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400">
-              Campus Radar
+            <h1 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400 mb-2">
+              Welcome back 👋
             </h1>
-            <p className="text-gray-400 mt-2 font-medium">Discover and join sports activities around campus</p>
+            <p className="text-gray-400 text-lg font-medium">Find and join sports activities happening around campus.</p>
           </div>
           <button
             onClick={() => setIsCreateModalOpen(true)}
@@ -142,94 +182,80 @@ const Dashboard = () => {
           </button>
         </div>
 
-        {loading ? (
-          <div className="flex justify-center items-center h-64">
-            <div className="animate-spin rounded-full h-14 w-14 border-b-2 border-neon-blue shadow-[0_0_15px_rgba(0,243,255,0.5)]"></div>
+        {/* Popular Sports Section */}
+        <section className="mb-12">
+          <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
+            <span className="text-3xl">⚡</span> Popular Sports
+          </h2>
+          <div className="flex flex-wrap gap-4">
+            {sports.map((sport, index) => (
+              <div key={index} className="bg-dark-800/80 backdrop-blur-sm border border-dark-700 hover:border-neon-blue/50 rounded-xl px-6 py-3 text-gray-200 font-bold hover:text-white transition-all duration-300 cursor-pointer shadow-lg hover:shadow-[0_5px_15px_rgba(0,243,255,0.2)] hover:-translate-y-1">
+                {sport}
+              </div>
+            ))}
           </div>
-        ) : events.length === 0 ? (
-          <div className="bg-dark-800/40 backdrop-blur-md rounded-3xl p-16 text-center border border-dark-700 shadow-xl">
-            <div className="mx-auto w-28 h-28 bg-dark-700/50 rounded-full flex items-center justify-center mb-6 shadow-[inset_0_0_20px_rgba(0,0,0,0.5)] border border-dark-600">
-              <span className="text-5xl drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]">🏆</span>
-            </div>
-            <h3 className="text-2xl font-bold text-white mb-2">No events on the radar</h3>
-            <p className="text-gray-400 mb-8 text-lg">Be the pioneer! Start the first sports event.</p>
-            <button
-              onClick={() => setIsCreateModalOpen(true)}
-              className="px-8 py-3 rounded-full text-sm font-bold text-neon-blue border border-neon-blue hover:bg-neon-blue/10 transition-all duration-300 shadow-[0_0_10px_rgba(0,243,255,0.2)]"
-            >
-              Start an Event
-            </button>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {events.map((event) => (
-              <div key={event._id} className="bg-dark-800/80 backdrop-blur-sm rounded-2xl overflow-hidden border border-dark-700 hover:border-neon-blue/50 group transition-all duration-500 hover:-translate-y-2 shadow-lg hover:shadow-[0_10px_30px_rgba(0,243,255,0.15)] flex flex-col">
-                <div className="h-36 bg-dark-700 relative overflow-hidden flex items-end p-5">
-                  <div className="absolute inset-0 bg-gradient-to-br from-dark-800 to-transparent opacity-80 z-0"></div>
-                  <div className="absolute -right-10 -top-10 w-40 h-40 bg-neon-blue/20 blur-[50px] rounded-full group-hover:bg-neon-pink/30 transition-colors duration-700 z-0"></div>
-                  <span className={`relative z-10 border text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wider backdrop-blur-md ${getSportBadgeColor(event.sport)}`}>
-                    {event.sport}
+        </section>
+
+        {/* Ongoing Events Section */}
+        <section className="mb-12">
+          <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
+            <span className="text-3xl">🔥</span> Ongoing Events
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {ongoingEvents.map((event, index) => (
+              <div key={index} className="bg-dark-800/80 backdrop-blur-sm rounded-2xl p-6 border border-dark-700 hover:border-orange-500/50 transition-all duration-500 hover:-translate-y-2 shadow-lg hover:shadow-[0_10px_30px_rgba(249,115,22,0.15)] flex flex-col relative overflow-hidden group">
+                <div className="absolute -right-10 -top-10 w-32 h-32 bg-orange-500/10 blur-[40px] rounded-full group-hover:bg-orange-500/20 transition-colors duration-700 z-0"></div>
+                <div className="relative z-10 flex justify-between items-start mb-4">
+                  <h3 className="text-xl font-extrabold text-white group-hover:text-orange-400 transition-colors">{event.title}</h3>
+                  <span className={`text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider ${event.status === 'Live Now' ? 'bg-red-500/10 text-red-500 border border-red-500/30' : 'bg-orange-500/10 text-orange-500 border border-orange-500/30'}`}>
+                    {event.status}
                   </span>
                 </div>
-                <div className="p-6 flex-grow flex flex-col">
-                  <div className="mb-4">
-                    <Link to={`/events/${event._id}`} className="text-2xl font-extrabold text-white group-hover:text-neon-blue transition-colors line-clamp-2">
-                      {event.title}
-                    </Link>
+                <div className="relative z-10 flex items-center text-sm text-gray-300 font-medium mt-auto pt-4 border-t border-dark-700">
+                  <span className="mr-2 text-orange-400">📍</span>
+                  {event.location}
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Upcoming Events Section */}
+        <section className="mb-12">
+          <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
+            <span className="text-3xl">🏆</span> Upcoming Events
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {upcomingEvents.map((event, index) => (
+              <div key={index} className="bg-dark-800/80 backdrop-blur-sm rounded-2xl overflow-hidden border border-dark-700 hover:border-neon-blue/50 transition-all duration-500 hover:-translate-y-2 shadow-lg hover:shadow-[0_10px_30px_rgba(0,243,255,0.15)] flex flex-col group">
+                <div className="p-6 flex-grow flex flex-col relative overflow-hidden">
+                  <div className="absolute -right-10 -bottom-10 w-40 h-40 bg-neon-blue/10 blur-[50px] rounded-full group-hover:bg-neon-pink/20 transition-colors duration-700 z-0"></div>
+                  <div className="relative z-10 mb-4">
+                    <h3 className="text-2xl font-extrabold text-white group-hover:text-neon-blue transition-colors">{event.title}</h3>
                   </div>
-                  <div className="space-y-3 mb-6 flex-grow">
+                  <div className="relative z-10 space-y-3 mb-6 flex-grow">
                     <div className="flex items-center text-sm text-gray-300 font-medium">
-                      <span className="w-6 flex justify-center mr-2 text-neon-pink drop-shadow-[0_0_5px_rgba(255,0,255,0.5)]">📅</span>
-                      {new Date(event.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                      <span className="mr-3 text-neon-pink">📅</span>
+                      {event.time}
                     </div>
                     <div className="flex items-center text-sm text-gray-300 font-medium">
-                      <span className="w-6 flex justify-center mr-2 text-neon-green drop-shadow-[0_0_5px_rgba(57,255,20,0.5)]">📍</span>
-                      <span className="line-clamp-1">{event.location}</span>
-                    </div>
-                    <div className="flex items-center text-sm text-gray-300 font-medium">
-                      <span className="w-6 flex justify-center mr-2 text-neon-blue drop-shadow-[0_0_5px_rgba(0,243,255,0.5)]">👥</span>
-                      <span className="bg-dark-900 px-2 py-0.5 rounded text-xs border border-dark-700">
-                        {event.participants?.length || 1} {event.maxParticipants ? `/ ${event.maxParticipants}` : ''}
-                      </span>
-                      <span className="ml-2 text-gray-500">joined</span>
+                      <span className="mr-3 text-neon-green">📍</span>
+                      {event.location}
                     </div>
                   </div>
-                  <div className="flex items-center justify-between pt-5 border-t border-dark-700 mt-auto">
-                    <div className="flex items-center gap-3">
-                      <div className="h-9 w-9 rounded-full bg-dark-900 border border-dark-600 flex items-center justify-center text-gray-300 text-sm font-bold uppercase shadow-inner">
-                        {event.creator?.name?.charAt(0) || 'U'}
-                      </div>
-                      <span className="text-sm font-medium text-gray-400 truncate max-w-[100px]">{event.creator?.name || 'User'}</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <button
-                        onClick={async () => {
-                          try {
-                            const { data } = await axiosInstance.post(`/api/events/${event._id}/join`, {});
-                            setEvents(events.map(e => e._id === data._id ? data : e));
-                            toast.success('Successfully joined the event!', { icon: '🎉' });
-                          } catch (err) {
-                            toast.error(err.response?.data?.message || 'Failed to join event');
-                          }
-                        }}
-                        disabled={event.participants?.includes(user._id) || (event.maxParticipants > 0 && event.participants?.length >= event.maxParticipants)}
-                        className={`text-sm font-bold px-4 py-2 rounded-lg transition-all duration-300 ${
-                          event.participants?.includes(user._id) 
-                            ? 'bg-neon-green/10 text-neon-green border border-neon-green/50 cursor-default' 
-                            : event.maxParticipants > 0 && event.participants?.length >= event.maxParticipants
-                              ? 'bg-dark-700 text-gray-500 cursor-not-allowed'
-                              : 'bg-dark-700 text-white hover:bg-neon-blue hover:text-dark-900 hover:shadow-[0_0_15px_rgba(0,243,255,0.4)]'
-                        }`}
-                      >
-                        {event.participants?.includes(user._id) ? 'Joined ✓' : (event.maxParticipants > 0 && event.participants?.length >= event.maxParticipants ? 'Full' : 'RSVP')}
-                      </button>
-                    </div>
+                  <div className="relative z-10 pt-5 border-t border-dark-700 mt-auto">
+                    <button
+                      onClick={() => alert("Joined Successfully!")}
+                      className="w-full bg-dark-700 text-white font-bold py-3 rounded-lg hover:bg-neon-blue hover:text-dark-900 transition-all duration-300 shadow-[0_0_10px_rgba(0,0,0,0.5)] hover:shadow-[0_0_15px_rgba(0,243,255,0.4)]"
+                    >
+                      Join Event
+                    </button>
                   </div>
                 </div>
               </div>
             ))}
           </div>
-        )}
+        </section>
       </main>
 
       {/* Create Event Modal */}
