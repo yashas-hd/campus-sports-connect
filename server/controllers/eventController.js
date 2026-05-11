@@ -49,7 +49,8 @@ const getEventById = async (req, res) => {
   try {
     const event = await Event.findById(req.params.id)
       .populate('creator', 'name college bio')
-      .populate('participants', 'name college');
+      .populate('participants', 'name college')
+      .populate('comments.user', 'name');
 
     if (!event) {
       return res.status(404).json({ message: 'Event not found' });
@@ -113,9 +114,44 @@ const joinEvent = async (req, res) => {
   }
 };
 
+// @desc    Add comment to event
+// @route   POST /api/events/:id/comment
+// @access  Private
+const addComment = async (req, res) => {
+  try {
+    const event = await Event.findById(req.params.id);
+
+    if (!event) {
+      return res.status(404).json({ message: 'Event not found' });
+    }
+
+    if (!req.body.text || req.body.text.trim() === '') {
+      return res.status(400).json({ message: 'Comment text is required' });
+    }
+
+    event.comments.push({
+      user: req.user._id,
+      text: req.body.text,
+    });
+
+    await event.save();
+
+    // Re-fetch to populate the user details for the new comment
+    const updatedEvent = await Event.findById(req.params.id)
+      .populate('creator', 'name college bio')
+      .populate('participants', 'name college')
+      .populate('comments.user', 'name');
+
+    res.status(201).json(updatedEvent);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   getEvents,
   createEvent,
   getEventById,
   joinEvent,
+  addComment,
 };

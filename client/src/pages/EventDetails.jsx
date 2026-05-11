@@ -13,6 +13,8 @@ const EventDetails = () => {
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [commentText, setCommentText] = useState('');
+  const [isCommenting, setIsCommenting] = useState(false);
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
 
@@ -61,6 +63,25 @@ const EventDetails = () => {
       toast.success('Successfully enlisted in operation!', { icon: '🎖️' });
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed to join event');
+    }
+  };
+
+  const handleCommentSubmit = async (e) => {
+    e.preventDefault();
+    if (!commentText.trim()) return;
+
+    setIsCommenting(true);
+    try {
+      const { data } = await axiosInstance.post(`/api/events/${event._id}/comment`, {
+        text: commentText
+      });
+      setEvent(data); // update event with new comment array
+      setCommentText('');
+      toast.success('Comment posted successfully!', { icon: '💬' });
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to post comment');
+    } finally {
+      setIsCommenting(false);
     }
   };
 
@@ -240,6 +261,60 @@ const EventDetails = () => {
                 </div>
               </div>
 
+            </div>
+
+            {/* Discussion Section */}
+            <div className="mt-12 pt-8 border-t border-dark-700">
+              <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-3">
+                <span className="text-neon-pink">💬</span> Discussion
+              </h2>
+
+              <div className="bg-dark-900/50 p-6 rounded-2xl border border-dark-700 mb-8 shadow-inner">
+                <form onSubmit={handleCommentSubmit}>
+                  <textarea
+                    value={commentText}
+                    onChange={(e) => setCommentText(e.target.value)}
+                    placeholder="Join the conversation..."
+                    className="w-full bg-dark-800 border border-dark-600 rounded-xl p-4 text-white focus:outline-none focus:border-neon-pink focus:ring-1 focus:ring-neon-pink resize-none transition-colors"
+                    rows="3"
+                    required
+                  ></textarea>
+                  <div className="flex justify-end mt-4">
+                    <button
+                      type="submit"
+                      disabled={!commentText.trim() || isCommenting}
+                      className="bg-neon-pink text-dark-900 px-6 py-2 rounded-xl font-bold hover:bg-white hover:text-neon-pink transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_0_10px_rgba(255,0,255,0.3)]"
+                    >
+                      {isCommenting ? 'Transmitting...' : 'Post Comment'}
+                    </button>
+                  </div>
+                </form>
+              </div>
+
+              <div className="space-y-4 max-h-96 overflow-y-auto custom-scrollbar pr-2">
+                {(!event.comments || event.comments.length === 0) ? (
+                  <p className="text-gray-500 text-center py-6 italic bg-dark-900/30 rounded-xl border border-dark-700/50">
+                    No comms yet. Be the first to initiate contact!
+                  </p>
+                ) : (
+                  event.comments.map((comment, idx) => (
+                    <div key={comment._id || idx} className="bg-dark-800/60 p-5 rounded-2xl border border-dark-600 hover:border-dark-500 transition-all duration-300 flex gap-4">
+                      <div className="h-10 w-10 rounded-full bg-dark-900 border border-dark-500 flex items-center justify-center text-neon-pink font-bold uppercase flex-shrink-0">
+                        {comment.user?.name ? comment.user.name.charAt(0) : '?'}
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex justify-between items-baseline mb-1">
+                          <h4 className="font-bold text-white text-sm">{comment.user?.name || 'Unknown User'}</h4>
+                          <span className="text-[10px] text-gray-500 font-medium uppercase tracking-wider">
+                            {new Date(comment.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                          </span>
+                        </div>
+                        <p className="text-gray-300 text-sm leading-relaxed whitespace-pre-wrap">{comment.text}</p>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
             </div>
           </div>
         </div>

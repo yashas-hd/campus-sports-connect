@@ -42,6 +42,22 @@ const eventSchema = mongoose.Schema(
       enum: ['upcoming', 'ongoing', 'completed', 'cancelled'],
       default: 'upcoming',
     },
+    comments: [
+      {
+        user: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'User',
+        },
+        text: {
+          type: String,
+          required: true,
+        },
+        createdAt: {
+          type: Date,
+          default: Date.now,
+        },
+      },
+    ],
   },
   {
     timestamps: true,
