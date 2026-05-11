@@ -91,7 +91,7 @@ const Login = () => {
             <button
               type="submit"
               disabled={loading}
-              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-bold rounded-lg text-dark-900 bg-gradient-to-r from-neon-blue to-neon-pink hover:from-neon-pink hover:to-neon-blue focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-dark-900 focus:ring-neon-blue transition-all duration-500 hover:shadow-[0_0_20px_rgba(0,243,255,0.4)] disabled:opacity-70 disabled:cursor-not-allowed"
+              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-bold rounded-lg text-dark-900 bg-gradient-to-r from-neon-blue to-neon-pink hover:from-neon-pink hover:to-neon-blue focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-dark-900 focus:ring-neon-blue transition-all duration-500 animate-pulse-glow hover:shadow-[0_0_25px_rgba(0,243,255,0.6)] disabled:opacity-70 disabled:cursor-not-allowed disabled:animate-none"
             >
               {loading ? 'Authenticating...' : 'Sign In'}
             </button>

@@ -103,7 +103,7 @@ const Register = () => {
             <button
               type="submit"
               disabled={loading}
-              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-bold rounded-lg text-dark-900 bg-gradient-to-r from-neon-pink to-neon-blue hover:from-neon-blue hover:to-neon-pink focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-dark-900 focus:ring-neon-pink transition-all duration-500 hover:shadow-[0_0_20px_rgba(255,0,255,0.4)] disabled:opacity-70 disabled:cursor-not-allowed"
+              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-bold rounded-lg text-dark-900 bg-gradient-to-r from-neon-pink to-neon-blue hover:from-neon-blue hover:to-neon-pink focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-dark-900 focus:ring-neon-pink transition-all duration-500 animate-pulse-glow hover:shadow-[0_0_25px_rgba(255,0,255,0.6)] disabled:opacity-70 disabled:cursor-not-allowed disabled:animate-none"
             >
               {loading ? 'Registering...' : 'Join Now'}
             </button>

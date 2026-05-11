@@ -309,9 +309,20 @@ const Dashboard = () => {
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {loading ? (
-                <div className="col-span-full flex justify-center py-10">
-                  <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-neon-pink shadow-[0_0_15px_rgba(255,0,255,0.5)]"></div>
-                </div>
+                Array(3).fill().map((_, i) => (
+                  <div key={i} className="bg-dark-800/50 rounded-2xl p-6 border border-dark-700 animate-pulse-glow flex flex-col h-64">
+                    <div className="flex justify-between mb-4">
+                      <div className="h-6 w-24 rounded-full animate-skeleton"></div>
+                      <div className="h-6 w-20 rounded animate-skeleton"></div>
+                    </div>
+                    <div className="h-8 w-3/4 rounded mb-6 animate-skeleton"></div>
+                    <div className="space-y-3 mt-auto">
+                      <div className="h-4 w-1/2 rounded animate-skeleton"></div>
+                      <div className="h-4 w-2/3 rounded animate-skeleton"></div>
+                    </div>
+                    <div className="h-10 w-full rounded-lg mt-6 animate-skeleton"></div>
+                  </div>
+                ))
               ) : recommendedEvents.length === 0 ? (
                 <div className="col-span-full text-center py-10 text-gray-400 bg-dark-800/40 backdrop-blur-md rounded-2xl border border-dark-700">
                   <span className="text-4xl block mb-2 opacity-50">🤷‍♂️</span>
@@ -424,9 +435,17 @@ const Dashboard = () => {
         <section className="mb-12">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {loading ? (
-              <div className="col-span-full flex justify-center py-10">
-                <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-neon-blue shadow-[0_0_15px_rgba(0,243,255,0.5)]"></div>
-              </div>
+              Array(6).fill().map((_, i) => (
+                <div key={i} className="bg-dark-800/50 rounded-2xl p-6 border border-dark-700 animate-pulse-glow flex flex-col h-64">
+                  <div className="h-6 w-24 rounded-full mb-4 animate-skeleton"></div>
+                  <div className="h-8 w-3/4 rounded mb-6 animate-skeleton"></div>
+                  <div className="space-y-3 mt-auto">
+                    <div className="h-4 w-1/2 rounded animate-skeleton"></div>
+                    <div className="h-4 w-2/3 rounded animate-skeleton"></div>
+                  </div>
+                  <div className="h-10 w-full rounded-lg mt-6 animate-skeleton"></div>
+                </div>
+              ))
             ) : filteredEvents.length === 0 ? (
               <div className="col-span-full text-center py-12 text-gray-400 bg-dark-800/40 backdrop-blur-md rounded-3xl border border-dark-700 shadow-inner">
                 <span className="text-5xl block mb-4 opacity-50">📭</span>

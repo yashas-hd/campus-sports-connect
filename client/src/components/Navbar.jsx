@@ -76,7 +76,7 @@ const Navbar = () => {
                 </Link>
                 <Link
                   to="/register"
-                  className="bg-gradient-to-r from-neon-blue to-neon-pink text-dark-900 px-5 py-2.5 rounded-lg text-sm font-bold hover:shadow-[0_0_15px_rgba(0,243,255,0.4)] transition-all duration-300"
+                  className="bg-gradient-to-r from-neon-blue to-neon-pink text-dark-900 px-5 py-2.5 rounded-lg text-sm font-bold shadow-[0_0_15px_rgba(0,243,255,0.2)] hover:shadow-[0_0_25px_rgba(0,243,255,0.6)] animate-pulse-glow transition-all duration-300"
                 >
                   Join Now
                 </Link>

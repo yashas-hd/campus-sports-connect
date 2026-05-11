@@ -106,11 +106,36 @@ const Profile = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-dark-900 font-sans flex flex-col relative">
+      <div className="min-h-screen bg-dark-900 text-gray-100 font-sans pb-12 relative overflow-hidden">
         <Navbar />
-        <div className="flex-1 flex justify-center items-center relative z-10">
-          <div className="animate-spin rounded-full h-14 w-14 border-b-2 border-neon-pink shadow-[0_0_15px_rgba(255,0,255,0.5)]"></div>
-        </div>
+        <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 relative z-10">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Left Column Skeleton */}
+            <div className="lg:col-span-1 space-y-6">
+              <div className="bg-dark-800/60 rounded-3xl p-8 border border-dark-700 animate-pulse-glow h-[500px]">
+                <div className="h-28 w-28 rounded-full mx-auto mb-6 animate-skeleton"></div>
+                <div className="h-8 w-3/4 mx-auto rounded mb-2 animate-skeleton"></div>
+                <div className="h-4 w-1/2 mx-auto rounded mb-8 animate-skeleton"></div>
+                <div className="h-24 w-full rounded-xl mb-6 animate-skeleton"></div>
+                <div className="h-10 w-full rounded-xl animate-skeleton"></div>
+              </div>
+            </div>
+            {/* Right Column Skeleton */}
+            <div className="lg:col-span-2 space-y-6">
+              <div className="bg-dark-800/60 rounded-3xl p-8 border border-dark-700 animate-pulse-glow min-h-[500px]">
+                <div className="flex gap-4 mb-8">
+                  <div className="h-12 flex-1 rounded-lg animate-skeleton"></div>
+                  <div className="h-12 flex-1 rounded-lg animate-skeleton"></div>
+                </div>
+                <div className="space-y-4">
+                  {Array(3).fill().map((_, i) => (
+                    <div key={i} className="h-24 w-full rounded-2xl animate-skeleton"></div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </main>
       </div>
     );
   }

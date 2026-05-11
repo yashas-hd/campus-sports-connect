@@ -24,6 +24,8 @@ export default {
       animation: {
         'blob': 'blob 7s infinite',
         'fade-in-up': 'fadeInUp 0.5s ease-out forwards',
+        'pulse-glow': 'pulseGlow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        'skeleton': 'skeleton 1.5s ease-in-out infinite',
       },
       keyframes: {
         blob: {
@@ -35,6 +37,15 @@ export default {
         fadeInUp: {
           '0%': { opacity: '0', transform: 'translateY(20px)' },
           '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        pulseGlow: {
+          '0%, 100%': { opacity: '1', filter: 'brightness(1)' },
+          '50%': { opacity: '.8', filter: 'brightness(1.2)' },
+        },
+        skeleton: {
+          '0%': { backgroundColor: '#1e293b' },
+          '50%': { backgroundColor: '#334155' },
+          '100%': { backgroundColor: '#1e293b' },
         }
       }
     },
