@@ -61,6 +61,11 @@ const EventDetails = () => {
       const updatedEvent = await axiosInstance.get(`/api/events/${event._id}`);
       setEvent(updatedEvent.data);
       toast.success('Successfully enlisted in operation!', { icon: '🎖️' });
+      
+      const saved = JSON.parse(localStorage.getItem('campus_notifications')) || [];
+      const updated = [{ id: Date.now(), message: `You joined ${event.title}` }, ...saved];
+      localStorage.setItem('campus_notifications', JSON.stringify(updated));
+      window.dispatchEvent(new Event('campus_notify'));
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed to join event');
     }
@@ -78,6 +83,11 @@ const EventDetails = () => {
       setEvent(data); // update event with new comment array
       setCommentText('');
       toast.success('Comment posted successfully!', { icon: '💬' });
+
+      const saved = JSON.parse(localStorage.getItem('campus_notifications')) || [];
+      const updated = [{ id: Date.now(), message: "New comment added successfully" }, ...saved];
+      localStorage.setItem('campus_notifications', JSON.stringify(updated));
+      window.dispatchEvent(new Event('campus_notify'));
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed to post comment');
     } finally {
