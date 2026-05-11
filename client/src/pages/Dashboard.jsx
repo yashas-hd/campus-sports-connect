@@ -47,10 +47,44 @@ const sports = [
   "🏸 Badminton"
 ];
 
+const sportsInfo = {
+  Cricket: {
+    players: "11 Players",
+    duration: "20 Overs",
+    location: "Outdoor Ground",
+    equipment: "Bat, Ball, Stumps"
+  },
+  Football: {
+    players: "11 Players",
+    duration: "90 Minutes",
+    location: "Football Field",
+    equipment: "Football, Goal Post"
+  },
+  Volleyball: {
+    players: "6 Players",
+    duration: "Best of 3 or 5 Sets",
+    location: "Indoor Court",
+    equipment: "Volleyball, Net"
+  },
+  Basketball: {
+    players: "5 Players",
+    duration: "40-48 Minutes",
+    location: "Indoor/Outdoor Court",
+    equipment: "Basketball, Hoops"
+  },
+  Badminton: {
+    players: "1 or 2 Players",
+    duration: "Best of 3 Games",
+    location: "Indoor Court",
+    equipment: "Rackets, Shuttlecock"
+  }
+};
+
 const Dashboard = () => {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [selectedSport, setSelectedSport] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
@@ -188,11 +222,18 @@ const Dashboard = () => {
             <span className="text-3xl">⚡</span> Popular Sports
           </h2>
           <div className="flex flex-wrap gap-4">
-            {sports.map((sport, index) => (
-              <div key={index} className="bg-dark-800/80 backdrop-blur-sm border border-dark-700 hover:border-neon-blue/50 rounded-xl px-6 py-3 text-gray-200 font-bold hover:text-white transition-all duration-300 cursor-pointer shadow-lg hover:shadow-[0_5px_15px_rgba(0,243,255,0.2)] hover:-translate-y-1">
-                {sport}
-              </div>
-            ))}
+            {sports.map((sport, index) => {
+              const sportName = sport.replace(/[^a-zA-Z]/g, '').trim();
+              return (
+                <div 
+                  key={index} 
+                  onClick={() => setSelectedSport(sportName)}
+                  className="bg-dark-800/80 backdrop-blur-sm border border-dark-700 hover:border-neon-blue/50 rounded-xl px-6 py-3 text-gray-200 font-bold hover:text-white transition-all duration-300 cursor-pointer shadow-lg hover:shadow-[0_5px_15px_rgba(0,243,255,0.2)] hover:-translate-y-1"
+                >
+                  {sport}
+                </div>
+              );
+            })}
           </div>
         </section>
 
@@ -295,6 +336,79 @@ const Dashboard = () => {
           </div>
         </section>
       </main>
+
+      {/* Sport Details Modal */}
+      {selectedSport && sportsInfo[selectedSport] && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-dark-900/80 backdrop-blur-sm animate-fade-in-up">
+          <div className="bg-dark-800 rounded-2xl w-full max-w-md shadow-[0_0_50px_rgba(0,0,0,0.5)] border border-dark-700 overflow-hidden relative group">
+            {/* Modal glow effect */}
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-2 bg-gradient-to-r from-transparent via-neon-pink to-transparent opacity-50 blur-sm"></div>
+            
+            <div className="px-8 py-5 border-b border-dark-700 flex justify-between items-center bg-dark-800 z-10">
+              <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+                <span className="text-neon-pink">⚡</span> {selectedSport}
+              </h2>
+              <button
+                onClick={() => setSelectedSport(null)}
+                className="text-gray-500 hover:text-white hover:rotate-90 transition-all duration-300 bg-dark-900 w-8 h-8 rounded-full flex items-center justify-center"
+              >
+                <span className="text-xl leading-none">&times;</span>
+              </button>
+            </div>
+
+            <div className="p-8 space-y-6">
+              <div className="flex items-center gap-4 group/item hover:translate-x-2 transition-transform duration-300">
+                <div className="w-10 h-10 rounded-full bg-neon-blue/10 flex items-center justify-center text-neon-blue border border-neon-blue/30 shadow-[0_0_10px_rgba(0,243,255,0.2)]">
+                  👥
+                </div>
+                <div>
+                  <p className="text-xs text-gray-400 font-bold uppercase tracking-wider mb-1">Players</p>
+                  <p className="text-white font-medium">{sportsInfo[selectedSport].players}</p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-4 group/item hover:translate-x-2 transition-transform duration-300">
+                <div className="w-10 h-10 rounded-full bg-neon-green/10 flex items-center justify-center text-neon-green border border-neon-green/30 shadow-[0_0_10px_rgba(57,255,20,0.2)]">
+                  ⏱️
+                </div>
+                <div>
+                  <p className="text-xs text-gray-400 font-bold uppercase tracking-wider mb-1">Duration</p>
+                  <p className="text-white font-medium">{sportsInfo[selectedSport].duration}</p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-4 group/item hover:translate-x-2 transition-transform duration-300">
+                <div className="w-10 h-10 rounded-full bg-orange-500/10 flex items-center justify-center text-orange-500 border border-orange-500/30 shadow-[0_0_10px_rgba(249,115,22,0.2)]">
+                  📍
+                </div>
+                <div>
+                  <p className="text-xs text-gray-400 font-bold uppercase tracking-wider mb-1">Location</p>
+                  <p className="text-white font-medium">{sportsInfo[selectedSport].location}</p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-4 group/item hover:translate-x-2 transition-transform duration-300">
+                <div className="w-10 h-10 rounded-full bg-yellow-400/10 flex items-center justify-center text-yellow-400 border border-yellow-400/30 shadow-[0_0_10px_rgba(250,204,21,0.2)]">
+                  🎒
+                </div>
+                <div>
+                  <p className="text-xs text-gray-400 font-bold uppercase tracking-wider mb-1">Equipment</p>
+                  <p className="text-white font-medium">{sportsInfo[selectedSport].equipment}</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="px-8 py-5 border-t border-dark-700 bg-dark-800 flex justify-end">
+              <button
+                onClick={() => setSelectedSport(null)}
+                className="w-full px-6 py-3 text-sm font-bold text-dark-900 bg-gradient-to-r from-neon-pink to-orange-500 rounded-lg hover:shadow-[0_0_15px_rgba(255,0,255,0.4)] transition-all duration-300"
+              >
+                Awesome!
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Create Event Modal */}
       {isCreateModalOpen && (
