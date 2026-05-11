@@ -2,23 +2,50 @@ import { useContext, useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import AuthContext from '../context/AuthContext';
 import { MdSportsBasketball } from 'react-icons/md';
+import { FaBell } from 'react-icons/fa';
 
 const Navbar = () => {
   const { user, logout } = useContext(AuthContext);
   const navigate = useNavigate();
   const [scrolled, setScrolled] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [notifications, setNotifications] = useState(() => {
+    const saved = localStorage.getItem('campus_notifications');
+    return saved ? JSON.parse(saved) : [];
+  });
 
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 10);
     };
+    
+    const handleStorageChange = () => {
+      const saved = localStorage.getItem('campus_notifications');
+      if (saved) setNotifications(JSON.parse(saved));
+    };
+
     window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('campus_notify', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('campus_notify', handleStorageChange);
+    };
   }, []);
 
   const handleLogout = () => {
     logout();
     navigate('/login');
+  };
+
+  const removeNotification = (id) => {
+    setNotifications(prev => {
+      const updated = prev.filter(n => n.id !== id);
+      localStorage.setItem('campus_notifications', JSON.stringify(updated));
+      return updated;
+    });
   };
 
   return (
@@ -41,6 +68,68 @@ const Navbar = () => {
                 <Link to="/dashboard" className="text-gray-300 hover:text-neon-blue px-3 py-2 rounded-md text-sm font-semibold transition-colors duration-200">
                   Dashboard
                 </Link>
+                {/* Notification Bell */}
+                <div className="relative">
+                  <button 
+                    onClick={() => setShowNotifications(!showNotifications)}
+                    className="relative p-2 text-gray-300 hover:text-neon-pink transition-colors focus:outline-none mt-1"
+                  >
+                    <FaBell className="h-6 w-6" />
+                    {notifications.length > 0 && (
+                      <span className="absolute top-0 right-0 inline-flex items-center justify-center w-5 h-5 text-xs font-bold leading-none text-white transform translate-x-1/4 -translate-y-1/4 bg-neon-pink rounded-full border-2 border-dark-900 shadow-[0_0_10px_rgba(255,0,255,0.5)] animate-pulse-glow">
+                        {notifications.length}
+                      </span>
+                    )}
+                  </button>
+
+                  {/* Notification Dropdown */}
+                  {showNotifications && (
+                    <div className="absolute right-0 mt-3 w-80 bg-dark-800/95 backdrop-blur-xl border border-dark-700 rounded-2xl shadow-2xl z-50 overflow-hidden animate-fade-in-up">
+                      <div className="px-4 py-3 border-b border-dark-700 bg-dark-900/50 flex justify-between items-center">
+                        <h3 className="text-sm font-bold text-white flex items-center gap-2">
+                          <span className="text-neon-pink">🔔</span> Notifications
+                        </h3>
+                        {notifications.length > 0 && (
+                          <button 
+                            onClick={() => {
+                              setNotifications([]);
+                              localStorage.removeItem('campus_notifications');
+                              setShowNotifications(false);
+                            }}
+                            className="text-xs text-gray-400 hover:text-neon-blue transition-colors"
+                          >
+                            Clear All
+                          </button>
+                        )}
+                      </div>
+                      <div className="max-h-80 overflow-y-auto custom-scrollbar">
+                        {notifications.length === 0 ? (
+                          <div className="px-4 py-8 text-center text-gray-400 text-sm">
+                            No new notifications
+                          </div>
+                        ) : (
+                          <div className="divide-y divide-dark-700">
+                            {notifications.map((notif) => (
+                              <div key={notif.id} className="p-4 hover:bg-dark-700/50 transition-colors group relative">
+                                <div className="flex gap-3">
+                                  <div className="h-2 w-2 mt-1.5 rounded-full bg-neon-blue flex-shrink-0 animate-pulse-glow"></div>
+                                  <p className="text-sm text-gray-300 pr-4">{notif.message}</p>
+                                </div>
+                                <button 
+                                  onClick={() => removeNotification(notif.id)}
+                                  className="absolute top-1/2 -translate-y-1/2 right-4 text-gray-500 hover:text-neon-pink opacity-0 group-hover:opacity-100 transition-all p-1"
+                                >
+                                  ✕
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
                 <div className="relative group">
                   <button className="flex items-center gap-2 focus:outline-none">
                     <div className="h-10 w-10 rounded-full bg-dark-800 border-2 border-dark-700 group-hover:border-neon-pink flex items-center justify-center text-white font-bold transition-colors duration-300 shadow-sm">

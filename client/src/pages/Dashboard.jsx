@@ -93,28 +93,11 @@ const Dashboard = () => {
   const [filterStatus, setFilterStatus] = useState('All');
   const [userProfile, setUserProfile] = useState(null);
 
-  // Notifications State
-  const [notifications, setNotifications] = useState(() => {
-    const saved = localStorage.getItem('campus_notifications');
-    return saved ? JSON.parse(saved) : [
-      { id: Date.now(), message: "Welcome to Campus Sports Connect!" }
-    ];
-  });
-
-  const addNotification = (message) => {
-    setNotifications(prev => {
-      const updated = [{ id: Date.now(), message }, ...prev];
-      localStorage.setItem('campus_notifications', JSON.stringify(updated));
-      return updated;
-    });
-  };
-
-  const removeNotification = (id) => {
-    setNotifications(prev => {
-      const updated = prev.filter(n => n.id !== id);
-      localStorage.setItem('campus_notifications', JSON.stringify(updated));
-      return updated;
-    });
+  const triggerNotification = (message) => {
+    const saved = JSON.parse(localStorage.getItem('campus_notifications')) || [];
+    const updated = [{ id: Date.now(), message }, ...saved];
+    localStorage.setItem('campus_notifications', JSON.stringify(updated));
+    window.dispatchEvent(new Event('campus_notify'));
   };
 
   const [formData, setFormData] = useState({
@@ -152,13 +135,6 @@ const Dashboard = () => {
 
     fetchData();
 
-    const handleStorageChange = () => {
-      const saved = localStorage.getItem('campus_notifications');
-      if (saved) setNotifications(JSON.parse(saved));
-    };
-    window.addEventListener('storage', handleStorageChange);
-    window.addEventListener('campus_notify', handleStorageChange);
-
     // Socket.io integration
     const socket = io(API);
 
@@ -180,12 +156,10 @@ const Dashboard = () => {
 
     socket.on('new_notification', (notification) => {
       toast.success(notification.message, { icon: '🔔' });
-      addNotification(notification.message);
+      triggerNotification(notification.message);
     });
 
     return () => {
-      window.removeEventListener('storage', handleStorageChange);
-      window.removeEventListener('campus_notify', handleStorageChange);
       socket.disconnect();
     };
   }, [user, navigate]);
@@ -214,7 +188,7 @@ const Dashboard = () => {
       });
 
       toast.success('Event Created Successfully!', { icon: '🏆' });
-      addNotification(`${eventData.sport || 'Event'} Match created successfully`);
+      triggerNotification(`${eventData.sport || 'Event'} Match created successfully`);
       setIsCreateModalOpen(false);
       setFormData({
         title: '',
@@ -275,31 +249,6 @@ const Dashboard = () => {
       <Navbar />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 relative z-10">
-
-        {/* Notifications Section */}
-        {notifications.length > 0 && (
-          <section className="mb-8 bg-dark-800/40 backdrop-blur-md border border-dark-700 p-6 rounded-3xl shadow-xl animate-fade-in-up">
-            <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-              <span>🔔</span> Notifications
-            </h2>
-            <div className="flex flex-col gap-3 max-h-60 overflow-y-auto pr-2 custom-scrollbar">
-              {notifications.map((notif) => (
-                <div key={notif.id} className="group relative flex justify-between items-center bg-dark-900/80 p-4 rounded-xl border border-dark-600 hover:border-neon-blue/50 transition-all duration-300 shadow-md hover:shadow-[0_0_15px_rgba(0,243,255,0.2)] hover:-translate-y-0.5">
-                  <div className="flex items-center gap-3">
-                    <div className="h-2 w-2 rounded-full bg-neon-blue animate-pulse-glow"></div>
-                    <p className="text-sm text-gray-300 font-medium">{notif.message}</p>
-                  </div>
-                  <button 
-                    onClick={() => removeNotification(notif.id)}
-                    className="text-gray-500 hover:text-neon-pink opacity-0 group-hover:opacity-100 transition-all duration-300 p-1"
-                  >
-                    ✕
-                  </button>
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
 
         {/* Welcome Banner */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-4 bg-dark-800/60 backdrop-blur-md p-8 rounded-3xl border border-dark-700 shadow-xl">
