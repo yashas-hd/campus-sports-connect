@@ -226,34 +226,63 @@ const Dashboard = () => {
             <span className="text-3xl">🏆</span> Upcoming Events
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {upcomingEvents.map((event, index) => (
-              <div key={index} className="bg-dark-800/80 backdrop-blur-sm rounded-2xl overflow-hidden border border-dark-700 hover:border-neon-blue/50 transition-all duration-500 hover:-translate-y-2 shadow-lg hover:shadow-[0_10px_30px_rgba(0,243,255,0.15)] flex flex-col group">
-                <div className="p-6 flex-grow flex flex-col relative overflow-hidden">
-                  <div className="absolute -right-10 -bottom-10 w-40 h-40 bg-neon-blue/10 blur-[50px] rounded-full group-hover:bg-neon-pink/20 transition-colors duration-700 z-0"></div>
-                  <div className="relative z-10 mb-4">
-                    <h3 className="text-2xl font-extrabold text-white group-hover:text-neon-blue transition-colors">{event.title}</h3>
-                  </div>
-                  <div className="relative z-10 space-y-3 mb-6 flex-grow">
-                    <div className="flex items-center text-sm text-gray-300 font-medium">
-                      <span className="mr-3 text-neon-pink">📅</span>
-                      {event.time}
+            {loading ? (
+              <div className="col-span-full flex justify-center py-10">
+                <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-neon-blue shadow-[0_0_15px_rgba(0,243,255,0.5)]"></div>
+              </div>
+            ) : events.length === 0 ? (
+              <div className="col-span-full text-center py-10 text-gray-400 bg-dark-800/40 backdrop-blur-md rounded-2xl border border-dark-700">
+                <span className="text-4xl block mb-2 opacity-50">📡</span>
+                No events on the radar. Be the first to create one!
+              </div>
+            ) : (
+              events.map((event) => (
+                <div key={event._id} className="bg-dark-800/80 backdrop-blur-sm rounded-2xl overflow-hidden border border-dark-700 hover:border-neon-blue/50 transition-all duration-500 hover:-translate-y-2 shadow-lg hover:shadow-[0_10px_30px_rgba(0,243,255,0.15)] flex flex-col group">
+                  <div className="p-6 flex-grow flex flex-col relative overflow-hidden">
+                    <div className="absolute -right-10 -bottom-10 w-40 h-40 bg-neon-blue/10 blur-[50px] rounded-full group-hover:bg-neon-pink/20 transition-colors duration-700 z-0"></div>
+                    
+                    {/* Sport Badge */}
+                    <div className="relative z-10 mb-3 flex justify-between items-start">
+                      <span className={`text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider backdrop-blur-md ${getSportBadgeColor(event.sport)}`}>
+                        {event.sport}
+                      </span>
                     </div>
-                    <div className="flex items-center text-sm text-gray-300 font-medium">
-                      <span className="mr-3 text-neon-green">📍</span>
-                      {event.location}
+
+                    <div className="relative z-10 mb-4">
+                      <h3 className="text-2xl font-extrabold text-white group-hover:text-neon-blue transition-colors line-clamp-2">{event.title}</h3>
                     </div>
-                  </div>
-                  <div className="relative z-10 pt-5 border-t border-dark-700 mt-auto">
-                    <button
-                      onClick={() => alert("Joined Successfully!")}
-                      className="w-full bg-dark-700 text-white font-bold py-3 rounded-lg hover:bg-neon-blue hover:text-dark-900 transition-all duration-300 shadow-[0_0_10px_rgba(0,0,0,0.5)] hover:shadow-[0_0_15px_rgba(0,243,255,0.4)]"
-                    >
-                      Join Event
-                    </button>
+                    
+                    <div className="relative z-10 space-y-3 mb-6 flex-grow">
+                      <div className="flex items-center text-sm text-gray-300 font-medium">
+                        <span className="mr-3 text-neon-pink drop-shadow-[0_0_5px_rgba(255,0,255,0.5)]">📅</span>
+                        {new Date(event.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                      </div>
+                      <div className="flex items-center text-sm text-gray-300 font-medium">
+                        <span className="mr-3 text-neon-green drop-shadow-[0_0_5px_rgba(57,255,20,0.5)]">📍</span>
+                        <span className="line-clamp-1">{event.location}</span>
+                      </div>
+                      <div className="flex items-center text-sm text-gray-300 font-medium">
+                        <span className="mr-3 text-neon-blue drop-shadow-[0_0_5px_rgba(0,243,255,0.5)]">👑</span>
+                        <span className="truncate">{event.creator?.name || 'Unknown Host'}</span>
+                      </div>
+                    </div>
+                    
+                    <div className="relative z-10 pt-5 border-t border-dark-700 mt-auto">
+                      <button
+                        onClick={(e) => {
+                          e.target.innerText = 'Joined ✓';
+                          e.target.className = 'w-full bg-neon-green/10 text-neon-green border border-neon-green/50 font-bold py-3 rounded-lg transition-all duration-300 shadow-[0_0_15px_rgba(57,255,20,0.2)]';
+                          alert("Joined Successfully!");
+                        }}
+                        className="w-full bg-dark-700 text-white font-bold py-3 rounded-lg hover:bg-neon-blue hover:text-dark-900 transition-all duration-300 shadow-[0_0_10px_rgba(0,0,0,0.5)] hover:shadow-[0_0_15px_rgba(0,243,255,0.4)]"
+                      >
+                        Join Event
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </section>
       </main>
