@@ -1,5 +1,6 @@
 const Event = require('../models/Event');
 const Notification = require('../models/Notification');
+const User = require('../models/User');
 
 // @desc    Get all events
 // @route   GET /api/events
@@ -83,6 +84,13 @@ const joinEvent = async (req, res) => {
 
     event.participants.push(req.user._id);
     await event.save();
+
+    // Add event ID into logged-in user's joinedEvents array
+    const user = await User.findById(req.user._id);
+    if (!user.joinedEvents.includes(event._id)) {
+      user.joinedEvents.push(event._id);
+      await user.save();
+    }
 
     // Create notification for creator
     if (event.creator.toString() !== req.user._id.toString()) {

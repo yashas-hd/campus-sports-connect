@@ -14,7 +14,7 @@ const getUserProfile = async (req, res) => {
       
       // Find events the user has joined (but not hosting)
       const joinedEvents = await Event.find({
-        participants: user._id,
+        _id: { $in: user.joinedEvents },
         creator: { $ne: user._id }
       }).sort({ date: 1 });
 

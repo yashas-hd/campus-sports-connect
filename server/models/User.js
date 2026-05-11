@@ -50,6 +50,12 @@ const userSchema = mongoose.Schema(
       type: Number,
       default: 0,
     },
+    joinedEvents: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Event',
+      },
+    ],
   },
   {
     timestamps: true,

@@ -269,10 +269,19 @@ const Dashboard = () => {
                     
                     <div className="relative z-10 pt-5 border-t border-dark-700 mt-auto">
                       <button
-                        onClick={(e) => {
-                          e.target.innerText = 'Joined ✓';
-                          e.target.className = 'w-full bg-neon-green/10 text-neon-green border border-neon-green/50 font-bold py-3 rounded-lg transition-all duration-300 shadow-[0_0_15px_rgba(57,255,20,0.2)]';
-                          alert("Joined Successfully!");
+                        onClick={async (e) => {
+                          try {
+                            const btn = e.target;
+                            btn.innerText = 'Joining...';
+                            await axiosInstance.post(`/api/events/${event._id}/join`, {});
+                            btn.innerText = 'Joined ✓';
+                            btn.className = 'w-full bg-neon-green/10 text-neon-green border border-neon-green/50 font-bold py-3 rounded-lg transition-all duration-300 shadow-[0_0_15px_rgba(57,255,20,0.2)]';
+                            btn.disabled = true;
+                            alert("Joined Successfully!");
+                          } catch (err) {
+                            e.target.innerText = 'Join Event';
+                            toast.error(err.response?.data?.message || 'Failed to join event');
+                          }
                         }}
                         className="w-full bg-dark-700 text-white font-bold py-3 rounded-lg hover:bg-neon-blue hover:text-dark-900 transition-all duration-300 shadow-[0_0_10px_rgba(0,0,0,0.5)] hover:shadow-[0_0_15px_rgba(0,243,255,0.4)]"
                       >
