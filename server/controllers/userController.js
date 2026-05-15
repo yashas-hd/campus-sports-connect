@@ -26,6 +26,9 @@ const getUserProfile = async (req, res) => {
         bio: user.bio,
         sportsInterests: user.sportsInterests,
         favoriteSports: user.favoriteSports,
+        preferredSport: user.preferredSport,
+        preferredPosition: user.preferredPosition,
+        experienceLevel: user.experienceLevel,
         hostedEvents,
         joinedEvents,
       });
@@ -48,6 +51,9 @@ const updateUserProfile = async (req, res) => {
       user.name = req.body.name || user.name;
       user.bio = req.body.bio !== undefined ? req.body.bio : user.bio;
       user.sportsInterests = req.body.sportsInterests || user.sportsInterests;
+      user.preferredSport = req.body.preferredSport !== undefined ? req.body.preferredSport : user.preferredSport;
+      user.preferredPosition = req.body.preferredPosition !== undefined ? req.body.preferredPosition : user.preferredPosition;
+      user.experienceLevel = req.body.experienceLevel || user.experienceLevel;
 
       // Handle password update if provided
       if (req.body.password) {
@@ -63,6 +69,9 @@ const updateUserProfile = async (req, res) => {
         college: updatedUser.college,
         bio: updatedUser.bio,
         sportsInterests: updatedUser.sportsInterests,
+        preferredSport: updatedUser.preferredSport,
+        preferredPosition: updatedUser.preferredPosition,
+        experienceLevel: updatedUser.experienceLevel,
         isVerified: updatedUser.isVerified,
       });
     } else {
