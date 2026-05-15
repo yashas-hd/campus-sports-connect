@@ -35,27 +35,36 @@ const registerUser = async (req, res) => {
       otpAttempts: 0,
     });
 
-    // Send OTP via email
+    // Send OTP via email (non-blocking for demo purposes)
     try {
       const message = `Your OTP for Campus Sports Connect registration is: ${otp}. It is valid for 10 minutes.`;
-      await sendEmail({
+      sendEmail({
         email: user.email,
         subject: 'Campus Sports Connect - Registration OTP',
         message,
-      });
-      res.status(201).json({
-        message: 'User registered. Please check your email for OTP.',
+      }).catch(err => console.error("Email sending failed, but continuing for demo fallback:", err));
+
+      console.log("User created successfully");
+      return res.status(201).json({
+        success: true,
+        message: 'User registered successfully',
         userId: user._id,
         otp: otp,
       });
     } catch (error) {
-      user.otp = undefined;
-      user.otpExpires = undefined;
-      await user.save({ validateBeforeSave: false });
-      return res.status(500).json({ message: 'Email could not be sent' });
+      console.error("Error during registration response formatting:", error);
+      return res.status(500).json({ 
+        success: false,
+        message: 'Registration failed' 
+      });
     }
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("Registration error:", error);
+    return res.status(500).json({ 
+      success: false,
+      message: 'Registration failed',
+      error: error.message 
+    });
   }
 };
 
