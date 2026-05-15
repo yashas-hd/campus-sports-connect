@@ -26,7 +26,7 @@ const getUserProfile = async (req, res) => {
         bio: user.bio,
         sportsInterests: user.sportsInterests,
         favoriteSports: user.favoriteSports,
-        preferredSport: user.preferredSport,
+        preferredSports: user.preferredSports,
         preferredPosition: user.preferredPosition,
         experienceLevel: user.experienceLevel,
         hostedEvents,
@@ -51,7 +51,7 @@ const updateUserProfile = async (req, res) => {
       user.name = req.body.name || user.name;
       user.bio = req.body.bio !== undefined ? req.body.bio : user.bio;
       user.sportsInterests = req.body.sportsInterests || user.sportsInterests;
-      user.preferredSport = req.body.preferredSport !== undefined ? req.body.preferredSport : user.preferredSport;
+      user.preferredSports = req.body.preferredSports || user.preferredSports;
       user.preferredPosition = req.body.preferredPosition !== undefined ? req.body.preferredPosition : user.preferredPosition;
       user.experienceLevel = req.body.experienceLevel || user.experienceLevel;
 
@@ -69,7 +69,7 @@ const updateUserProfile = async (req, res) => {
         college: updatedUser.college,
         bio: updatedUser.bio,
         sportsInterests: updatedUser.sportsInterests,
-        preferredSport: updatedUser.preferredSport,
+        preferredSports: updatedUser.preferredSports,
         preferredPosition: updatedUser.preferredPosition,
         experienceLevel: updatedUser.experienceLevel,
         isVerified: updatedUser.isVerified,

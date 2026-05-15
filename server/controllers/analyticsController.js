@@ -6,7 +6,10 @@ const User = require('../models/User');
 // @access  Private
 const getOverview = async (req, res) => {
   try {
-    const events = await Event.find();
+    const [events, users] = await Promise.all([
+      Event.find(),
+      User.find()
+    ]);
     
     const totalEvents = events.length;
     const totalTryouts = events.filter(e => e.eventType === 'Competitive Tryout').length;
@@ -53,6 +56,34 @@ const getOverview = async (req, res) => {
       }
     }
 
+    let userSportCounts = {};
+    let multiSportParticipationCount = 0;
+
+    users.forEach(user => {
+      if (user.preferredSports && user.preferredSports.length > 0) {
+        if (user.preferredSports.length > 1) {
+          multiSportParticipationCount++;
+        }
+        user.preferredSports.forEach(sport => {
+          userSportCounts[sport] = (userSportCounts[sport] || 0) + 1;
+        });
+      }
+    });
+
+    let mostSelectedSport = "None";
+    let maxUserSportCount = 0;
+    let topSportsInterests = [];
+
+    for (const [sport, count] of Object.entries(userSportCounts)) {
+      if (count > maxUserSportCount) {
+        maxUserSportCount = count;
+        mostSelectedSport = sport;
+      }
+      topSportsInterests.push({ sport, count });
+    }
+    
+    topSportsInterests = topSportsInterests.sort((a, b) => b.count - a.count).slice(0, 3).map(i => i.sport);
+
     const avgApplications = totalTryouts > 0 ? (totalApplications / totalTryouts).toFixed(1) : 0;
 
     const barChartData = Object.entries(sportCounts).map(([name, value]) => ({ name, value }));
@@ -73,7 +104,10 @@ const getOverview = async (req, res) => {
       barChartData,
       pieChartData,
       averageTeamRating,
-      topRatedPlayers
+      topRatedPlayers,
+      mostSelectedSport,
+      multiSportParticipationCount,
+      topSportsInterests
     });
   } catch (error) {
     res.status(500).json({ message: error.message });

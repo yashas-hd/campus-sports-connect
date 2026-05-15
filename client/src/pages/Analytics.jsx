@@ -114,6 +114,9 @@ const Analytics = () => {
               <InsightCard label="Average Team Rating" value={data?.averageTeamRating ? `⭐ ${data.averageTeamRating}` : '-'} />
               <InsightCard label="Total Team Selections" value={data?.totalApprovedPlayers} />
               <InsightCard label="Overall Active Users" value={data?.activeParticipants} />
+              <InsightCard label="Most Selected Sport" value={data?.mostSelectedSport} />
+              <InsightCard label="Multi-Sport Athletes" value={data?.multiSportParticipationCount} />
+              <InsightCard label="Top 3 Interests" value={data?.topSportsInterests?.join(', ')} />
             </div>
           </div>
 

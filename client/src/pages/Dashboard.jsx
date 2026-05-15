@@ -261,11 +261,11 @@ const Dashboard = () => {
   const filterSportsList = ["All", "Cricket", "Football", "Volleyball", "Basketball", "Badminton", "Kabaddi"];
   const filterStatusList = ["All", "Upcoming", "Ongoing", "Joined"];
 
-  const favoriteSports = userProfile?.favoriteSports || [];
+  const preferredSports = userProfile?.preferredSports || [];
   const recommendedEvents = events.filter(event => 
     event.status !== 'completed' &&
     event.status !== 'cancelled' &&
-    favoriteSports.some(sport => event.sport?.toLowerCase().includes(sport.toLowerCase()))
+    preferredSports.some(sport => event.sport?.toLowerCase().includes(sport.toLowerCase()))
   );
 
   return (

@@ -38,9 +38,23 @@ const userSchema = mongoose.Schema(
       type: [String],
       default: [],
     },
-    preferredSport: {
-      type: String,
-      default: '',
+    preferredSports: {
+      type: [String],
+      enum: [
+        'Cricket',
+        'Football',
+        'Basketball',
+        'Volleyball',
+        'Badminton',
+        'Kabaddi'
+      ],
+      validate: {
+        validator: function(arr) {
+          return arr.length <= 3;
+        },
+        message: 'Maximum 3 preferred sports allowed.'
+      },
+      default: [],
     },
     preferredPosition: {
       type: String,

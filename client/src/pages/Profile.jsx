@@ -17,7 +17,7 @@ const Profile = () => {
     name: '',
     bio: '',
     sportsInterests: '',
-    preferredSport: '',
+    preferredSports: [],
     preferredPosition: '',
     experienceLevel: 'Beginner',
   });
@@ -29,10 +29,10 @@ const Profile = () => {
         setProfileData(data);
         setFavoriteSports(data.favoriteSports || []);
         setFormData({
-          name: data.name,
+          name: data.name || '',
           bio: data.bio || '',
-          sportsInterests: data.sportsInterests ? data.sportsInterests.join(', ') : '',
-          preferredSport: data.preferredSport || '',
+          sportsInterests: data.sportsInterests?.join(', ') || '',
+          preferredSports: data.preferredSports || [],
           preferredPosition: data.preferredPosition || '',
           experienceLevel: data.experienceLevel || 'Beginner',
         });
@@ -67,6 +67,20 @@ const Profile = () => {
     );
   };
 
+  const togglePreferredSport = (sport) => {
+    setFormData((prev) => {
+      const isSelected = prev.preferredSports.includes(sport);
+      if (isSelected) {
+        return { ...prev, preferredSports: prev.preferredSports.filter((s) => s !== sport) };
+      }
+      if (prev.preferredSports.length >= 3) {
+        toast.error('Maximum 3 preferred sports allowed.', { icon: '⚠️' });
+        return prev;
+      }
+      return { ...prev, preferredSports: [...prev.preferredSports, sport] };
+    });
+  };
+
   const handleSaveFavorites = async () => {
     setIsSavingFavorites(true);
     try {
@@ -89,7 +103,7 @@ const Profile = () => {
         name: formData.name,
         bio: formData.bio,
         sportsInterests: formData.sportsInterests.split(',').map(s => s.trim()).filter(s => s !== ''),
-        preferredSport: formData.preferredSport,
+        preferredSports: formData.preferredSports,
         preferredPosition: formData.preferredPosition,
         experienceLevel: formData.experienceLevel,
       };
@@ -97,7 +111,7 @@ const Profile = () => {
       const { data } = await axiosInstance.put('/api/users/profile', payload);
       
       login({ ...user, name: data.name });
-      setProfileData({ ...profileData, name: data.name, bio: data.bio, sportsInterests: data.sportsInterests, preferredSport: data.preferredSport, preferredPosition: data.preferredPosition, experienceLevel: data.experienceLevel });
+      setProfileData({ ...profileData, name: data.name, bio: data.bio, sportsInterests: data.sportsInterests, preferredSports: data.preferredSports, preferredPosition: data.preferredPosition, experienceLevel: data.experienceLevel });
       setIsEditing(false);
       toast.success('Profile updated successfully!', { icon: '✨' });
     } catch (error) {
@@ -213,9 +227,19 @@ const Profile = () => {
                         )}
                       </div>
                       <div className="grid grid-cols-2 gap-4 mt-4">
-                        <div className="bg-dark-900/50 p-3 rounded-lg border border-dark-700">
-                          <span className="block text-[10px] text-gray-500 uppercase tracking-wider mb-1">Preferred Sport</span>
-                          <span className="text-sm text-gray-300 font-medium">{profileData.preferredSport || 'N/A'}</span>
+                        <div className="bg-dark-900/50 p-3 rounded-lg border border-dark-700 col-span-2">
+                          <span className="block text-[10px] text-gray-500 uppercase tracking-wider mb-2">Preferred Sports</span>
+                          <div className="flex flex-wrap gap-2">
+                            {profileData.preferredSports?.length > 0 ? (
+                              profileData.preferredSports.map((sport, idx) => (
+                                <span key={idx} className={`text-xs font-bold px-2 py-1 rounded-md border ${getSportBadgeColor(sport)}`}>
+                                  {getSportEmoji(sport)} {sport}
+                                </span>
+                              ))
+                            ) : (
+                              <span className="text-sm text-gray-300 font-medium">N/A</span>
+                            )}
+                          </div>
                         </div>
                         <div className="bg-dark-900/50 p-3 rounded-lg border border-dark-700">
                           <span className="block text-[10px] text-gray-500 uppercase tracking-wider mb-1">Preferred Position</span>
@@ -271,22 +295,27 @@ const Profile = () => {
                     />
                   </div>
                   <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5">Pref. Sport</label>
-                      <select
-                        name="preferredSport"
-                        value={formData.preferredSport}
-                        onChange={handleInputChange}
-                        className="w-full px-4 py-2.5 bg-dark-900 border border-dark-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-neon-blue focus:border-neon-blue text-white transition-all text-sm [color-scheme:dark]"
-                      >
-                        <option value="">Select a sport</option>
-                        <option value="Cricket">🏏 Cricket</option>
-                        <option value="Football">⚽ Football</option>
-                        <option value="Basketball">🏀 Basketball</option>
-                        <option value="Volleyball">🏐 Volleyball</option>
-                        <option value="Badminton">🏸 Badminton</option>
-                        <option value="Kabaddi">🤼 Kabaddi</option>
-                      </select>
+                    <div className="col-span-2">
+                      <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5">Preferred Sports (Max 3)</label>
+                      <div className="flex flex-wrap gap-2">
+                        {sportsOptions.map(sport => {
+                          const isSelected = formData.preferredSports.includes(sport);
+                          return (
+                            <button
+                              key={sport}
+                              type="button"
+                              onClick={() => togglePreferredSport(sport)}
+                              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border ${
+                                isSelected 
+                                  ? 'bg-neon-blue/20 text-neon-blue border-neon-blue/50 shadow-[0_0_10px_rgba(0,243,255,0.2)]' 
+                                  : 'bg-dark-800 text-gray-400 border-dark-600 hover:border-dark-500'
+                              }`}
+                            >
+                              {getSportEmoji(sport)} {sport}
+                            </button>
+                          );
+                        })}
+                      </div>
                     </div>
                     <div>
                       <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5">Pref. Position</label>

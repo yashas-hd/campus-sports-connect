@@ -360,8 +360,8 @@ const EventDetails = () => {
                             
                             <div className="grid grid-cols-2 gap-2 mb-3 mt-2 bg-dark-900/50 p-2 rounded-lg">
                               <div>
-                                <span className="block text-[10px] text-gray-500 uppercase">Sport</span>
-                                <span className="text-xs text-gray-300 font-medium">{req.user?.preferredSport || 'N/A'}</span>
+                                <span className="block text-[10px] text-gray-500 uppercase">Sports</span>
+                                <span className="text-xs text-gray-300 font-medium">{req.user?.preferredSports?.join(', ') || 'N/A'}</span>
                               </div>
                               <div>
                                 <span className="block text-[10px] text-gray-500 uppercase">Position</span>

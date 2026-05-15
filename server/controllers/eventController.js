@@ -57,8 +57,8 @@ const getEventById = async (req, res) => {
       .populate('creator', 'name college bio')
       .populate('participants', 'name college')
       .populate('comments.user', 'name')
-      .populate('teamRequests.user', 'name email college preferredSport preferredPosition experienceLevel')
-      .populate('approvedPlayers', 'name college preferredSport preferredPosition');
+      .populate('teamRequests.user', 'name email college preferredSports preferredPosition experienceLevel')
+      .populate('approvedPlayers', 'name college preferredSports preferredPosition');
 
     if (!event) {
       return res.status(404).json({ message: 'Event not found' });
@@ -171,8 +171,8 @@ const applyForTryout = async (req, res) => {
       return res.status(400).json({ message: 'This event is not a tryout' });
     }
 
-    if (req.user.preferredSport !== event.sport) {
-      return res.status(400).json({ message: 'You can only apply for tryouts matching your preferred sport.' });
+    if (!req.user.preferredSports || !req.user.preferredSports.includes(event.sport)) {
+      return res.status(400).json({ message: 'You can only apply for tryouts matching your selected preferred sports.' });
     }
 
     const alreadyApplied = event.teamRequests.some(r => r.user.toString() === req.user._id.toString());
@@ -206,8 +206,8 @@ const applyForTryout = async (req, res) => {
       .populate('creator', 'name college bio')
       .populate('participants', 'name college')
       .populate('comments.user', 'name')
-      .populate('teamRequests.user', 'name email college preferredSport preferredPosition experienceLevel')
-      .populate('approvedPlayers', 'name college preferredSport preferredPosition');
+      .populate('teamRequests.user', 'name email college preferredSports preferredPosition experienceLevel')
+      .populate('approvedPlayers', 'name college preferredSports preferredPosition');
 
     res.json(updatedEvent);
   } catch (error) {
@@ -280,8 +280,8 @@ const approvePlayer = async (req, res) => {
       .populate('creator', 'name college bio')
       .populate('participants', 'name college')
       .populate('comments.user', 'name')
-      .populate('teamRequests.user', 'name email college preferredSport preferredPosition experienceLevel')
-      .populate('approvedPlayers', 'name college preferredSport preferredPosition');
+      .populate('teamRequests.user', 'name email college preferredSports preferredPosition experienceLevel')
+      .populate('approvedPlayers', 'name college preferredSports preferredPosition');
 
     res.json(updatedEvent);
   } catch (error) {
@@ -332,8 +332,8 @@ const rejectPlayer = async (req, res) => {
       .populate('creator', 'name college bio')
       .populate('participants', 'name college')
       .populate('comments.user', 'name')
-      .populate('teamRequests.user', 'name email college preferredSport preferredPosition experienceLevel')
-      .populate('approvedPlayers', 'name college preferredSport preferredPosition');
+      .populate('teamRequests.user', 'name email college preferredSports preferredPosition experienceLevel')
+      .populate('approvedPlayers', 'name college preferredSports preferredPosition');
 
     res.json(updatedEvent);
   } catch (error) {
@@ -424,8 +424,8 @@ const withdrawApplication = async (req, res) => {
       .populate('creator', 'name college bio')
       .populate('participants', 'name college')
       .populate('comments.user', 'name')
-      .populate('teamRequests.user', 'name email college preferredSport preferredPosition experienceLevel')
-      .populate('approvedPlayers', 'name college preferredSport preferredPosition');
+      .populate('teamRequests.user', 'name email college preferredSports preferredPosition experienceLevel')
+      .populate('approvedPlayers', 'name college preferredSports preferredPosition');
 
     res.json(updatedEvent);
   } catch (error) {
@@ -476,8 +476,8 @@ const removePlayer = async (req, res) => {
       .populate('creator', 'name college bio')
       .populate('participants', 'name college')
       .populate('comments.user', 'name')
-      .populate('teamRequests.user', 'name email college preferredSport preferredPosition experienceLevel')
-      .populate('approvedPlayers', 'name college preferredSport preferredPosition');
+      .populate('teamRequests.user', 'name email college preferredSports preferredPosition experienceLevel')
+      .populate('approvedPlayers', 'name college preferredSports preferredPosition');
 
     res.json(updatedEvent);
   } catch (error) {
@@ -543,8 +543,8 @@ const ratePlayer = async (req, res) => {
       .populate('creator', 'name college bio')
       .populate('participants', 'name college')
       .populate('comments.user', 'name')
-      .populate('teamRequests.user', 'name email college preferredSport preferredPosition experienceLevel')
-      .populate('approvedPlayers', 'name college preferredSport preferredPosition');
+      .populate('teamRequests.user', 'name email college preferredSports preferredPosition experienceLevel')
+      .populate('approvedPlayers', 'name college preferredSports preferredPosition');
 
     res.json(updatedEvent);
   } catch (error) {
