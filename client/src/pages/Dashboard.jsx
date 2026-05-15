@@ -498,25 +498,16 @@ const Dashboard = () => {
                     </div>
                     
                     <div className="relative z-10 pt-5 border-t border-dark-700 mt-auto">
-                      <button
-                        onClick={async (e) => {
-                          try {
-                            const btn = e.target;
-                            btn.innerText = 'Joining...';
-                            await axiosInstance.post(`/api/events/${event._id}/join`, {});
-                            btn.innerText = 'Joined ✓';
-                            btn.className = 'w-full bg-neon-green/10 text-neon-green border border-neon-green/50 font-bold py-3 rounded-lg transition-all duration-300 shadow-[0_0_15px_rgba(57,255,20,0.2)]';
-                            btn.disabled = true;
-                            alert("Joined Successfully!");
-                          } catch (err) {
-                            e.target.innerText = 'Join Event';
-                            toast.error(err.response?.data?.message || 'Failed to join event');
-                          }
-                        }}
-                        className="w-full bg-dark-700 text-white font-bold py-3 rounded-lg hover:bg-neon-blue hover:text-dark-900 transition-all duration-300 shadow-[0_0_10px_rgba(0,0,0,0.5)] hover:shadow-[0_0_15px_rgba(0,243,255,0.4)]"
+                      <Link
+                        to={`/events/${event._id}`}
+                        className={`block w-full text-center font-bold py-3 rounded-lg transition-all duration-300 shadow-[0_0_10px_rgba(0,0,0,0.5)] ${
+                          event.eventType === 'Competitive Tryout' 
+                            ? 'bg-gradient-to-r from-neon-pink/80 to-orange-500/80 text-white hover:shadow-[0_0_15px_rgba(255,0,255,0.4)]' 
+                            : 'bg-dark-700 text-white hover:bg-neon-blue hover:text-dark-900 hover:shadow-[0_0_15px_rgba(0,243,255,0.4)]'
+                        }`}
                       >
-                        Join Event
-                      </button>
+                        {event.eventType === 'Competitive Tryout' ? 'View Tryout Details' : 'View Event Details'}
+                      </Link>
                     </div>
                   </div>
                 </div>
