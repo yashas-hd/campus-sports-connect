@@ -310,6 +310,82 @@ const rejectPlayer = async (req, res) => {
   }
 };
 
+// @desc    Delete event
+// @route   DELETE /api/events/:id
+// @access  Private
+const deleteEvent = async (req, res) => {
+  try {
+    const event = await Event.findById(req.params.id);
+
+    if (!event) {
+      return res.status(404).json({ message: 'Event not found' });
+    }
+
+    if (event.creator.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: 'Only the host can delete this event' });
+    }
+
+    // Clean up joinedEvents array for all participants
+    await User.updateMany(
+      { joinedEvents: event._id },
+      { $pull: { joinedEvents: event._id } }
+    );
+
+    // Delete related notifications
+    await Notification.deleteMany({ event: event._id });
+
+    await event.deleteOne();
+
+    res.json({ message: 'Event deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// @desc    Withdraw Application / Leave Team
+// @route   POST /api/events/:id/withdraw
+// @access  Private
+const withdrawApplication = async (req, res) => {
+  try {
+    const event = await Event.findById(req.params.id);
+
+    if (!event) {
+      return res.status(404).json({ message: 'Event not found' });
+    }
+
+    const userId = req.user._id.toString();
+
+    // Remove from teamRequests
+    event.teamRequests = event.teamRequests.filter(r => r.user.toString() !== userId);
+
+    // Remove from approvedPlayers
+    event.approvedPlayers = event.approvedPlayers.filter(p => p.toString() !== userId);
+
+    // Remove from participants
+    event.participants = event.participants.filter(p => p.toString() !== userId);
+
+    await event.save();
+
+    // Remove from user's joinedEvents
+    const user = await User.findById(req.user._id);
+    if (user && user.joinedEvents.includes(event._id)) {
+      user.joinedEvents.pull(event._id);
+      await user.save();
+    }
+
+    const updatedEvent = await Event.findById(req.params.id)
+      .populate('creator', 'name college bio')
+      .populate('participants', 'name college')
+      .populate('comments.user', 'name')
+      .populate('teamRequests.user', 'name email college preferredSport preferredPosition experienceLevel')
+      .populate('approvedPlayers', 'name college preferredSport preferredPosition');
+
+    res.json(updatedEvent);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   getEvents,
   createEvent,
@@ -319,4 +395,6 @@ module.exports = {
   applyForTryout,
   approvePlayer,
   rejectPlayer,
+  deleteEvent,
+  withdrawApplication,
 };

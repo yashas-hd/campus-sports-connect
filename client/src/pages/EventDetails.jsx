@@ -102,6 +102,28 @@ const EventDetails = () => {
     }
   };
 
+  const handleDeleteEvent = async () => {
+    if (window.confirm('Are you sure you want to abort and delete this operation? This action cannot be undone.')) {
+      try {
+        await axiosInstance.delete(`/api/events/${event._id}`);
+        toast.success('Event deleted successfully!', { icon: '🗑️' });
+        navigate('/dashboard');
+      } catch (err) {
+        toast.error(err.response?.data?.message || 'Failed to delete event');
+      }
+    }
+  };
+
+  const handleWithdraw = async () => {
+    try {
+      const { data } = await axiosInstance.post(`/api/events/${event._id}/withdraw`, {});
+      setEvent(data);
+      toast.success(isApproved || isParticipating ? 'You left the team' : 'Application withdrawn successfully', { icon: '🚪' });
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to withdraw');
+    }
+  };
+
   const handleCommentSubmit = async (e) => {
     e.preventDefault();
     if (!commentText.trim()) return;
@@ -341,46 +363,81 @@ const EventDetails = () => {
                   {!isCreator && (
                     <>
                       {!isCompetitiveTryout ? (
-                        <button
-                          onClick={handleRSVP}
-                          disabled={isParticipating || isFull}
-                          className={`w-full py-3.5 px-4 rounded-xl text-sm font-bold shadow-lg transition-all duration-300 uppercase tracking-wider ${
-                            isParticipating
-                              ? 'bg-neon-green/10 border border-neon-green/50 text-neon-green shadow-[0_0_15px_rgba(57,255,20,0.2)]'
-                              : isFull
-                              ? 'bg-dark-700 text-gray-500 cursor-not-allowed border border-dark-600'
-                              : 'bg-gradient-to-r from-neon-blue to-neon-pink text-dark-900 hover:shadow-[0_0_20px_rgba(255,0,255,0.4)]'
-                          }`}
-                        >
-                          {isParticipating ? '✓ Enlisted' : isFull ? 'Squad Full' : 'Enlist Now'}
-                        </button>
+                        isParticipating ? (
+                          <div className="space-y-3">
+                            <div className="w-full py-3.5 px-4 rounded-xl text-sm font-bold shadow-lg uppercase tracking-wider text-center bg-neon-green/10 border border-neon-green/50 text-neon-green shadow-[0_0_15px_rgba(57,255,20,0.2)]">
+                              ✓ Enlisted
+                            </div>
+                            <button
+                              onClick={handleWithdraw}
+                              className="w-full py-2.5 px-4 rounded-xl text-xs font-bold transition-all duration-300 uppercase tracking-wider bg-dark-800 border border-dark-600 text-gray-400 hover:text-red-500 hover:border-red-500/50 hover:bg-red-500/10"
+                            >
+                              🚪 Leave Match
+                            </button>
+                          </div>
+                        ) : (
+                          <button
+                            onClick={handleRSVP}
+                            disabled={isFull}
+                            className={`w-full py-3.5 px-4 rounded-xl text-sm font-bold shadow-lg transition-all duration-300 uppercase tracking-wider ${
+                              isFull
+                                ? 'bg-dark-700 text-gray-500 cursor-not-allowed border border-dark-600'
+                                : 'bg-gradient-to-r from-neon-blue to-neon-pink text-dark-900 hover:shadow-[0_0_20px_rgba(255,0,255,0.4)]'
+                            }`}
+                          >
+                            {isFull ? 'Squad Full' : 'Enlist Now'}
+                          </button>
+                        )
                       ) : (
-                        <button
-                          onClick={handleApplyTryout}
-                          disabled={hasApplied || isApproved || isFull}
-                          className={`w-full py-3.5 px-4 rounded-xl text-sm font-bold shadow-lg transition-all duration-300 uppercase tracking-wider ${
-                            isApproved
-                              ? 'bg-neon-green/10 border border-neon-green/50 text-neon-green shadow-[0_0_15px_rgba(57,255,20,0.2)]'
-                              : myTeamStatus === 'Pending'
-                              ? 'bg-yellow-500/10 border border-yellow-500/50 text-yellow-500 shadow-[0_0_15px_rgba(234,179,8,0.2)]'
-                              : myTeamStatus === 'Rejected'
-                              ? 'bg-red-500/10 border border-red-500/50 text-red-500 shadow-[0_0_15px_rgba(239,68,68,0.2)] cursor-not-allowed'
-                              : isFull
-                              ? 'bg-dark-700 text-gray-500 cursor-not-allowed border border-dark-600'
-                              : 'bg-gradient-to-r from-neon-pink to-orange-500 text-dark-900 hover:shadow-[0_0_20px_rgba(255,0,255,0.4)]'
-                          }`}
-                        >
-                          {isApproved ? '🟢 Selected for Team' : 
-                           myTeamStatus === 'Pending' ? '🟡 Application Pending' : 
-                           myTeamStatus === 'Rejected' ? '🔴 Rejected' : 
-                           isFull ? 'Squad Full' : 'Apply for Tryout'}
-                        </button>
+                        (hasApplied || isApproved) ? (
+                          <div className="space-y-3">
+                            <div className={`w-full py-3.5 px-4 rounded-xl text-sm font-bold shadow-lg uppercase tracking-wider text-center ${
+                              isApproved
+                                ? 'bg-neon-green/10 border border-neon-green/50 text-neon-green shadow-[0_0_15px_rgba(57,255,20,0.2)]'
+                                : myTeamStatus === 'Pending'
+                                ? 'bg-yellow-500/10 border border-yellow-500/50 text-yellow-500 shadow-[0_0_15px_rgba(234,179,8,0.2)]'
+                                : 'bg-red-500/10 border border-red-500/50 text-red-500 shadow-[0_0_15px_rgba(239,68,68,0.2)]'
+                            }`}>
+                              {isApproved ? '🟢 Selected for Team' : 
+                               myTeamStatus === 'Pending' ? '🟡 Application Pending' : 
+                               '🔴 Rejected'}
+                            </div>
+                            {myTeamStatus !== 'Rejected' && (
+                              <button
+                                onClick={handleWithdraw}
+                                className="w-full py-2.5 px-4 rounded-xl text-xs font-bold transition-all duration-300 uppercase tracking-wider bg-dark-800 border border-dark-600 text-gray-400 hover:text-red-500 hover:border-red-500/50 hover:bg-red-500/10"
+                              >
+                                {isApproved ? '🚪 Leave Team' : '❌ Withdraw Application'}
+                              </button>
+                            )}
+                          </div>
+                        ) : (
+                          <button
+                            onClick={handleApplyTryout}
+                            disabled={isFull}
+                            className={`w-full py-3.5 px-4 rounded-xl text-sm font-bold shadow-lg transition-all duration-300 uppercase tracking-wider ${
+                              isFull
+                                ? 'bg-dark-700 text-gray-500 cursor-not-allowed border border-dark-600'
+                                : 'bg-gradient-to-r from-neon-pink to-orange-500 text-dark-900 hover:shadow-[0_0_20px_rgba(255,0,255,0.4)]'
+                            }`}
+                          >
+                            {isFull ? 'Squad Full' : 'Apply for Tryout'}
+                          </button>
+                        )
                       )}
                     </>
                   )}
                   {isCreator && (
-                    <div className="w-full py-3.5 px-4 rounded-xl text-sm font-bold text-neon-blue bg-neon-blue/10 text-center border border-neon-blue/30 uppercase tracking-wider shadow-[inset_0_0_10px_rgba(0,243,255,0.1)]">
-                      You are Commander
+                    <div className="space-y-3">
+                      <div className="w-full py-3.5 px-4 rounded-xl text-sm font-bold text-neon-blue bg-neon-blue/10 text-center border border-neon-blue/30 uppercase tracking-wider shadow-[inset_0_0_10px_rgba(0,243,255,0.1)]">
+                        You are Commander
+                      </div>
+                      <button
+                        onClick={handleDeleteEvent}
+                        className="w-full py-3 px-4 rounded-xl text-sm font-bold shadow-lg transition-all duration-300 uppercase tracking-wider bg-red-500/10 border border-red-500/50 text-red-500 hover:bg-red-500 hover:text-white"
+                      >
+                        🗑 Delete Event
+                      </button>
                     </div>
                   )}
                 </div>
