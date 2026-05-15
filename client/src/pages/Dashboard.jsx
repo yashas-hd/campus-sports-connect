@@ -337,7 +337,7 @@ const Dashboard = () => {
         </section>
 
         {/* Recommended Events Section */}
-        {favoriteSports.length > 0 && (
+        {preferredSports.length > 0 && (
           <section className="mb-12">
             <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
               <span className="text-3xl">⭐</span> Recommended Events
