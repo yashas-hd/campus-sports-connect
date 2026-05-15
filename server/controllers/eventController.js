@@ -21,6 +21,11 @@ const createEvent = async (req, res) => {
   try {
     const { title, sport, date, location, description, maxParticipants, eventType } = req.body;
 
+    const allowedSports = ['Cricket', 'Football', 'Basketball', 'Volleyball', 'Badminton', 'Kabaddi'];
+    if (!allowedSports.includes(sport)) {
+      return res.status(400).json({ message: 'Only approved campus sports are allowed.' });
+    }
+
     const event = await Event.create({
       title,
       sport,
@@ -164,6 +169,10 @@ const applyForTryout = async (req, res) => {
 
     if (event.eventType !== 'Competitive Tryout') {
       return res.status(400).json({ message: 'This event is not a tryout' });
+    }
+
+    if (req.user.preferredSport !== event.sport) {
+      return res.status(400).json({ message: 'You can only apply for tryouts matching your preferred sport.' });
     }
 
     const alreadyApplied = event.teamRequests.some(r => r.user.toString() === req.user._id.toString());

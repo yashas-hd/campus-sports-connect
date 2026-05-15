@@ -44,7 +44,8 @@ const sports = [
   "⚽ Football",
   "🏐 Volleyball",
   "🏀 Basketball",
-  "🏸 Badminton"
+  "🏸 Badminton",
+  "🤼 Kabaddi"
 ];
 
 const sportsInfo = {
@@ -77,6 +78,12 @@ const sportsInfo = {
     duration: "Best of 3 Games",
     location: "Indoor Court",
     equipment: "Rackets, Shuttlecock"
+  },
+  Kabaddi: {
+    players: "7 Players",
+    duration: "40 Minutes",
+    location: "Kabaddi Mat",
+    equipment: "None"
   }
 };
 
@@ -102,7 +109,7 @@ const Dashboard = () => {
 
   const [formData, setFormData] = useState({
     title: '',
-    sport: '',
+    sport: 'Cricket',
     date: '',
     location: '',
     description: '',
@@ -193,7 +200,7 @@ const Dashboard = () => {
       setIsCreateModalOpen(false);
       setFormData({
         title: '',
-        sport: '',
+        sport: 'Cricket',
         date: '',
         location: '',
         description: '',
@@ -208,12 +215,27 @@ const Dashboard = () => {
   };
 
   const getSportBadgeColor = (sport) => {
+    if(!sport) return '';
     const s = sport.toLowerCase();
     if (s.includes('basket')) return 'text-orange-400 border-orange-400 bg-orange-400/10';
     if (s.includes('foot') || s.includes('soccer')) return 'text-neon-green border-neon-green bg-neon-green/10';
-    if (s.includes('tennis')) return 'text-yellow-400 border-yellow-400 bg-yellow-400/10';
+    if (s.includes('badminton')) return 'text-yellow-400 border-yellow-400 bg-yellow-400/10';
     if (s.includes('volley')) return 'text-neon-pink border-neon-pink bg-neon-pink/10';
+    if (s.includes('cricket')) return 'text-blue-400 border-blue-400 bg-blue-400/10';
+    if (s.includes('kabaddi')) return 'text-red-500 border-red-500 bg-red-500/10';
     return 'text-neon-blue border-neon-blue bg-neon-blue/10';
+  };
+
+  const getSportEmoji = (sport) => {
+    if(!sport) return '🏆';
+    const s = sport.toLowerCase();
+    if (s.includes('basket')) return '🏀';
+    if (s.includes('foot') || s.includes('soccer')) return '⚽';
+    if (s.includes('badminton')) return '🏸';
+    if (s.includes('volley')) return '🏐';
+    if (s.includes('cricket')) return '🏏';
+    if (s.includes('kabaddi')) return '🤼';
+    return '🏆';
   };
 
   const filteredEvents = events.filter(event => {
@@ -236,7 +258,7 @@ const Dashboard = () => {
     return searchMatch && sportMatch && statusMatch;
   });
 
-  const filterSportsList = ["All", "Cricket", "Football", "Volleyball", "Basketball", "Badminton"];
+  const filterSportsList = ["All", "Cricket", "Football", "Volleyball", "Basketball", "Badminton", "Kabaddi"];
   const filterStatusList = ["All", "Upcoming", "Ongoing", "Joined"];
 
   const favoriteSports = userProfile?.favoriteSports || [];
@@ -474,7 +496,7 @@ const Dashboard = () => {
                     {/* Sport Badge */}
                     <div className="relative z-10 mb-3 flex justify-between items-start">
                       <span className={`text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider backdrop-blur-md ${getSportBadgeColor(event.sport)}`}>
-                        {event.sport}
+                        {getSportEmoji(event.sport)} {event.sport}
                       </span>
                     </div>
 
@@ -655,15 +677,20 @@ const Dashboard = () => {
                 <div className="grid grid-cols-2 gap-5">
                   <div>
                     <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Sport</label>
-                    <input
-                      type="text"
+                    <select
                       name="sport"
                       required
                       value={formData.sport}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-3 bg-dark-900 border border-dark-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-neon-pink focus:border-neon-pink text-white transition-all placeholder-gray-600"
-                      placeholder="e.g., Basketball"
-                    />
+                      className="w-full px-4 py-3 bg-dark-900 border border-dark-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-neon-pink focus:border-neon-pink text-white transition-all [color-scheme:dark]"
+                    >
+                      <option value="Cricket">🏏 Cricket</option>
+                      <option value="Football">⚽ Football</option>
+                      <option value="Basketball">🏀 Basketball</option>
+                      <option value="Volleyball">🏐 Volleyball</option>
+                      <option value="Badminton">🏸 Badminton</option>
+                      <option value="Kabaddi">🤼 Kabaddi</option>
+                    </select>
                   </div>
                   <div>
                     <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Capacity</label>

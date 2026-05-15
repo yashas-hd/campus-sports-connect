@@ -8,6 +8,7 @@ const eventSchema = mongoose.Schema(
     },
     sport: {
       type: String,
+      enum: ['Cricket', 'Football', 'Basketball', 'Volleyball', 'Badminton', 'Kabaddi'],
       required: [true, 'Please specify the sport'],
     },
     date: {

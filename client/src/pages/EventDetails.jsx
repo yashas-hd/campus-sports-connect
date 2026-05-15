@@ -165,9 +165,23 @@ const EventDetails = () => {
     const s = sport.toLowerCase();
     if (s.includes('basket')) return 'text-orange-400 border-orange-400 bg-orange-400/10';
     if (s.includes('foot') || s.includes('soccer')) return 'text-neon-green border-neon-green bg-neon-green/10';
-    if (s.includes('tennis')) return 'text-yellow-400 border-yellow-400 bg-yellow-400/10';
+    if (s.includes('badminton')) return 'text-yellow-400 border-yellow-400 bg-yellow-400/10';
     if (s.includes('volley')) return 'text-neon-pink border-neon-pink bg-neon-pink/10';
+    if (s.includes('cricket')) return 'text-blue-400 border-blue-400 bg-blue-400/10';
+    if (s.includes('kabaddi')) return 'text-red-500 border-red-500 bg-red-500/10';
     return 'text-neon-blue border-neon-blue bg-neon-blue/10';
+  };
+
+  const getSportEmoji = (sport) => {
+    if(!sport) return '🏆';
+    const s = sport.toLowerCase();
+    if (s.includes('basket')) return '🏀';
+    if (s.includes('foot') || s.includes('soccer')) return '⚽';
+    if (s.includes('badminton')) return '🏸';
+    if (s.includes('volley')) return '🏐';
+    if (s.includes('cricket')) return '🏏';
+    if (s.includes('kabaddi')) return '🤼';
+    return '🏆';
   };
 
   if (loading) {
@@ -230,7 +244,7 @@ const EventDetails = () => {
             
             <div className="relative z-20 animate-fade-in-up">
               <span className={`inline-block mb-3 border text-xs font-bold px-3 py-1 rounded-full uppercase tracking-widest backdrop-blur-md ${getSportBadgeColor(event.sport)}`}>
-                {event.sport}
+                {getSportEmoji(event.sport)} {event.sport}
               </span>
               <h1 className="text-4xl md:text-5xl font-extrabold text-white drop-shadow-md tracking-tight leading-tight">{event.title}</h1>
             </div>
