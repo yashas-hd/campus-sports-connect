@@ -68,6 +68,9 @@ const Navbar = () => {
                 <Link to="/dashboard" className="text-gray-300 hover:text-neon-blue px-3 py-2 rounded-md text-sm font-semibold transition-colors duration-200">
                   Dashboard
                 </Link>
+                <Link to="/analytics" className="text-gray-300 hover:text-neon-blue px-3 py-2 rounded-md text-sm font-semibold transition-colors duration-200 flex items-center gap-1">
+                  📊 Analytics
+                </Link>
                 {/* Notification Bell */}
                 <div className="relative">
                   <button 

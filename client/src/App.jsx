@@ -7,6 +7,7 @@ import VerifyOTP from './pages/VerifyOTP';
 import Dashboard from './pages/Dashboard';
 import EventDetails from './pages/EventDetails';
 import Profile from './pages/Profile';
+import Analytics from './pages/Analytics';
 import { Toaster } from 'react-hot-toast';
 import './App.css';
 
@@ -86,6 +87,14 @@ function App() {
           element={
             <ProtectedRoute>
               <Profile />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/analytics" 
+          element={
+            <ProtectedRoute>
+              <Analytics />
             </ProtectedRoute>
           } 
         />
