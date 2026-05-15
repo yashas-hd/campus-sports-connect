@@ -386,6 +386,58 @@ const withdrawApplication = async (req, res) => {
   }
 };
 
+// @desc    Remove a player from an event (Host only)
+// @route   POST /api/events/:id/remove/:userId
+// @access  Private
+const removePlayer = async (req, res) => {
+  try {
+    const event = await Event.findById(req.params.id);
+
+    if (!event) {
+      return res.status(404).json({ message: 'Event not found' });
+    }
+
+    if (event.creator.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: 'Only the host can remove players' });
+    }
+
+    const userIdToRemove = req.params.userId;
+
+    if (userIdToRemove === req.user._id.toString()) {
+      return res.status(400).json({ message: 'You cannot remove yourself' });
+    }
+
+    // Remove from teamRequests
+    event.teamRequests = event.teamRequests.filter(r => r.user.toString() !== userIdToRemove);
+
+    // Remove from approvedPlayers
+    event.approvedPlayers = event.approvedPlayers.filter(p => p.toString() !== userIdToRemove);
+
+    // Remove from participants
+    event.participants = event.participants.filter(p => p.toString() !== userIdToRemove);
+
+    await event.save();
+
+    // Remove from user's joinedEvents
+    const user = await User.findById(userIdToRemove);
+    if (user && user.joinedEvents.includes(event._id)) {
+      user.joinedEvents.pull(event._id);
+      await user.save();
+    }
+
+    const updatedEvent = await Event.findById(req.params.id)
+      .populate('creator', 'name college bio')
+      .populate('participants', 'name college')
+      .populate('comments.user', 'name')
+      .populate('teamRequests.user', 'name email college preferredSport preferredPosition experienceLevel')
+      .populate('approvedPlayers', 'name college preferredSport preferredPosition');
+
+    res.json(updatedEvent);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   getEvents,
   createEvent,
@@ -397,4 +449,5 @@ module.exports = {
   rejectPlayer,
   deleteEvent,
   withdrawApplication,
+  removePlayer,
 };

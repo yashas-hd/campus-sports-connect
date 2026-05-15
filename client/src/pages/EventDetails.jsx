@@ -114,6 +114,18 @@ const EventDetails = () => {
     }
   };
 
+  const handleRemovePlayer = async (userId, userName) => {
+    if (window.confirm(`Are you sure you want to remove ${userName} from the squad?`)) {
+      try {
+        const { data } = await axiosInstance.post(`/api/events/${event._id}/remove/${userId}`, {});
+        setEvent(data);
+        toast.success(`${userName} was removed from the squad`, { icon: '👢' });
+      } catch (err) {
+        toast.error(err.response?.data?.message || 'Failed to remove player');
+      }
+    }
+  };
+
   const handleWithdraw = async () => {
     try {
       const { data } = await axiosInstance.post(`/api/events/${event._id}/withdraw`, {});
@@ -356,6 +368,15 @@ const EventDetails = () => {
                           </p>
                           <p className="text-xs text-gray-500 truncate mt-0.5">{p.college}</p>
                         </div>
+                        {isCreator && p._id !== event.creator?._id && (
+                          <button
+                            onClick={() => handleRemovePlayer(p._id, p.name)}
+                            className="ml-2 w-8 h-8 rounded-lg bg-red-500/10 text-red-500 border border-red-500/30 flex items-center justify-center hover:bg-red-500 hover:text-white transition-colors"
+                            title="Remove Player"
+                          >
+                            ×
+                          </button>
+                        )}
                       </div>
                     ))}
                   </div>
