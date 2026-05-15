@@ -411,18 +411,34 @@ const EventDetails = () => {
                   
                   <div className="space-y-3 mb-8 max-h-72 overflow-y-auto custom-scrollbar pr-2">
                     {event.participants?.map(p => (
-                      <div key={p._id} className="flex items-center gap-3 bg-dark-800/50 p-3 rounded-xl border border-dark-600 hover:border-dark-500 transition-colors">
-                        <div className="h-10 w-10 rounded-full bg-dark-900 border border-dark-600 flex items-center justify-center text-gray-300 text-sm font-bold uppercase flex-shrink-0 shadow-inner">
-                          {p.name.charAt(0)}
+                      <div key={p._id} className="flex flex-col gap-3 bg-dark-800/50 p-3 rounded-xl border border-dark-600 hover:border-dark-500 transition-colors">
+                        <div className="flex justify-between items-start w-full">
+                          <div className="flex items-center gap-3 min-w-0 flex-1">
+                            <div className="h-10 w-10 rounded-full bg-dark-900 border border-dark-600 flex items-center justify-center text-gray-300 text-sm font-bold uppercase flex-shrink-0 shadow-inner">
+                              {p.name.charAt(0)}
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <p className="text-sm font-bold text-white truncate">
+                                {p.name} 
+                                {p._id === event.creator?._id && <span className="text-[10px] bg-neon-blue/20 text-neon-blue px-2 py-0.5 rounded ml-2 uppercase tracking-wider">Host</span>}
+                              </p>
+                              <p className="text-xs text-gray-500 truncate mt-0.5">{p.college}</p>
+                            </div>
+                          </div>
+                          {isCreator && p._id !== event.creator?._id && (
+                            <button
+                              onClick={() => handleRemovePlayer(p._id, p.name)}
+                              disabled={processingActionId === p._id + '-remove'}
+                              className="ml-2 w-8 h-8 flex-shrink-0 rounded-lg bg-red-500/10 text-red-500 border border-red-500/30 flex items-center justify-center hover:bg-red-500 hover:text-white transition-colors disabled:opacity-50"
+                              title="Remove Player"
+                            >
+                              {processingActionId === p._id + '-remove' ? '...' : '×'}
+                            </button>
+                          )}
                         </div>
-                        <div className="min-w-0 flex-1">
-                          <p className="text-sm font-bold text-white truncate">
-                            {p.name} 
-                            {p._id === event.creator?._id && <span className="text-[10px] bg-neon-blue/20 text-neon-blue px-2 py-0.5 rounded ml-2 uppercase tracking-wider">Host</span>}
-                          </p>
-                          <p className="text-xs text-gray-500 truncate mt-0.5">{p.college}</p>
-                          
-                          {isCompetitiveTryout && p._id !== event.creator?._id && (
+                        
+                        {isCompetitiveTryout && p._id !== event.creator?._id && (
+                          <div className="w-full">
                             <PlayerRating 
                               reqData={event.teamRequests?.find(r => r.user?._id === p._id || r.user === p._id)} 
                               isCreator={isCreator} 
@@ -430,17 +446,7 @@ const EventDetails = () => {
                               onRate={handleRatePlayer} 
                               processingActionId={processingActionId} 
                             />
-                          )}
-                        </div>
-                        {isCreator && p._id !== event.creator?._id && (
-                            <button
-                              onClick={() => handleRemovePlayer(p._id, p.name)}
-                              disabled={processingActionId === p._id + '-remove'}
-                              className="ml-2 w-8 h-8 rounded-lg bg-red-500/10 text-red-500 border border-red-500/30 flex items-center justify-center hover:bg-red-500 hover:text-white transition-colors disabled:opacity-50"
-                              title="Remove Player"
-                            >
-                              {processingActionId === p._id + '-remove' ? '...' : '×'}
-                            </button>
+                          </div>
                         )}
                       </div>
                     ))}
