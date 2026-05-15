@@ -111,6 +111,7 @@ const Analytics = () => {
             </h3>
             <div className="space-y-4">
               <InsightCard label="Avg Applications per Tryout" value={data?.avgApplications} />
+              <InsightCard label="Average Team Rating" value={data?.averageTeamRating ? `⭐ ${data.averageTeamRating}` : '-'} />
               <InsightCard label="Total Team Selections" value={data?.totalApprovedPlayers} />
               <InsightCard label="Overall Active Users" value={data?.activeParticipants} />
             </div>
@@ -130,10 +131,9 @@ const Analytics = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-dark-700">
-                <TableRow param="Team Selection" traditional="Random" modern="Structured" />
-                <TableRow param="Fresher Participation" traditional="Limited" modern="Improved" />
-                <TableRow param="Player Evaluation" traditional="Manual" modern="Organized" />
-                <TableRow param="Team Formation" traditional="Unbalanced" modern="Skill-Based" />
+                <TableRow param="Team Selection" traditional="Random Selection" modern="Performance-Based Selection" />
+                <TableRow param="Evaluation Tracking" traditional="No Evaluation Tracking" modern="Structured Player Ratings" />
+                <TableRow param="Player Observation" traditional="Manual Observation" modern="Digital Performance Insights" />
               </tbody>
             </table>
           </div>

@@ -16,16 +16,33 @@ const getOverview = async (req, res) => {
     let activeParticipants = 0;
     let sportCounts = {};
 
+    let totalRatings = 0;
+    let ratingCount = 0;
+    let players = [];
+
     events.forEach(event => {
       totalApplications += event.teamRequests ? event.teamRequests.length : 0;
       totalApprovedPlayers += event.approvedPlayers ? event.approvedPlayers.length : 0;
       activeParticipants += event.participants ? event.participants.length : 0;
       
+      if (event.teamRequests) {
+        event.teamRequests.forEach(req => {
+          if (req.teamStatus === 'Approved' && req.rating > 0) {
+            totalRatings += req.rating;
+            ratingCount++;
+            players.push({ user: req.user, rating: req.rating, sport: event.sport });
+          }
+        });
+      }
+
       const sport = event.sport;
       if (sport) {
         sportCounts[sport] = (sportCounts[sport] || 0) + 1;
       }
     });
+
+    const averageTeamRating = ratingCount > 0 ? (totalRatings / ratingCount).toFixed(1) : 0;
+    const topRatedPlayers = players.sort((a, b) => b.rating - a.rating).slice(0, 5);
 
     let mostPopularSport = "None";
     let maxCount = 0;
@@ -54,7 +71,9 @@ const getOverview = async (req, res) => {
       mostPopularSport,
       avgApplications,
       barChartData,
-      pieChartData
+      pieChartData,
+      averageTeamRating,
+      topRatedPlayers
     });
   } catch (error) {
     res.status(500).json({ message: error.message });

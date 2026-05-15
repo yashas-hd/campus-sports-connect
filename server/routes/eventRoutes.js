@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { getEvents, createEvent, getEventById, joinEvent, addComment, applyForTryout, approvePlayer, rejectPlayer, deleteEvent, withdrawApplication, removePlayer } = require('../controllers/eventController');
+const { getEvents, createEvent, getEventById, joinEvent, addComment, applyForTryout, approvePlayer, rejectPlayer, deleteEvent, withdrawApplication, removePlayer, ratePlayer } = require('../controllers/eventController');
 const { protect } = require('../middleware/authMiddleware');
 
 router.route('/')
@@ -19,6 +19,9 @@ router.route('/:id/withdraw')
 
 router.route('/:id/remove/:userId')
   .post(protect, removePlayer);
+
+router.route('/:id/rate/:userId')
+  .post(protect, ratePlayer);
 
 router.route('/:id/comment')
   .post(protect, addComment);

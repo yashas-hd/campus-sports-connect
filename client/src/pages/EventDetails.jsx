@@ -151,6 +151,19 @@ const EventDetails = () => {
     }
   };
 
+  const handleRatePlayer = async (userId, rating, feedback) => {
+    setProcessingActionId(userId + '-rate');
+    try {
+      const { data } = await axiosInstance.post(`/api/events/${event._id}/rate/${userId}`, { rating, feedback });
+      setEvent(data);
+      toast.success('Player rating saved!', { icon: '⭐' });
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to save rating');
+    } finally {
+      setProcessingActionId(null);
+    }
+  };
+
   const handleCommentSubmit = async (e) => {
     e.preventDefault();
     if (!commentText.trim()) return;
@@ -408,6 +421,16 @@ const EventDetails = () => {
                             {p._id === event.creator?._id && <span className="text-[10px] bg-neon-blue/20 text-neon-blue px-2 py-0.5 rounded ml-2 uppercase tracking-wider">Host</span>}
                           </p>
                           <p className="text-xs text-gray-500 truncate mt-0.5">{p.college}</p>
+                          
+                          {isCompetitiveTryout && p._id !== event.creator?._id && (
+                            <PlayerRating 
+                              reqData={event.teamRequests?.find(r => r.user?._id === p._id || r.user === p._id)} 
+                              isCreator={isCreator} 
+                              userId={p._id} 
+                              onRate={handleRatePlayer} 
+                              processingActionId={processingActionId} 
+                            />
+                          )}
                         </div>
                         {isCreator && p._id !== event.creator?._id && (
                             <button
@@ -566,6 +589,84 @@ const EventDetails = () => {
           </div>
         </div>
       </main>
+    </div>
+  );
+};
+
+const PlayerRating = ({ reqData, isCreator, userId, onRate, processingActionId }) => {
+  const [rating, setRating] = useState(reqData?.rating || 0);
+  const [feedback, setFeedback] = useState(reqData?.feedback || '');
+  const [isEditing, setIsEditing] = useState(false);
+
+  useEffect(() => {
+    if (reqData) {
+      setRating(reqData.rating || 0);
+      setFeedback(reqData.feedback || '');
+    }
+  }, [reqData]);
+
+  if (!reqData) return null;
+
+  if (!isCreator) {
+    if (reqData.rating > 0) {
+      return (
+        <div className="mt-2 text-[10px] text-yellow-400 bg-dark-900 px-2 py-1 rounded inline-block border border-yellow-400/20 font-medium">
+          Rating: {Array(reqData.rating).fill('★').join('')}{Array(5 - reqData.rating).fill('☆').join('')} ({reqData.rating}/5)
+        </div>
+      );
+    }
+    return null;
+  }
+
+  // Host view
+  return (
+    <div className="mt-3 bg-dark-900/50 p-3 rounded-lg border border-dark-600 w-full">
+      <div className="flex items-center justify-between mb-2">
+        <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider flex items-center gap-1">
+          <span className="text-neon-blue">📊</span> Performance Rating
+        </span>
+        {reqData.rating > 0 && !isEditing && (
+          <button onClick={() => setIsEditing(true)} className="text-[10px] text-neon-pink hover:text-white transition-colors">Edit</button>
+        )}
+      </div>
+      
+      {(!reqData.rating || isEditing) ? (
+        <div className="space-y-2">
+          <div className="flex gap-1 text-lg">
+            {[1, 2, 3, 4, 5].map(star => (
+              <button 
+                key={star} 
+                onClick={() => setRating(star)} 
+                className={`focus:outline-none transition-transform hover:scale-110 ${rating >= star ? 'text-yellow-400' : 'text-gray-600 hover:text-yellow-400/50'}`}
+              >
+                ★
+              </button>
+            ))}
+          </div>
+          <textarea
+            value={feedback}
+            onChange={(e) => setFeedback(e.target.value)}
+            placeholder="Feedback (optional)..."
+            className="w-full bg-dark-900 border border-dark-600 rounded p-2 text-xs text-white focus:border-neon-blue focus:outline-none focus:ring-1 focus:ring-neon-blue resize-none transition-colors"
+            rows="2"
+          />
+          <div className="flex justify-end gap-2">
+            {isEditing && <button onClick={() => { setIsEditing(false); setRating(reqData.rating); setFeedback(reqData.feedback); }} className="text-[10px] text-gray-400 hover:text-white transition-colors px-2">Cancel</button>}
+            <button 
+              onClick={() => { onRate(userId, rating, feedback); setIsEditing(false); }}
+              disabled={rating === 0 || processingActionId === userId + '-rate'}
+              className="px-3 py-1 bg-neon-blue/10 text-neon-blue text-xs font-bold rounded hover:bg-neon-blue hover:text-dark-900 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed border border-neon-blue/30 shadow-[0_0_10px_rgba(0,243,255,0.1)]"
+            >
+              {processingActionId === userId + '-rate' ? '...' : 'Save Rating'}
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div className="group">
+          <div className="text-yellow-400 text-sm mb-1">{Array(reqData.rating).fill('★').join('')}{Array(5 - reqData.rating).fill('☆').join('')}</div>
+          {reqData.feedback && <p className="text-xs text-gray-300 italic">"{reqData.feedback}"</p>}
+        </div>
+      )}
     </div>
   );
 };

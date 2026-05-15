@@ -54,6 +54,16 @@ const eventSchema = mongoose.Schema(
           type: Date,
           default: Date.now,
         },
+        rating: {
+          type: Number,
+          min: 0,
+          max: 5,
+          default: 0
+        },
+        feedback: {
+          type: String,
+          default: ""
+        }
       },
     ],
     approvedPlayers: [

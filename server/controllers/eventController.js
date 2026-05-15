@@ -485,6 +485,73 @@ const removePlayer = async (req, res) => {
   }
 };
 
+// @desc    Rate Player
+// @route   POST /api/events/:id/rate/:userId
+// @access  Private
+const ratePlayer = async (req, res) => {
+  try {
+    const event = await Event.findById(req.params.id);
+
+    if (!event) {
+      return res.status(404).json({ message: 'Event not found' });
+    }
+
+    if (event.creator.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: 'Only the host can rate players' });
+    }
+
+    const targetUserId = req.params.userId;
+    const { rating, feedback } = req.body;
+
+    if (rating < 1 || rating > 5) {
+      return res.status(400).json({ message: 'Rating must be between 1 and 5' });
+    }
+
+    const requestIndex = event.teamRequests.findIndex(r => r.user.toString() === targetUserId);
+
+    if (requestIndex === -1) {
+      return res.status(404).json({ message: 'Applicant not found in team requests' });
+    }
+
+    if (event.teamRequests[requestIndex].teamStatus !== 'Approved') {
+      return res.status(400).json({ message: 'Only approved players can be rated' });
+    }
+
+    event.teamRequests[requestIndex].rating = rating;
+    if (feedback !== undefined) {
+      event.teamRequests[requestIndex].feedback = feedback;
+    }
+
+    await event.save();
+
+    // Send notification
+    try {
+      const notification = await Notification.create({
+        recipient: targetUserId,
+        sender: req.user._id,
+        event: event._id,
+        type: 'player_rated',
+        message: `You received a ${rating}-star rating for ${event.title}`,
+      });
+      const io = req.app.get('io');
+      io.to(targetUserId.toString()).emit('new_notification', notification);
+    } catch (err) {
+      console.error('Notification creation failed:', err);
+    }
+
+    const updatedEvent = await Event.findById(req.params.id)
+      .populate('creator', 'name college bio')
+      .populate('participants', 'name college')
+      .populate('comments.user', 'name')
+      .populate('teamRequests.user', 'name email college preferredSport preferredPosition experienceLevel')
+      .populate('approvedPlayers', 'name college preferredSport preferredPosition');
+
+    res.json(updatedEvent);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   getEvents,
   createEvent,
@@ -497,4 +564,5 @@ module.exports = {
   deleteEvent,
   withdrawApplication,
   removePlayer,
+  ratePlayer,
 };
