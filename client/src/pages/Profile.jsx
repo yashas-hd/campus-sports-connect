@@ -17,6 +17,9 @@ const Profile = () => {
     name: '',
     bio: '',
     sportsInterests: '',
+    preferredSport: '',
+    preferredPosition: '',
+    experienceLevel: 'Beginner',
   });
 
   useEffect(() => {
@@ -29,6 +32,9 @@ const Profile = () => {
           name: data.name,
           bio: data.bio || '',
           sportsInterests: data.sportsInterests ? data.sportsInterests.join(', ') : '',
+          preferredSport: data.preferredSport || '',
+          preferredPosition: data.preferredPosition || '',
+          experienceLevel: data.experienceLevel || 'Beginner',
         });
       } catch (error) {
         toast.error('Failed to load profile data');
@@ -82,12 +88,15 @@ const Profile = () => {
         name: formData.name,
         bio: formData.bio,
         sportsInterests: formData.sportsInterests.split(',').map(s => s.trim()).filter(s => s !== ''),
+        preferredSport: formData.preferredSport,
+        preferredPosition: formData.preferredPosition,
+        experienceLevel: formData.experienceLevel,
       };
 
       const { data } = await axiosInstance.put('/api/users/profile', payload);
       
       login({ ...user, name: data.name });
-      setProfileData({ ...profileData, name: data.name, bio: data.bio, sportsInterests: data.sportsInterests });
+      setProfileData({ ...profileData, name: data.name, bio: data.bio, sportsInterests: data.sportsInterests, preferredSport: data.preferredSport, preferredPosition: data.preferredPosition, experienceLevel: data.experienceLevel });
       setIsEditing(false);
       toast.success('Profile updated successfully!', { icon: '✨' });
     } catch (error) {
@@ -187,6 +196,20 @@ const Profile = () => {
                           <span className="text-sm text-gray-500 italic">None specified.</span>
                         )}
                       </div>
+                      <div className="grid grid-cols-2 gap-4 mt-4">
+                        <div className="bg-dark-900/50 p-3 rounded-lg border border-dark-700">
+                          <span className="block text-[10px] text-gray-500 uppercase tracking-wider mb-1">Preferred Sport</span>
+                          <span className="text-sm text-gray-300 font-medium">{profileData.preferredSport || 'N/A'}</span>
+                        </div>
+                        <div className="bg-dark-900/50 p-3 rounded-lg border border-dark-700">
+                          <span className="block text-[10px] text-gray-500 uppercase tracking-wider mb-1">Preferred Position</span>
+                          <span className="text-sm text-gray-300 font-medium">{profileData.preferredPosition || 'N/A'}</span>
+                        </div>
+                        <div className="bg-dark-900/50 p-3 rounded-lg border border-dark-700 col-span-2">
+                          <span className="block text-[10px] text-gray-500 uppercase tracking-wider mb-1">Experience Level</span>
+                          <span className="text-sm text-neon-blue font-medium">{profileData.experienceLevel || 'Beginner'}</span>
+                        </div>
+                      </div>
                     </div>
                   </div>
                   
@@ -230,6 +253,43 @@ const Profile = () => {
                       className="w-full px-4 py-2.5 bg-dark-900 border border-dark-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-neon-green focus:border-neon-green text-white transition-all text-sm"
                       placeholder="e.g., Basketball, Tennis"
                     />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5">Pref. Sport</label>
+                      <input
+                        type="text"
+                        name="preferredSport"
+                        value={formData.preferredSport}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-2.5 bg-dark-900 border border-dark-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-neon-blue focus:border-neon-blue text-white transition-all text-sm"
+                        placeholder="e.g., Football"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5">Pref. Position</label>
+                      <input
+                        type="text"
+                        name="preferredPosition"
+                        value={formData.preferredPosition}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-2.5 bg-dark-900 border border-dark-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-neon-blue focus:border-neon-blue text-white transition-all text-sm"
+                        placeholder="e.g., Striker"
+                      />
+                    </div>
+                    <div className="col-span-2">
+                      <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5">Experience Level</label>
+                      <select
+                        name="experienceLevel"
+                        value={formData.experienceLevel}
+                        onChange={handleInputChange}
+                        className="w-full px-4 py-2.5 bg-dark-900 border border-dark-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-neon-blue focus:border-neon-blue text-white transition-all text-sm [color-scheme:dark]"
+                      >
+                        <option value="Beginner">Beginner</option>
+                        <option value="Intermediate">Intermediate</option>
+                        <option value="Advanced">Advanced</option>
+                      </select>
+                    </div>
                   </div>
                   <div className="flex gap-3 pt-4">
                     <button

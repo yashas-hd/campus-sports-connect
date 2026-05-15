@@ -19,7 +19,7 @@ const getEvents = async (req, res) => {
 // @access  Private
 const createEvent = async (req, res) => {
   try {
-    const { title, sport, date, location, description, maxParticipants } = req.body;
+    const { title, sport, date, location, description, maxParticipants, eventType } = req.body;
 
     const event = await Event.create({
       title,
@@ -28,6 +28,7 @@ const createEvent = async (req, res) => {
       location,
       description,
       maxParticipants,
+      eventType: eventType || 'Casual Match',
       creator: req.user._id,
       participants: [req.user._id], // Creator is automatically a participant
     });
@@ -50,7 +51,9 @@ const getEventById = async (req, res) => {
     const event = await Event.findById(req.params.id)
       .populate('creator', 'name college bio')
       .populate('participants', 'name college')
-      .populate('comments.user', 'name');
+      .populate('comments.user', 'name')
+      .populate('teamRequests.user', 'name email college preferredSport preferredPosition experienceLevel')
+      .populate('approvedPlayers', 'name college preferredSport preferredPosition');
 
     if (!event) {
       return res.status(404).json({ message: 'Event not found' });
@@ -148,10 +151,172 @@ const addComment = async (req, res) => {
   }
 };
 
+// @desc    Apply for Tryout
+// @route   POST /api/events/:id/apply
+// @access  Private
+const applyForTryout = async (req, res) => {
+  try {
+    const event = await Event.findById(req.params.id);
+
+    if (!event) {
+      return res.status(404).json({ message: 'Event not found' });
+    }
+
+    if (event.eventType !== 'Competitive Tryout') {
+      return res.status(400).json({ message: 'This event is not a tryout' });
+    }
+
+    const alreadyApplied = event.teamRequests.some(r => r.user.toString() === req.user._id.toString());
+    const alreadyApproved = event.approvedPlayers.includes(req.user._id);
+
+    if (alreadyApplied || alreadyApproved || event.participants.includes(req.user._id)) {
+      return res.status(400).json({ message: 'You have already applied or joined this event' });
+    }
+
+    event.teamRequests.push({ user: req.user._id, teamStatus: 'Pending' });
+    await event.save();
+
+    // Create notification for creator
+    if (event.creator.toString() !== req.user._id.toString()) {
+      const notification = await Notification.create({
+        recipient: event.creator,
+        sender: req.user._id,
+        event: event._id,
+        type: 'new_applicant',
+        message: `${req.user.name} applied for tryouts: ${event.title}`,
+      });
+      const io = req.app.get('io');
+      io.to(event.creator.toString()).emit('new_notification', notification);
+    }
+
+    const updatedEvent = await Event.findById(req.params.id)
+      .populate('creator', 'name college bio')
+      .populate('participants', 'name college')
+      .populate('comments.user', 'name')
+      .populate('teamRequests.user', 'name email college preferredSport preferredPosition experienceLevel')
+      .populate('approvedPlayers', 'name college preferredSport preferredPosition');
+
+    res.json(updatedEvent);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// @desc    Approve Player
+// @route   POST /api/events/:id/approve/:userId
+// @access  Private
+const approvePlayer = async (req, res) => {
+  try {
+    const event = await Event.findById(req.params.id);
+
+    if (!event) {
+      return res.status(404).json({ message: 'Event not found' });
+    }
+
+    if (event.creator.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: 'Only the host can approve players' });
+    }
+
+    const targetUserId = req.params.userId;
+    const requestIndex = event.teamRequests.findIndex(r => r.user.toString() === targetUserId);
+
+    if (requestIndex === -1) {
+      return res.status(404).json({ message: 'Applicant not found' });
+    }
+
+    if (event.maxParticipants > 0 && event.participants.length >= event.maxParticipants) {
+      return res.status(400).json({ message: 'Event capacity reached' });
+    }
+
+    // Update status
+    event.teamRequests[requestIndex].teamStatus = 'Approved';
+
+    if (!event.approvedPlayers.includes(targetUserId)) {
+      event.approvedPlayers.push(targetUserId);
+    }
+    
+    if (!event.participants.includes(targetUserId)) {
+      event.participants.push(targetUserId);
+    }
+
+    await event.save();
+
+    // Add event ID into target user's joinedEvents
+    const targetUser = await User.findById(targetUserId);
+    if (targetUser && !targetUser.joinedEvents.includes(event._id)) {
+      targetUser.joinedEvents.push(event._id);
+      await targetUser.save();
+    }
+
+    // Notify user
+    const notification = await Notification.create({
+      recipient: targetUserId,
+      sender: req.user._id,
+      event: event._id,
+      type: 'tryout_approved',
+      message: `You were approved for the team: ${event.title}!`,
+    });
+    const io = req.app.get('io');
+    io.to(targetUserId).emit('new_notification', notification);
+
+    const updatedEvent = await Event.findById(req.params.id)
+      .populate('creator', 'name college bio')
+      .populate('participants', 'name college')
+      .populate('comments.user', 'name')
+      .populate('teamRequests.user', 'name email college preferredSport preferredPosition experienceLevel')
+      .populate('approvedPlayers', 'name college preferredSport preferredPosition');
+
+    res.json(updatedEvent);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// @desc    Reject Player
+// @route   POST /api/events/:id/reject/:userId
+// @access  Private
+const rejectPlayer = async (req, res) => {
+  try {
+    const event = await Event.findById(req.params.id);
+
+    if (!event) {
+      return res.status(404).json({ message: 'Event not found' });
+    }
+
+    if (event.creator.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: 'Only the host can reject players' });
+    }
+
+    const targetUserId = req.params.userId;
+    const requestIndex = event.teamRequests.findIndex(r => r.user.toString() === targetUserId);
+
+    if (requestIndex === -1) {
+      return res.status(404).json({ message: 'Applicant not found' });
+    }
+
+    event.teamRequests[requestIndex].teamStatus = 'Rejected';
+    await event.save();
+
+    const updatedEvent = await Event.findById(req.params.id)
+      .populate('creator', 'name college bio')
+      .populate('participants', 'name college')
+      .populate('comments.user', 'name')
+      .populate('teamRequests.user', 'name email college preferredSport preferredPosition experienceLevel')
+      .populate('approvedPlayers', 'name college preferredSport preferredPosition');
+
+    res.json(updatedEvent);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   getEvents,
   createEvent,
   getEventById,
   joinEvent,
   addComment,
+  applyForTryout,
+  approvePlayer,
+  rejectPlayer,
 };

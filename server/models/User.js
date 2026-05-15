@@ -38,6 +38,19 @@ const userSchema = mongoose.Schema(
       type: [String],
       default: [],
     },
+    preferredSport: {
+      type: String,
+      default: '',
+    },
+    preferredPosition: {
+      type: String,
+      default: '',
+    },
+    experienceLevel: {
+      type: String,
+      enum: ['Beginner', 'Intermediate', 'Advanced'],
+      default: 'Beginner',
+    },
     isVerified: {
       type: Boolean,
       default: false, // Set to true after OTP verification

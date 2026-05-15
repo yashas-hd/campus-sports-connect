@@ -107,6 +107,7 @@ const Dashboard = () => {
     location: '',
     description: '',
     maxParticipants: 0,
+    eventType: 'Casual Match',
   });
 
   const { user } = useContext(AuthContext);
@@ -197,6 +198,7 @@ const Dashboard = () => {
         location: '',
         description: '',
         maxParticipants: 0,
+        eventType: 'Casual Match',
       });
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed to create event');
@@ -627,6 +629,36 @@ const Dashboard = () => {
                     className="w-full px-4 py-3 bg-dark-900 border border-dark-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-neon-blue focus:border-neon-blue text-white transition-all placeholder-gray-600"
                     placeholder="e.g., Midnight Basketball Pickup"
                   />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Event Type</label>
+                  <div className="flex gap-4">
+                    <label className={`flex-1 cursor-pointer p-4 rounded-xl border transition-all duration-300 text-center ${formData.eventType === 'Casual Match' ? 'bg-neon-blue/10 border-neon-blue text-neon-blue shadow-[0_0_15px_rgba(0,243,255,0.2)]' : 'bg-dark-900 border-dark-700 text-gray-400 hover:border-gray-500'}`}>
+                      <input
+                        type="radio"
+                        name="eventType"
+                        value="Casual Match"
+                        checked={formData.eventType === 'Casual Match'}
+                        onChange={handleInputChange}
+                        className="hidden"
+                      />
+                      <span className="font-bold block mb-1">Casual Match</span>
+                      <span className="text-xs opacity-70">Direct Join Allowed</span>
+                    </label>
+                    <label className={`flex-1 cursor-pointer p-4 rounded-xl border transition-all duration-300 text-center ${formData.eventType === 'Competitive Tryout' ? 'bg-neon-pink/10 border-neon-pink text-neon-pink shadow-[0_0_15px_rgba(255,0,255,0.2)]' : 'bg-dark-900 border-dark-700 text-gray-400 hover:border-gray-500'}`}>
+                      <input
+                        type="radio"
+                        name="eventType"
+                        value="Competitive Tryout"
+                        checked={formData.eventType === 'Competitive Tryout'}
+                        onChange={handleInputChange}
+                        className="hidden"
+                      />
+                      <span className="font-bold block mb-1">Tryout / Selection</span>
+                      <span className="text-xs opacity-70">Requires Approval</span>
+                    </label>
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-5">

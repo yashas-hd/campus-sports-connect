@@ -71,6 +71,37 @@ const EventDetails = () => {
     }
   };
 
+  const handleApplyTryout = async () => {
+    try {
+      await axiosInstance.post(`/api/events/${event._id}/apply`, {});
+      const updatedEvent = await axiosInstance.get(`/api/events/${event._id}`);
+      setEvent(updatedEvent.data);
+      toast.success('Tryout application submitted!', { icon: '📝' });
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to apply');
+    }
+  };
+
+  const handleApprovePlayer = async (userId) => {
+    try {
+      const { data } = await axiosInstance.post(`/api/events/${event._id}/approve/${userId}`, {});
+      setEvent(data);
+      toast.success('Player approved for the team!', { icon: '🟢' });
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to approve player');
+    }
+  };
+
+  const handleRejectPlayer = async (userId) => {
+    try {
+      const { data } = await axiosInstance.post(`/api/events/${event._id}/reject/${userId}`, {});
+      setEvent(data);
+      toast.success('Player rejected.', { icon: '🔴' });
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to reject player');
+    }
+  };
+
   const handleCommentSubmit = async (e) => {
     e.preventDefault();
     if (!commentText.trim()) return;
@@ -138,6 +169,11 @@ const EventDetails = () => {
   const isParticipating = event.participants?.some(p => p._id === user._id);
   const isCreator = event.creator?._id === user._id;
   const isFull = event.maxParticipants > 0 && event.participants?.length >= event.maxParticipants;
+  const isCompetitiveTryout = event.eventType === 'Competitive Tryout';
+  const myRequest = event.teamRequests?.find(r => (r.user?._id === user._id || r.user === user._id));
+  const hasApplied = !!myRequest;
+  const myTeamStatus = myRequest?.teamStatus;
+  const isApproved = event.approvedPlayers?.some(p => p._id === user._id || p === user._id);
 
   return (
     <div className="min-h-screen bg-dark-900 text-gray-100 font-sans pb-12 relative overflow-hidden">
@@ -222,9 +258,63 @@ const EventDetails = () => {
 
               {/* Right Column: Participants & Action */}
               <div className="space-y-6">
+                
+                {/* Host Review Panel */}
+                {isCreator && isCompetitiveTryout && (
+                  <div className="bg-dark-900/80 p-6 rounded-2xl border border-neon-pink/50 shadow-[0_0_15px_rgba(255,0,255,0.1)]">
+                    <h3 className="font-bold text-white text-lg mb-4 flex items-center gap-2">
+                      <span className="text-neon-pink">📋</span> Host Review Panel
+                    </h3>
+                    
+                    {(!event.teamRequests || event.teamRequests.length === 0) ? (
+                      <p className="text-gray-500 text-sm italic">No tryout applications yet.</p>
+                    ) : (
+                      <div className="space-y-4 max-h-96 overflow-y-auto custom-scrollbar pr-2">
+                        {event.teamRequests.map(req => (
+                          <div key={req._id} className="bg-dark-800 p-4 rounded-xl border border-dark-600 transition-colors">
+                            <div className="flex justify-between items-start mb-2">
+                              <div>
+                                <h4 className="text-sm font-bold text-white">{req.user?.name}</h4>
+                                <p className="text-xs text-gray-400">{req.user?.college} • {req.user?.email}</p>
+                              </div>
+                              {req.teamStatus === 'Pending' && <span className="text-[10px] font-bold px-2 py-1 rounded bg-yellow-500/10 text-yellow-500 border border-yellow-500/30">🟡 Pending</span>}
+                              {req.teamStatus === 'Approved' && <span className="text-[10px] font-bold px-2 py-1 rounded bg-neon-green/10 text-neon-green border border-neon-green/30">🟢 Approved</span>}
+                              {req.teamStatus === 'Rejected' && <span className="text-[10px] font-bold px-2 py-1 rounded bg-red-500/10 text-red-500 border border-red-500/30">🔴 Rejected</span>}
+                            </div>
+                            
+                            <div className="grid grid-cols-2 gap-2 mb-3 mt-2 bg-dark-900/50 p-2 rounded-lg">
+                              <div>
+                                <span className="block text-[10px] text-gray-500 uppercase">Sport</span>
+                                <span className="text-xs text-gray-300 font-medium">{req.user?.preferredSport || 'N/A'}</span>
+                              </div>
+                              <div>
+                                <span className="block text-[10px] text-gray-500 uppercase">Position</span>
+                                <span className="text-xs text-gray-300 font-medium">{req.user?.preferredPosition || 'N/A'}</span>
+                              </div>
+                              <div className="col-span-2 mt-1">
+                                <span className="block text-[10px] text-gray-500 uppercase">Experience</span>
+                                <span className="text-xs text-neon-blue font-medium">{req.user?.experienceLevel || 'Beginner'}</span>
+                              </div>
+                            </div>
+                            
+                            {req.teamStatus === 'Pending' && (
+                              <div className="flex gap-2">
+                                <button onClick={() => handleApprovePlayer(req.user._id)} className="flex-1 py-1.5 text-xs font-bold bg-neon-green/20 text-neon-green rounded hover:bg-neon-green/30 transition-colors">Accept</button>
+                                <button onClick={() => handleRejectPlayer(req.user._id)} className="flex-1 py-1.5 text-xs font-bold bg-red-500/20 text-red-500 rounded hover:bg-red-500/30 transition-colors">Reject</button>
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+
                 <div className="bg-dark-900/80 p-6 rounded-2xl border border-dark-700 shadow-xl">
                   <div className="flex justify-between items-center mb-6">
-                    <h3 className="font-bold text-white text-lg">Squad</h3>
+                    <h3 className="font-bold text-white text-lg">
+                      {isCompetitiveTryout ? '⭐ Final Team Members' : 'Squad'}
+                    </h3>
                     <span className="text-xs font-bold bg-dark-800 px-3 py-1.5 rounded-lg text-gray-300 border border-dark-600 shadow-inner flex items-center gap-2">
                       <span className="text-neon-blue">👥</span>
                       {event.participants?.length} / {event.maxParticipants || '∞'}
@@ -249,19 +339,44 @@ const EventDetails = () => {
                   </div>
 
                   {!isCreator && (
-                    <button
-                      onClick={handleRSVP}
-                      disabled={isParticipating || isFull}
-                      className={`w-full py-3.5 px-4 rounded-xl text-sm font-bold shadow-lg transition-all duration-300 uppercase tracking-wider ${
-                        isParticipating
-                          ? 'bg-neon-green/10 border border-neon-green/50 text-neon-green shadow-[0_0_15px_rgba(57,255,20,0.2)]'
-                          : isFull
-                          ? 'bg-dark-700 text-gray-500 cursor-not-allowed border border-dark-600'
-                          : 'bg-gradient-to-r from-neon-blue to-neon-pink text-dark-900 hover:shadow-[0_0_20px_rgba(255,0,255,0.4)]'
-                      }`}
-                    >
-                      {isParticipating ? '✓ Enlisted' : isFull ? 'Squad Full' : 'Enlist Now'}
-                    </button>
+                    <>
+                      {!isCompetitiveTryout ? (
+                        <button
+                          onClick={handleRSVP}
+                          disabled={isParticipating || isFull}
+                          className={`w-full py-3.5 px-4 rounded-xl text-sm font-bold shadow-lg transition-all duration-300 uppercase tracking-wider ${
+                            isParticipating
+                              ? 'bg-neon-green/10 border border-neon-green/50 text-neon-green shadow-[0_0_15px_rgba(57,255,20,0.2)]'
+                              : isFull
+                              ? 'bg-dark-700 text-gray-500 cursor-not-allowed border border-dark-600'
+                              : 'bg-gradient-to-r from-neon-blue to-neon-pink text-dark-900 hover:shadow-[0_0_20px_rgba(255,0,255,0.4)]'
+                          }`}
+                        >
+                          {isParticipating ? '✓ Enlisted' : isFull ? 'Squad Full' : 'Enlist Now'}
+                        </button>
+                      ) : (
+                        <button
+                          onClick={handleApplyTryout}
+                          disabled={hasApplied || isApproved || isFull}
+                          className={`w-full py-3.5 px-4 rounded-xl text-sm font-bold shadow-lg transition-all duration-300 uppercase tracking-wider ${
+                            isApproved
+                              ? 'bg-neon-green/10 border border-neon-green/50 text-neon-green shadow-[0_0_15px_rgba(57,255,20,0.2)]'
+                              : myTeamStatus === 'Pending'
+                              ? 'bg-yellow-500/10 border border-yellow-500/50 text-yellow-500 shadow-[0_0_15px_rgba(234,179,8,0.2)]'
+                              : myTeamStatus === 'Rejected'
+                              ? 'bg-red-500/10 border border-red-500/50 text-red-500 shadow-[0_0_15px_rgba(239,68,68,0.2)] cursor-not-allowed'
+                              : isFull
+                              ? 'bg-dark-700 text-gray-500 cursor-not-allowed border border-dark-600'
+                              : 'bg-gradient-to-r from-neon-pink to-orange-500 text-dark-900 hover:shadow-[0_0_20px_rgba(255,0,255,0.4)]'
+                          }`}
+                        >
+                          {isApproved ? '🟢 Selected for Team' : 
+                           myTeamStatus === 'Pending' ? '🟡 Application Pending' : 
+                           myTeamStatus === 'Rejected' ? '🔴 Rejected' : 
+                           isFull ? 'Squad Full' : 'Apply for Tryout'}
+                        </button>
+                      )}
+                    </>
                   )}
                   {isCreator && (
                     <div className="w-full py-3.5 px-4 rounded-xl text-sm font-bold text-neon-blue bg-neon-blue/10 text-center border border-neon-blue/30 uppercase tracking-wider shadow-[inset_0_0_10px_rgba(0,243,255,0.1)]">

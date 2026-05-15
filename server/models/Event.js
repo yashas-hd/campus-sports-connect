@@ -22,12 +22,40 @@ const eventSchema = mongoose.Schema(
       type: String,
       required: [true, 'Please add a description'],
     },
+    eventType: {
+      type: String,
+      enum: ['Casual Match', 'Competitive Tryout'],
+      default: 'Casual Match',
+    },
     creator: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
       ref: 'User',
     },
     participants: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+      },
+    ],
+    teamRequests: [
+      {
+        user: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'User',
+        },
+        teamStatus: {
+          type: String,
+          enum: ['Pending', 'Approved', 'Rejected'],
+          default: 'Pending',
+        },
+        requestedAt: {
+          type: Date,
+          default: Date.now,
+        },
+      },
+    ],
+    approvedPlayers: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
