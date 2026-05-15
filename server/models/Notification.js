@@ -17,7 +17,7 @@ const notificationSchema = mongoose.Schema(
     },
     type: {
       type: String,
-      enum: ['event_invite', 'event_update', 'new_participant', 'system'],
+      enum: ['event_invite', 'event_update', 'new_participant', 'new_applicant', 'system'],
       required: true,
     },
     message: {
