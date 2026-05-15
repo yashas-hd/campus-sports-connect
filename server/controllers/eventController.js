@@ -187,15 +187,19 @@ const applyForTryout = async (req, res) => {
 
     // Create notification for creator
     if (event.creator.toString() !== req.user._id.toString()) {
-      const notification = await Notification.create({
-        recipient: event.creator,
-        sender: req.user._id,
-        event: event._id,
-        type: 'new_applicant',
-        message: `${req.user.name} applied for tryouts: ${event.title}`,
-      });
-      const io = req.app.get('io');
-      io.to(event.creator.toString()).emit('new_notification', notification);
+      try {
+        const notification = await Notification.create({
+          recipient: event.creator,
+          sender: req.user._id,
+          event: event._id,
+          type: 'new_applicant',
+          message: `${req.user.name} applied for tryouts: ${event.title}`,
+        });
+        const io = req.app.get('io');
+        io.to(event.creator.toString()).emit('new_notification', notification);
+      } catch (err) {
+        console.error('Notification creation failed:', err);
+      }
     }
 
     const updatedEvent = await Event.findById(req.params.id)
@@ -258,15 +262,19 @@ const approvePlayer = async (req, res) => {
     }
 
     // Notify user
-    const notification = await Notification.create({
-      recipient: targetUserId,
-      sender: req.user._id,
-      event: event._id,
-      type: 'tryout_approved',
-      message: `You were approved for the team: ${event.title}!`,
-    });
-    const io = req.app.get('io');
-    io.to(targetUserId).emit('new_notification', notification);
+    try {
+      const notification = await Notification.create({
+        recipient: targetUserId,
+        sender: req.user._id,
+        event: event._id,
+        type: 'player_approved',
+        message: `You were approved for the team: ${event.title}!`,
+      });
+      const io = req.app.get('io');
+      io.to(targetUserId).emit('new_notification', notification);
+    } catch (err) {
+      console.error('Notification creation failed:', err);
+    }
 
     const updatedEvent = await Event.findById(req.params.id)
       .populate('creator', 'name college bio')
@@ -305,6 +313,20 @@ const rejectPlayer = async (req, res) => {
 
     event.teamRequests[requestIndex].teamStatus = 'Rejected';
     await event.save();
+
+    try {
+      const notification = await Notification.create({
+        recipient: targetUserId,
+        sender: req.user._id,
+        event: event._id,
+        type: 'player_rejected',
+        message: `Your application for ${event.title} was not accepted at this time.`,
+      });
+      const io = req.app.get('io');
+      io.to(targetUserId).emit('new_notification', notification);
+    } catch (err) {
+      console.error('Notification creation failed:', err);
+    }
 
     const updatedEvent = await Event.findById(req.params.id)
       .populate('creator', 'name college bio')
@@ -380,6 +402,22 @@ const withdrawApplication = async (req, res) => {
     if (user && user.joinedEvents.includes(event._id)) {
       user.joinedEvents.pull(event._id);
       await user.save();
+    }
+
+    try {
+      if (event.creator.toString() !== req.user._id.toString()) {
+        const notification = await Notification.create({
+          recipient: event.creator,
+          sender: req.user._id,
+          event: event._id,
+          type: 'withdraw_application',
+          message: `${req.user.name} withdrew from the team: ${event.title}`,
+        });
+        const io = req.app.get('io');
+        io.to(event.creator.toString()).emit('new_notification', notification);
+      }
+    } catch (err) {
+      console.error('Notification creation failed:', err);
     }
 
     const updatedEvent = await Event.findById(req.params.id)

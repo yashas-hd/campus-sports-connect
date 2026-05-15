@@ -15,6 +15,7 @@ const EventDetails = () => {
   const [error, setError] = useState('');
   const [commentText, setCommentText] = useState('');
   const [isCommenting, setIsCommenting] = useState(false);
+  const [processingActionId, setProcessingActionId] = useState(null);
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
 
@@ -72,33 +73,41 @@ const EventDetails = () => {
   };
 
   const handleApplyTryout = async () => {
+    setProcessingActionId('apply');
     try {
-      await axiosInstance.post(`/api/events/${event._id}/apply`, {});
-      const updatedEvent = await axiosInstance.get(`/api/events/${event._id}`);
-      setEvent(updatedEvent.data);
+      const { data } = await axiosInstance.post(`/api/events/${event._id}/apply`, {});
+      setEvent(data);
       toast.success('Tryout application submitted!', { icon: '📝' });
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed to apply');
+    } finally {
+      setProcessingActionId(null);
     }
   };
 
   const handleApprovePlayer = async (userId) => {
+    setProcessingActionId(userId + '-approve');
     try {
       const { data } = await axiosInstance.post(`/api/events/${event._id}/approve/${userId}`, {});
       setEvent(data);
       toast.success('Player approved for the team!', { icon: '🟢' });
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed to approve player');
+    } finally {
+      setProcessingActionId(null);
     }
   };
 
   const handleRejectPlayer = async (userId) => {
+    setProcessingActionId(userId + '-reject');
     try {
       const { data } = await axiosInstance.post(`/api/events/${event._id}/reject/${userId}`, {});
       setEvent(data);
       toast.success('Player rejected.', { icon: '🔴' });
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed to reject player');
+    } finally {
+      setProcessingActionId(null);
     }
   };
 
@@ -116,23 +125,29 @@ const EventDetails = () => {
 
   const handleRemovePlayer = async (userId, userName) => {
     if (window.confirm(`Are you sure you want to remove ${userName} from the squad?`)) {
+      setProcessingActionId(userId + '-remove');
       try {
         const { data } = await axiosInstance.post(`/api/events/${event._id}/remove/${userId}`, {});
         setEvent(data);
         toast.success(`${userName} was removed from the squad`, { icon: '👢' });
       } catch (err) {
         toast.error(err.response?.data?.message || 'Failed to remove player');
+      } finally {
+        setProcessingActionId(null);
       }
     }
   };
 
   const handleWithdraw = async () => {
+    setProcessingActionId('withdraw');
     try {
       const { data } = await axiosInstance.post(`/api/events/${event._id}/withdraw`, {});
       setEvent(data);
       toast.success(isApproved || isParticipating ? 'You left the team' : 'Application withdrawn successfully', { icon: '🚪' });
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed to withdraw');
+    } finally {
+      setProcessingActionId(null);
     }
   };
 
@@ -347,8 +362,20 @@ const EventDetails = () => {
                             
                             {req.teamStatus === 'Pending' && (
                               <div className="flex gap-2">
-                                <button onClick={() => handleApprovePlayer(req.user._id)} className="flex-1 py-1.5 text-xs font-bold bg-neon-green/20 text-neon-green rounded hover:bg-neon-green/30 transition-colors">Accept</button>
-                                <button onClick={() => handleRejectPlayer(req.user._id)} className="flex-1 py-1.5 text-xs font-bold bg-red-500/20 text-red-500 rounded hover:bg-red-500/30 transition-colors">Reject</button>
+                                <button 
+                                  onClick={() => handleApprovePlayer(req.user._id)} 
+                                  disabled={processingActionId === req.user._id + '-approve' || processingActionId === req.user._id + '-reject'}
+                                  className="flex-1 py-1.5 text-xs font-bold bg-neon-green/20 text-neon-green rounded hover:bg-neon-green/30 transition-colors disabled:opacity-50"
+                                >
+                                  {processingActionId === req.user._id + '-approve' ? '...' : 'Accept'}
+                                </button>
+                                <button 
+                                  onClick={() => handleRejectPlayer(req.user._id)} 
+                                  disabled={processingActionId === req.user._id + '-approve' || processingActionId === req.user._id + '-reject'}
+                                  className="flex-1 py-1.5 text-xs font-bold bg-red-500/20 text-red-500 rounded hover:bg-red-500/30 transition-colors disabled:opacity-50"
+                                >
+                                  {processingActionId === req.user._id + '-reject' ? '...' : 'Reject'}
+                                </button>
                               </div>
                             )}
                           </div>
@@ -383,13 +410,14 @@ const EventDetails = () => {
                           <p className="text-xs text-gray-500 truncate mt-0.5">{p.college}</p>
                         </div>
                         {isCreator && p._id !== event.creator?._id && (
-                          <button
-                            onClick={() => handleRemovePlayer(p._id, p.name)}
-                            className="ml-2 w-8 h-8 rounded-lg bg-red-500/10 text-red-500 border border-red-500/30 flex items-center justify-center hover:bg-red-500 hover:text-white transition-colors"
-                            title="Remove Player"
-                          >
-                            ×
-                          </button>
+                            <button
+                              onClick={() => handleRemovePlayer(p._id, p.name)}
+                              disabled={processingActionId === p._id + '-remove'}
+                              className="ml-2 w-8 h-8 rounded-lg bg-red-500/10 text-red-500 border border-red-500/30 flex items-center justify-center hover:bg-red-500 hover:text-white transition-colors disabled:opacity-50"
+                              title="Remove Player"
+                            >
+                              {processingActionId === p._id + '-remove' ? '...' : '×'}
+                            </button>
                         )}
                       </div>
                     ))}
@@ -405,9 +433,10 @@ const EventDetails = () => {
                             </div>
                             <button
                               onClick={handleWithdraw}
-                              className="w-full py-2.5 px-4 rounded-xl text-xs font-bold transition-all duration-300 uppercase tracking-wider bg-dark-800 border border-dark-600 text-gray-400 hover:text-red-500 hover:border-red-500/50 hover:bg-red-500/10"
+                              disabled={processingActionId === 'withdraw'}
+                              className="w-full py-2.5 px-4 rounded-xl text-xs font-bold transition-all duration-300 uppercase tracking-wider bg-dark-800 border border-dark-600 text-gray-400 hover:text-red-500 hover:border-red-500/50 hover:bg-red-500/10 disabled:opacity-50"
                             >
-                              🚪 Leave Match
+                              {processingActionId === 'withdraw' ? 'Leaving...' : '🚪 Leave Match'}
                             </button>
                           </div>
                         ) : (
@@ -440,23 +469,24 @@ const EventDetails = () => {
                             {myTeamStatus !== 'Rejected' && (
                               <button
                                 onClick={handleWithdraw}
-                                className="w-full py-2.5 px-4 rounded-xl text-xs font-bold transition-all duration-300 uppercase tracking-wider bg-dark-800 border border-dark-600 text-gray-400 hover:text-red-500 hover:border-red-500/50 hover:bg-red-500/10"
+                                disabled={processingActionId === 'withdraw'}
+                                className="w-full py-2.5 px-4 rounded-xl text-xs font-bold transition-all duration-300 uppercase tracking-wider bg-dark-800 border border-dark-600 text-gray-400 hover:text-red-500 hover:border-red-500/50 hover:bg-red-500/10 disabled:opacity-50"
                               >
-                                {isApproved ? '🚪 Leave Team' : '❌ Withdraw Application'}
+                                {processingActionId === 'withdraw' ? 'Processing...' : (isApproved ? '🚪 Leave Team' : '❌ Withdraw Application')}
                               </button>
                             )}
                           </div>
                         ) : (
                           <button
                             onClick={handleApplyTryout}
-                            disabled={isFull}
+                            disabled={isFull || processingActionId === 'apply'}
                             className={`w-full py-3.5 px-4 rounded-xl text-sm font-bold shadow-lg transition-all duration-300 uppercase tracking-wider ${
                               isFull
                                 ? 'bg-dark-700 text-gray-500 cursor-not-allowed border border-dark-600'
-                                : 'bg-gradient-to-r from-neon-pink to-orange-500 text-dark-900 hover:shadow-[0_0_20px_rgba(255,0,255,0.4)]'
+                                : 'bg-gradient-to-r from-neon-pink to-orange-500 text-dark-900 hover:shadow-[0_0_20px_rgba(255,0,255,0.4)] disabled:opacity-50'
                             }`}
                           >
-                            {isFull ? 'Squad Full' : 'Apply for Tryout'}
+                            {isFull ? 'Squad Full' : (processingActionId === 'apply' ? 'Applying...' : 'Apply for Tryout')}
                           </button>
                         )
                       )}
