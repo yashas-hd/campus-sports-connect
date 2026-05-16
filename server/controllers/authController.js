@@ -22,7 +22,6 @@ const registerUser = async (req, res) => {
 
     // Generate OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    console.log("OTP:", otp);
     const otpExpires = Date.now() + 5 * 60 * 1000; // 5 minutes
 
     const user = await User.create({
@@ -44,7 +43,6 @@ const registerUser = async (req, res) => {
         message,
       }).catch(err => console.error("Email sending failed, but continuing for demo fallback:", err));
 
-      console.log("User created successfully");
       return res.status(201).json({
         success: true,
         message: 'User registered successfully',
@@ -160,7 +158,6 @@ const resendOTP = async (req, res) => {
     }
 
     const newOtp = Math.floor(100000 + Math.random() * 900000).toString();
-    console.log("Resent OTP:", newOtp);
 
     user.otp = newOtp;
     user.otpExpires = Date.now() + 5 * 60 * 1000;

@@ -240,9 +240,9 @@ const Dashboard = () => {
 
   const filteredEvents = events.filter(event => {
     const searchMatch = 
-      event.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      event.sport?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      event.location?.toLowerCase().includes(searchQuery.toLowerCase());
+      (event.title?.toLowerCase() || '').includes(searchQuery.toLowerCase()) ||
+      (event.sport?.toLowerCase() || '').includes(searchQuery.toLowerCase()) ||
+      (event.location?.toLowerCase() || '').includes(searchQuery.toLowerCase());
       
     const sportMatch = filterSport === 'All' || event.sport?.toLowerCase() === filterSport.toLowerCase();
     
@@ -265,7 +265,7 @@ const Dashboard = () => {
   const recommendedEvents = events.filter(event => 
     event.status !== 'completed' &&
     event.status !== 'cancelled' &&
-    preferredSports.some(sport => event.sport?.toLowerCase().includes(sport.toLowerCase()))
+    preferredSports.some(sport => (event.sport?.toLowerCase() || '').includes(sport.toLowerCase()))
   );
 
   return (

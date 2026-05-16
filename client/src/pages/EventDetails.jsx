@@ -249,7 +249,7 @@ const EventDetails = () => {
   const myRequest = event.teamRequests?.find(r => (r.user?._id === user._id || r.user === user._id));
   const hasApplied = !!myRequest;
   const myTeamStatus = myRequest?.teamStatus;
-  const isApproved = event.approvedPlayers?.some(p => p._id === user._id || p === user._id);
+  const isApproved = event.approvedPlayers?.some(p => p?._id === user?._id || p === user?._id);
 
   return (
     <div className="min-h-screen bg-dark-900 text-gray-100 font-sans pb-12 relative overflow-hidden">
@@ -346,7 +346,7 @@ const EventDetails = () => {
                       <p className="text-gray-500 text-sm italic">No tryout applications yet.</p>
                     ) : (
                       <div className="space-y-4 max-h-96 overflow-y-auto custom-scrollbar pr-2">
-                        {event.teamRequests.map(req => (
+                        {event.teamRequests?.map(req => (
                           <div key={req._id} className="bg-dark-800 p-4 rounded-xl border border-dark-600 transition-colors">
                             <div className="flex justify-between items-start mb-2">
                               <div>
@@ -573,7 +573,7 @@ const EventDetails = () => {
                     No comms yet. Be the first to initiate contact!
                   </p>
                 ) : (
-                  event.comments.map((comment, idx) => (
+                  event.comments?.map((comment, idx) => (
                     <div key={comment._id || idx} className="bg-dark-800/60 p-5 rounded-2xl border border-dark-600 hover:border-dark-500 transition-all duration-300 flex gap-4">
                       <div className="h-10 w-10 rounded-full bg-dark-900 border border-dark-500 flex items-center justify-center text-neon-pink font-bold uppercase flex-shrink-0">
                         {comment.user?.name ? comment.user.name.charAt(0) : '?'}

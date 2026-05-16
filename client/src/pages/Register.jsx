@@ -20,15 +20,14 @@ const Register = () => {
 
     try {
       const { data } = await axios.post(`${API}/api/auth/register`, formData);
-      console.log("Signup success");
       toast.success("OTP Sent successfully!");
       toast("Demo OTP: " + data.otp, { icon: '🔑', duration: 8000 });
       // Redirect to OTP verification
-      setLoading(false);
       navigate('/verify-otp', { state: { userId: data.userId, email: formData.email } });
     } catch (err) {
       console.error("Signup failed:", err);
       toast.error(err.response?.data?.message || 'Registration failed');
+    } finally {
       setLoading(false);
     }
   };

@@ -65,7 +65,7 @@ const Analytics = () => {
             <h3 className="text-xl font-bold text-white mb-6">Sport Distribution</h3>
             <div className="h-72 w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={data?.barChartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <BarChart data={data?.barChartData || []} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                   <XAxis dataKey="name" stroke="#9ca3af" fontSize={12} tickLine={false} axisLine={false} />
                   <YAxis stroke="#9ca3af" fontSize={12} tickLine={false} axisLine={false} />
                   <Tooltip cursor={{ fill: '#334155' }} contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: '8px', color: '#fff' }} />
@@ -81,7 +81,7 @@ const Analytics = () => {
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
-                    data={data?.pieChartData}
+                    data={data?.pieChartData || []}
                     cx="50%"
                     cy="50%"
                     innerRadius={60}
@@ -90,7 +90,7 @@ const Analytics = () => {
                     dataKey="value"
                     stroke="none"
                   >
-                    {data?.pieChartData.map((entry, index) => (
+                    {data?.pieChartData?.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
                     ))}
                   </Pie>

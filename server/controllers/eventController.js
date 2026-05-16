@@ -103,17 +103,21 @@ const joinEvent = async (req, res) => {
 
     // Create notification for creator
     if (event.creator.toString() !== req.user._id.toString()) {
-      const notification = await Notification.create({
-        recipient: event.creator,
-        sender: req.user._id,
-        event: event._id,
-        type: 'new_participant',
-        message: `${req.user.name} joined your event: ${event.title}`,
-      });
+      try {
+        const notification = await Notification.create({
+          recipient: event.creator,
+          sender: req.user._id,
+          event: event._id,
+          type: 'new_participant',
+          message: `${req.user.name} joined your event: ${event.title}`,
+        });
 
-      // Emit socket event to the creator's room
-      const io = req.app.get('io');
-      io.to(event.creator.toString()).emit('new_notification', notification);
+        // Emit socket event to the creator's room
+        const io = req.app.get('io');
+        io.to(event.creator.toString()).emit('new_notification', notification);
+      } catch (err) {
+        console.error('Notification creation failed:', err);
+      }
     }
 
     res.json(event);
