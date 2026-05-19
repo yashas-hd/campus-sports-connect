@@ -17,10 +17,11 @@ const protect = async (req, res, next) => {
 
       // Get user from the token
       req.user = await User.findById(decoded.id).select('-password');
+      console.log("Auth Middleware - Authenticated User:", req.user ? req.user._id : "None");
 
       next();
     } catch (error) {
-      console.error(error);
+      console.error("JWT Verification Error:", error.message);
       res.status(401).json({ message: 'Not authorized, token failed' });
     }
   }

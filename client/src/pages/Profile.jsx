@@ -25,6 +25,18 @@ const Profile = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
+        let hasToken = false;
+        try {
+          const userInfoStr = localStorage.getItem("userInfo");
+          const userInfo = userInfoStr ? JSON.parse(userInfoStr) : null;
+          hasToken = !!(userInfo?.token || localStorage.getItem("token"));
+        } catch (e) {}
+
+        if (!hasToken) {
+          setLoading(false);
+          return;
+        }
+
         const { data } = await axiosInstance.get('/api/users/profile');
         setProfileData(data);
         setFavoriteSports(data.favoriteSports || []);
@@ -37,6 +49,7 @@ const Profile = () => {
           experienceLevel: data.experienceLevel || 'Beginner',
         });
       } catch (error) {
+        console.error("Profile fetch error:", error);
         toast.error('Failed to load profile data');
       } finally {
         setLoading(false);

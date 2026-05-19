@@ -128,6 +128,19 @@ const Dashboard = () => {
 
     const fetchData = async () => {
       try {
+        let hasToken = false;
+        try {
+          const userInfoStr = localStorage.getItem("userInfo");
+          const userInfo = userInfoStr ? JSON.parse(userInfoStr) : null;
+          hasToken = !!(userInfo?.token || localStorage.getItem("token"));
+          console.log("UserInfo:", userInfo); // Debug logging
+        } catch (e) {}
+
+        if (!hasToken) {
+          setLoading(false);
+          return;
+        }
+
         const [eventsRes, profileRes] = await Promise.all([
           axiosInstance.get('/api/events'),
           axiosInstance.get('/api/users/profile')
@@ -135,7 +148,8 @@ const Dashboard = () => {
         setEvents(eventsRes.data);
         setUserProfile(profileRes.data);
       } catch (error) {
-        toast.error('Error fetching dashboard data');
+        console.error("Dashboard fetch error:", error);
+        toast.error('Failed to load dashboard');
       } finally {
         setLoading(false);
       }
@@ -263,9 +277,9 @@ const Dashboard = () => {
 
   const preferredSports = userProfile?.preferredSports || [];
   const recommendedEvents = events.filter(event => 
-    event.status !== 'completed' &&
-    event.status !== 'cancelled' &&
-    preferredSports.some(sport => (event.sport?.toLowerCase() || '').includes(sport.toLowerCase()))
+    event?.status !== 'completed' &&
+    event?.status !== 'cancelled' &&
+    preferredSports?.some(sport => (event?.sport?.toLowerCase() || '').includes(sport?.toLowerCase()))
   );
 
   return (
