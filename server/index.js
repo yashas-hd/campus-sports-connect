@@ -32,13 +32,28 @@ app.use(cors({
   allowedHeaders: ["Content-Type", "Authorization"]
 }));
 app.use((req, res, next) => {
-  if (req.method === "OPTIONS") {
-    res.header("Access-Control-Allow-Origin", process.env.CLIENT_URL);
-    res.header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
-    res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
-    return res.sendStatus(200);
+  try {
+    if (req.method === "OPTIONS") {
+      res.header("Access-Control-Allow-Origin", process.env.CLIENT_URL);
+      res.header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
+      res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+      return res.sendStatus(200);
+    }
+    
+    console.log(typeof next);
+    if (typeof next === 'function') {
+      next();
+    } else {
+      console.error("Middleware usage incorrect: next is not a function");
+      res.status(500).json({ message: "Server configuration error" });
+    }
+  } catch (err) {
+    if (typeof next === 'function') {
+      next(err);
+    } else {
+      res.status(500).json({ message: "Server configuration error", error: err.message });
+    }
   }
-  next();
 });
 app.use(express.json());
 

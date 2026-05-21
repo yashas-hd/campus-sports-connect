@@ -19,15 +19,21 @@ const protect = async (req, res, next) => {
       req.user = await User.findById(decoded.id).select('-password');
       console.log("Auth Middleware - Authenticated User:", req.user ? req.user._id : "None");
 
-      next();
+      console.log(typeof next);
+      if (typeof next === 'function') {
+        return next();
+      } else {
+        console.error("Middleware usage incorrect: next is not a function");
+        return res.status(500).json({ message: "Server configuration error" });
+      }
     } catch (error) {
       console.error("JWT Verification Error:", error.message);
-      res.status(401).json({ message: 'Not authorized, token failed' });
+      return res.status(401).json({ message: 'Not authorized, token failed' });
     }
   }
 
   if (!token) {
-    res.status(401).json({ message: 'Not authorized, no token' });
+    return res.status(401).json({ message: 'Not authorized, no token' });
   }
 };
 
