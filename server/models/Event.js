@@ -103,7 +103,7 @@ const eventSchema = mongoose.Schema(
   }
 );
 
-eventSchema.pre('validate', function(next) {
+eventSchema.pre('validate', function() {
   if (this.sport) {
     const { SPORTS } = require('../constants/sports');
     const validSport = SPORTS.find(s => s.toLowerCase() === this.sport.toLowerCase());
@@ -111,7 +111,6 @@ eventSchema.pre('validate', function(next) {
       this.sport = validSport;
     }
   }
-  next();
 });
 
 module.exports = mongoose.model('Event', eventSchema);
