@@ -21,15 +21,19 @@ const getEvents = async (req, res) => {
 const createEvent = async (req, res) => {
   try {
     const { title, sport, date, location, description, maxParticipants, eventType } = req.body;
+    console.log("Incoming Sport:", req.body.sport);
 
-    const allowedSports = SPORTS;
-    if (!allowedSports.includes(sport)) {
-      return res.status(400).json({ message: 'Only approved campus sports are allowed.' });
+    const validSport = SPORTS.find(
+      s => s.toLowerCase() === (sport || '').trim().toLowerCase()
+    );
+
+    if (!validSport) {
+      return res.status(400).json({ message: 'Invalid sport selected' });
     }
 
     const event = await Event.create({
       title,
-      sport,
+      sport: validSport,
       date,
       location,
       description,
