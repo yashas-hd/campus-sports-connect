@@ -1,6 +1,13 @@
 const Event = require('../models/Event');
 const User = require('../models/User');
 
+// Helper to normalize sport names for consistent analytics
+const normalizeSportName = (name) => {
+  if (!name) return '';
+  const trimmed = name.trim().toLowerCase();
+  return trimmed.charAt(0).toUpperCase() + trimmed.slice(1);
+};
+
 // @desc    Get analytics overview
 // @route   GET /api/analytics/overview
 // @access  Private
@@ -38,8 +45,8 @@ const getOverview = async (req, res) => {
         });
       }
 
-      const sport = event.sport;
-      if (sport) {
+      if (event.sport) {
+        const sport = normalizeSportName(event.sport);
         sportCounts[sport] = (sportCounts[sport] || 0) + 1;
       }
     });
@@ -65,7 +72,8 @@ const getOverview = async (req, res) => {
           multiSportParticipationCount++;
         }
         user.preferredSports.forEach(sport => {
-          userSportCounts[sport] = (userSportCounts[sport] || 0) + 1;
+          const normalizedSport = normalizeSportName(sport);
+          userSportCounts[normalizedSport] = (userSportCounts[normalizedSport] || 0) + 1;
         });
       }
     });

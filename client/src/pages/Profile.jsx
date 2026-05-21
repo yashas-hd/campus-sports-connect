@@ -4,6 +4,8 @@ import toast from 'react-hot-toast';
 import AuthContext from '../context/AuthContext';
 import Navbar from '../components/Navbar';
 import axiosInstance from '../utils/axiosInstance';
+import { SPORTS } from '../constants/sports';
+
 
 const Profile = () => {
   const { user, login } = useContext(AuthContext);
@@ -62,15 +64,6 @@ const Profile = () => {
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
-
-  const sportsOptions = [
-    "Cricket",
-    "Football",
-    "Basketball",
-    "Volleyball",
-    "Badminton",
-    "Kabaddi"
-  ];
 
   const toggleFavoriteSport = (sport) => {
     setFavoriteSports((prev) =>
@@ -311,7 +304,7 @@ const Profile = () => {
                     <div className="col-span-2">
                       <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5">Preferred Sports (Max 3)</label>
                       <div className="flex flex-wrap gap-2">
-                        {sportsOptions.map(sport => {
+                        {SPORTS.map(sport => {
                           const isSelected = formData.preferredSports.includes(sport);
                           return (
                             <button
@@ -383,7 +376,7 @@ const Profile = () => {
                 Select your favorite sports to receive personalized event recommendations on your dashboard.
               </p>
               <div className="flex flex-wrap gap-3 mb-6">
-                {sportsOptions.map(sport => {
+                {SPORTS.map(sport => {
                   const isSelected = favoriteSports.includes(sport);
                   return (
                     <button

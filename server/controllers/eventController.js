@@ -1,6 +1,7 @@
 const Event = require('../models/Event');
 const Notification = require('../models/Notification');
 const User = require('../models/User');
+const { SPORTS } = require('../constants/sports');
 
 // @desc    Get all events
 // @route   GET /api/events
@@ -21,7 +22,7 @@ const createEvent = async (req, res) => {
   try {
     const { title, sport, date, location, description, maxParticipants, eventType } = req.body;
 
-    const allowedSports = ['Cricket', 'Football', 'Basketball', 'Volleyball', 'Badminton', 'Kabaddi'];
+    const allowedSports = SPORTS;
     if (!allowedSports.includes(sport)) {
       return res.status(400).json({ message: 'Only approved campus sports are allowed.' });
     }
@@ -175,7 +176,15 @@ const applyForTryout = async (req, res) => {
       return res.status(400).json({ message: 'This event is not a tryout' });
     }
 
-    if (!req.user.preferredSports || !req.user.preferredSports.includes(event.sport)) {
+    console.log("Preferred Sports:", req.user.preferredSports);
+    console.log("Event Sport:", event.sport);
+
+    const normalizedSports = (req.user.preferredSports || []).map(
+      sport => sport.trim().toLowerCase()
+    );
+    const eventSport = event.sport.trim().toLowerCase();
+
+    if (!normalizedSports.includes(eventSport)) {
       return res.status(400).json({ message: 'You can only apply for tryouts matching your selected preferred sports.' });
     }
 

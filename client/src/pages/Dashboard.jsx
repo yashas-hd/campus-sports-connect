@@ -5,6 +5,8 @@ import toast from 'react-hot-toast';
 import AuthContext from '../context/AuthContext';
 import Navbar from '../components/Navbar';
 import axiosInstance from '../utils/axiosInstance';
+import { SPORTS } from '../constants/sports';
+
 
 const API = import.meta.env.VITE_API_URL;
 
@@ -39,14 +41,7 @@ const ongoingEvents = [
   }
 ];
 
-const sports = [
-  "🏏 Cricket",
-  "⚽ Football",
-  "🏐 Volleyball",
-  "🏀 Basketball",
-  "🏸 Badminton",
-  "🤼 Kabaddi"
-];
+
 
 const sportsInfo = {
   Cricket: {
@@ -272,14 +267,14 @@ const Dashboard = () => {
     return searchMatch && sportMatch && statusMatch;
   });
 
-  const filterSportsList = ["All", "Cricket", "Football", "Volleyball", "Basketball", "Badminton", "Kabaddi"];
+  const filterSportsList = ["All", ...SPORTS];
   const filterStatusList = ["All", "Upcoming", "Ongoing", "Joined"];
 
   const preferredSports = userProfile?.preferredSports || [];
   const recommendedEvents = events.filter(event => 
     event?.status !== 'completed' &&
     event?.status !== 'cancelled' &&
-    preferredSports?.some(sport => (event?.sport?.toLowerCase() || '').includes(sport?.toLowerCase()))
+    (preferredSports || []).some(sport => sport.trim().toLowerCase() === (event?.sport || '').trim().toLowerCase())
   );
 
   return (
@@ -311,15 +306,14 @@ const Dashboard = () => {
             <span className="text-3xl">⚡</span> Popular Sports
           </h2>
           <div className="flex flex-wrap gap-4">
-            {sports.map((sport, index) => {
-              const sportName = sport.replace(/[^a-zA-Z]/g, '').trim();
+            {SPORTS.map((sportName, index) => {
               return (
                 <div 
                   key={index} 
                   onClick={() => setSelectedSport(sportName)}
                   className="bg-dark-800/80 backdrop-blur-sm border border-dark-700 hover:border-neon-blue/50 rounded-xl px-6 py-3 text-gray-200 font-bold hover:text-white transition-all duration-300 cursor-pointer shadow-lg hover:shadow-[0_5px_15px_rgba(0,243,255,0.2)] hover:-translate-y-1"
                 >
-                  {sport}
+                  {getSportEmoji(sportName)} {sportName}
                 </div>
               );
             })}
@@ -698,12 +692,9 @@ const Dashboard = () => {
                       onChange={handleInputChange}
                       className="w-full px-4 py-3 bg-dark-900 border border-dark-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-neon-pink focus:border-neon-pink text-white transition-all [color-scheme:dark]"
                     >
-                      <option value="Cricket">🏏 Cricket</option>
-                      <option value="Football">⚽ Football</option>
-                      <option value="Basketball">🏀 Basketball</option>
-                      <option value="Volleyball">🏐 Volleyball</option>
-                      <option value="Badminton">🏸 Badminton</option>
-                      <option value="Kabaddi">🤼 Kabaddi</option>
+                      {SPORTS.map(sport => (
+                        <option key={sport} value={sport}>{getSportEmoji(sport)} {sport}</option>
+                      ))}
                     </select>
                   </div>
                   <div>
