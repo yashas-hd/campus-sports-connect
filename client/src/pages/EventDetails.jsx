@@ -56,6 +56,7 @@ const EventDetails = () => {
   }, [id, user, navigate]);
 
   const handleRSVP = async () => {
+    setProcessingActionId('rsvp');
     try {
       const { data } = await axiosInstance.post(`/api/events/${event._id}/join`, {});
       
@@ -69,6 +70,8 @@ const EventDetails = () => {
       window.dispatchEvent(new Event('campus_notify'));
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed to join event');
+    } finally {
+      setProcessingActionId(null);
     }
   };
 
@@ -113,12 +116,15 @@ const EventDetails = () => {
 
   const handleDeleteEvent = async () => {
     if (window.confirm('Are you sure you want to abort and delete this operation? This action cannot be undone.')) {
+      setProcessingActionId('delete');
       try {
         await axiosInstance.delete(`/api/events/${event._id}`);
         toast.success('Event deleted successfully!', { icon: '🗑️' });
         navigate('/dashboard');
       } catch (err) {
         toast.error(err.response?.data?.message || 'Failed to delete event');
+      } finally {
+        setProcessingActionId(null);
       }
     }
   };
@@ -242,14 +248,14 @@ const EventDetails = () => {
     );
   }
 
-  const isParticipating = event.participants?.some(p => p._id === user._id);
-  const isCreator = event.creator?._id === user._id;
-  const isFull = event.maxParticipants > 0 && event.participants?.length >= event.maxParticipants;
-  const isCompetitiveTryout = event.eventType === 'Competitive Tryout';
-  const myRequest = event.teamRequests?.find(r => (r.user?._id === user._id || r.user === user._id));
+  const isParticipating = event?.participants?.some(p => p?._id === user?._id || p === user?._id) || false;
+  const isCreator = event?.creator?._id === user?._id || event?.creator === user?._id || false;
+  const isFull = event?.maxParticipants > 0 && (event?.participants?.length || 0) >= event?.maxParticipants;
+  const isCompetitiveTryout = event?.eventType === 'Competitive Tryout';
+  const myRequest = event?.teamRequests?.find(r => r && (r.user?._id === user?._id || r.user === user?._id));
   const hasApplied = !!myRequest;
   const myTeamStatus = myRequest?.teamStatus;
-  const isApproved = event.approvedPlayers?.some(p => p?._id === user?._id || p === user?._id);
+  const isApproved = event?.approvedPlayers?.some(p => p?._id === user?._id || p === user?._id) || false;
 
   return (
     <div className="min-h-screen bg-dark-900 text-gray-100 font-sans pb-12 relative overflow-hidden">
@@ -471,14 +477,14 @@ const EventDetails = () => {
                         ) : (
                           <button
                             onClick={handleRSVP}
-                            disabled={isFull}
+                            disabled={isFull || processingActionId === 'rsvp'}
                             className={`w-full py-3.5 px-4 rounded-xl text-sm font-bold shadow-lg transition-all duration-300 uppercase tracking-wider ${
                               isFull
                                 ? 'bg-dark-700 text-gray-500 cursor-not-allowed border border-dark-600'
                                 : 'bg-gradient-to-r from-neon-blue to-neon-pink text-dark-900 hover:shadow-[0_0_20px_rgba(255,0,255,0.4)]'
                             }`}
                           >
-                            {isFull ? 'Squad Full' : 'Enlist Now'}
+                            {isFull ? 'Squad Full' : (processingActionId === 'rsvp' ? 'Enlisting...' : 'Enlist Now')}
                           </button>
                         )
                       ) : (
@@ -528,9 +534,10 @@ const EventDetails = () => {
                       </div>
                       <button
                         onClick={handleDeleteEvent}
-                        className="w-full py-3 px-4 rounded-xl text-sm font-bold shadow-lg transition-all duration-300 uppercase tracking-wider bg-red-500/10 border border-red-500/50 text-red-500 hover:bg-red-500 hover:text-white"
+                        disabled={processingActionId === 'delete'}
+                        className="w-full py-3 px-4 rounded-xl text-sm font-bold shadow-lg transition-all duration-300 uppercase tracking-wider bg-red-500/10 border border-red-500/50 text-red-500 hover:bg-red-500 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        🗑 Delete Event
+                        {processingActionId === 'delete' ? 'Deleting...' : '🗑 Delete Event'}
                       </button>
                     </div>
                   )}

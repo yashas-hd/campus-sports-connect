@@ -10,11 +10,13 @@ const registerUser = async (req, res) => {
   try {
     const { name, email, password, college } = req.body;
 
-    if (!email.endsWith(".edu")) {
+    const normalizedEmail = (email || '').trim().toLowerCase();
+
+    if (!normalizedEmail.endsWith(".edu")) {
       return res.status(400).json({ message: "Only college email allowed" });
     }
 
-    const userExists = await User.findOne({ email });
+    const userExists = await User.findOne({ email: normalizedEmail });
 
     if (userExists) {
       return res.status(400).json({ message: 'User already exists' });
@@ -26,7 +28,7 @@ const registerUser = async (req, res) => {
 
     const user = await User.create({
       name,
-      email,
+      email: normalizedEmail,
       password,
       college,
       otp,
@@ -117,12 +119,20 @@ const verifyOTP = async (req, res) => {
 // @access  Public
 const loginUser = async (req, res) => {
   try {
-    const { email } = req.body;
+    const { email, password } = req.body;
 
-    const user = await User.findOne({ email }).select('+password');
+    const normalizedEmail = (email || '').trim().toLowerCase();
+
+    const user = await User.findOne({ email: normalizedEmail }).select('+password');
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
+    }
+
+    // Match password
+    const isMatch = await user.matchPassword(password);
+    if (!isMatch) {
+      return res.status(401).json({ message: "Invalid email or password" });
     }
 
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
@@ -150,8 +160,9 @@ const loginUser = async (req, res) => {
 const resendOTP = async (req, res) => {
   try {
     const { email } = req.body;
+    const normalizedEmail = (email || '').trim().toLowerCase();
 
-    const user = await User.findOne({ email }).select('+password');
+    const user = await User.findOne({ email: normalizedEmail }).select('+password');
 
     if (!user) {
       return res.status(404).json({ message: 'User not found' });

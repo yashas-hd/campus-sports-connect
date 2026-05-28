@@ -128,7 +128,6 @@ const Dashboard = () => {
           const userInfoStr = localStorage.getItem("userInfo");
           const userInfo = userInfoStr ? JSON.parse(userInfoStr) : null;
           hasToken = !!(userInfo?.token || localStorage.getItem("token"));
-          console.log("UserInfo:", userInfo); // Debug logging
         } catch (e) {}
 
         if (!hasToken) {
@@ -162,7 +161,7 @@ const Dashboard = () => {
     socket.on('new_event', (newEvent) => {
       setEvents((prevEvents) => {
         if (!prevEvents.find(e => e._id === newEvent._id)) {
-          if (newEvent.creator !== user._id) {
+          if ((newEvent.creator?._id || newEvent.creator) !== user?._id) {
             toast.success(`New Event: ${newEvent.title}`, { icon: '🔥' });
           }
           return [...prevEvents, newEvent];
@@ -248,6 +247,7 @@ const Dashboard = () => {
   };
 
   const filteredEvents = events.filter(event => {
+    if (!event) return false;
     const searchMatch = 
       (event.title?.toLowerCase() || '').includes(searchQuery.toLowerCase()) ||
       (event.sport?.toLowerCase() || '').includes(searchQuery.toLowerCase()) ||
@@ -261,7 +261,7 @@ const Dashboard = () => {
     } else if (filterStatus === 'Ongoing') {
       statusMatch = event.status === 'ongoing';
     } else if (filterStatus === 'Joined') {
-      statusMatch = event.participants?.some(p => p === user._id || p._id === user._id) || event.creator === user._id;
+      statusMatch = event.participants?.some(p => p === user?._id || p?._id === user?._id) || event.creator === user?._id || event.creator?._id === user?._id;
     }
     
     return searchMatch && sportMatch && statusMatch;
@@ -272,9 +272,10 @@ const Dashboard = () => {
 
   const preferredSports = userProfile?.preferredSports || [];
   const recommendedEvents = events.filter(event => 
+    event &&
     event?.status !== 'completed' &&
     event?.status !== 'cancelled' &&
-    (preferredSports || []).some(sport => sport.trim().toLowerCase() === (event?.sport || '').trim().toLowerCase())
+    (preferredSports || []).some(sport => sport && sport.trim().toLowerCase() === (event?.sport || '').trim().toLowerCase())
   );
 
   return (

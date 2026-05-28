@@ -93,6 +93,17 @@ const userSchema = mongoose.Schema(
   }
 );
 
+userSchema.pre('validate', function (next) {
+  if (this.preferredSports && this.preferredSports.length > 0) {
+    const { SPORTS } = require('../constants/sports');
+    this.preferredSports = this.preferredSports.map(sport => {
+      const validSport = SPORTS.find(s => s.toLowerCase() === (sport || '').trim().toLowerCase());
+      return validSport || sport;
+    });
+  }
+  next();
+});
+
 // Encrypt password using bcrypt
 userSchema.pre('save', async function () {
   if (!this.isModified('password')) {

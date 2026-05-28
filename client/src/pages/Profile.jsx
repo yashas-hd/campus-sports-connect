@@ -149,7 +149,7 @@ const Profile = () => {
     return '🏆';
   };
 
-  if (loading) {
+  if (loading || !profileData) {
     return (
       <div className="min-h-screen bg-dark-900 text-gray-100 font-sans pb-12 relative overflow-hidden">
         <Navbar />
@@ -185,7 +185,7 @@ const Profile = () => {
     );
   }
 
-  const eventsToDisplay = activeTab === 'hosting' ? profileData.hostedEvents : profileData.joinedEvents;
+  const eventsToDisplay = activeTab === 'hosting' ? (profileData?.hostedEvents || []) : (profileData?.joinedEvents || []);
 
   return (
     <div className="min-h-screen bg-dark-900 text-gray-100 font-sans pb-12 relative overflow-hidden">
@@ -203,26 +203,26 @@ const Profile = () => {
             <div className="bg-dark-800/60 backdrop-blur-xl p-8 rounded-3xl shadow-2xl border border-dark-700 text-center relative overflow-hidden">
               <div className="absolute top-0 left-0 w-full h-24 bg-gradient-to-r from-neon-pink/20 to-neon-blue/20"></div>
               <div className="relative h-28 w-28 rounded-full bg-dark-900 border-4 border-dark-800 flex items-center justify-center text-white text-5xl font-extrabold uppercase mx-auto mb-6 shadow-[0_0_20px_rgba(0,0,0,0.5)] z-10">
-                {profileData.name.charAt(0)}
+                {profileData?.name?.charAt(0) || ''}
                 <div className="absolute inset-0 rounded-full border border-neon-pink/50 shadow-[inset_0_0_10px_rgba(255,0,255,0.3)]"></div>
               </div>
               
               {!isEditing ? (
                 <div className="relative z-10 animate-fade-in-up">
-                  <h2 className="text-2xl font-extrabold text-white">{profileData.name}</h2>
-                  <p className="text-sm font-medium text-neon-blue mt-1 mb-6">{profileData.college}</p>
+                  <h2 className="text-2xl font-extrabold text-white">{profileData?.name || ''}</h2>
+                  <p className="text-sm font-medium text-neon-blue mt-1 mb-6">{profileData?.college || ''}</p>
                   
                   <div className="text-left mt-6 space-y-6">
                     <div>
                       <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Mission Briefing</h3>
                       <p className="text-sm text-gray-300 leading-relaxed bg-dark-900/50 p-4 rounded-xl border border-dark-700">
-                        {profileData.bio || 'No bio provided. Update your profile to tell others about yourself.'}
+                        {profileData?.bio || 'No bio provided. Update your profile to tell others about yourself.'}
                       </p>
                     </div>
                     <div>
                       <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Combat Expertise (Sports)</h3>
                       <div className="flex flex-wrap gap-2">
-                        {profileData.sportsInterests?.length > 0 ? (
+                        {(profileData?.sportsInterests || []).length > 0 ? (
                           profileData.sportsInterests.map((sport, idx) => (
                             <span key={idx} className="bg-dark-900 border border-dark-600 text-gray-300 text-xs font-bold px-3 py-1.5 rounded-lg">
                               {sport}
@@ -236,7 +236,7 @@ const Profile = () => {
                         <div className="bg-dark-900/50 p-3 rounded-lg border border-dark-700 col-span-2">
                           <span className="block text-[10px] text-gray-500 uppercase tracking-wider mb-2">Preferred Sports</span>
                           <div className="flex flex-wrap gap-2">
-                            {profileData.preferredSports?.length > 0 ? (
+                            {(profileData?.preferredSports || []).length > 0 ? (
                               profileData.preferredSports.map((sport, idx) => (
                                 <span key={idx} className={`text-xs font-bold px-2 py-1 rounded-md border ${getSportBadgeColor(sport)}`}>
                                   {getSportEmoji(sport)} {sport}
@@ -249,11 +249,11 @@ const Profile = () => {
                         </div>
                         <div className="bg-dark-900/50 p-3 rounded-lg border border-dark-700">
                           <span className="block text-[10px] text-gray-500 uppercase tracking-wider mb-1">Preferred Position</span>
-                          <span className="text-sm text-gray-300 font-medium">{profileData.preferredPosition || 'N/A'}</span>
+                          <span className="text-sm text-gray-300 font-medium">{profileData?.preferredPosition || 'N/A'}</span>
                         </div>
                         <div className="bg-dark-900/50 p-3 rounded-lg border border-dark-700 col-span-2">
                           <span className="block text-[10px] text-gray-500 uppercase tracking-wider mb-1">Experience Level</span>
-                          <span className="text-sm text-neon-blue font-medium">{profileData.experienceLevel || 'Beginner'}</span>
+                          <span className="text-sm text-neon-blue font-medium">{profileData?.experienceLevel || 'Beginner'}</span>
                         </div>
                       </div>
                     </div>
@@ -413,7 +413,7 @@ const Profile = () => {
                     activeTab === 'hosting' ? 'text-neon-blue border-b-2 border-neon-blue bg-dark-700/50' : 'text-gray-500 hover:text-gray-300 hover:bg-dark-800'
                   }`}
                 >
-                  Deployed Events ({profileData.hostedEvents?.length || 0})
+                  Deployed Events ({profileData?.hostedEvents?.length || 0})
                 </button>
                 <button
                   onClick={() => setActiveTab('joined')}
@@ -421,7 +421,7 @@ const Profile = () => {
                     activeTab === 'joined' ? 'text-neon-pink border-b-2 border-neon-pink bg-dark-700/50' : 'text-gray-500 hover:text-gray-300 hover:bg-dark-800'
                   }`}
                 >
-                  Joined Events ({profileData.joinedEvents?.length || 0})
+                  Joined Events ({profileData?.joinedEvents?.length || 0})
                 </button>
               </div>
 

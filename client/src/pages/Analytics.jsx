@@ -63,41 +63,55 @@ const Analytics = () => {
           {/* Charts */}
           <div className="bg-dark-800/80 p-6 rounded-3xl border border-dark-700 shadow-xl backdrop-blur-sm">
             <h3 className="text-xl font-bold text-white mb-6">Sport Distribution</h3>
-            <div className="h-72 w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={data?.barChartData || []} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                  <XAxis dataKey="name" stroke="#9ca3af" fontSize={12} tickLine={false} axisLine={false} />
-                  <YAxis stroke="#9ca3af" fontSize={12} tickLine={false} axisLine={false} />
-                  <Tooltip cursor={{ fill: '#334155' }} contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: '8px', color: '#fff' }} />
-                  <Bar dataKey="value" fill="#00f3ff" radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
+            <div className="h-72 w-full relative">
+              {(!data?.barChartData || data.barChartData.length === 0 || data.barChartData.every(d => d.value === 0)) ? (
+                <div className="absolute inset-0 flex flex-col justify-center items-center text-gray-500 text-sm bg-dark-900/30 rounded-2xl border border-dashed border-dark-600">
+                  <span className="text-3xl mb-2">🏏</span>
+                  No events created yet.
+                </div>
+              ) : (
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={data?.barChartData || []} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                    <XAxis dataKey="name" stroke="#9ca3af" fontSize={12} tickLine={false} axisLine={false} />
+                    <YAxis stroke="#9ca3af" fontSize={12} tickLine={false} axisLine={false} />
+                    <Tooltip cursor={{ fill: '#334155' }} contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: '8px', color: '#fff' }} />
+                    <Bar dataKey="value" fill="#00f3ff" radius={[4, 4, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              )}
             </div>
           </div>
 
           <div className="bg-dark-800/80 p-6 rounded-3xl border border-dark-700 shadow-xl backdrop-blur-sm">
             <h3 className="text-xl font-bold text-white mb-6">Application Success Rate</h3>
-            <div className="h-72 w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={data?.pieChartData || []}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={60}
-                    outerRadius={100}
-                    paddingAngle={5}
-                    dataKey="value"
-                    stroke="none"
-                  >
-                    {data?.pieChartData?.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: '8px', color: '#fff' }} />
-                  <Legend verticalAlign="bottom" height={36} iconType="circle" />
-                </PieChart>
-              </ResponsiveContainer>
+            <div className="h-72 w-full relative">
+              {(!data?.pieChartData || data.pieChartData.length === 0 || data.pieChartData.every(d => d.value === 0)) ? (
+                <div className="absolute inset-0 flex flex-col justify-center items-center text-gray-500 text-sm bg-dark-900/30 rounded-2xl border border-dashed border-dark-600">
+                  <span className="text-3xl mb-2">📝</span>
+                  No applications recorded yet.
+                </div>
+              ) : (
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={data?.pieChartData || []}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={60}
+                      outerRadius={100}
+                      paddingAngle={5}
+                      dataKey="value"
+                      stroke="none"
+                    >
+                      {data?.pieChartData?.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: '8px', color: '#fff' }} />
+                    <Legend verticalAlign="bottom" height={36} iconType="circle" />
+                  </PieChart>
+                </ResponsiveContainer>
+              )}
             </div>
           </div>
         </div>
@@ -111,12 +125,12 @@ const Analytics = () => {
             </h3>
             <div className="space-y-4">
               <InsightCard label="Avg Applications per Tryout" value={data?.avgApplications} />
-              <InsightCard label="Average Team Rating" value={data?.averageTeamRating ? `⭐ ${data.averageTeamRating}` : '-'} />
+              <InsightCard label="Average Team Rating" value={data?.averageTeamRating !== undefined && data?.averageTeamRating !== 0 ? `⭐ ${data.averageTeamRating}` : '-'} />
               <InsightCard label="Total Team Selections" value={data?.totalApprovedPlayers} />
               <InsightCard label="Overall Active Users" value={data?.activeParticipants} />
               <InsightCard label="Most Selected Sport" value={data?.mostSelectedSport} />
               <InsightCard label="Multi-Sport Athletes" value={data?.multiSportParticipationCount} />
-              <InsightCard label="Top 3 Interests" value={data?.topSportsInterests?.join(', ')} />
+              <InsightCard label="Top 3 Interests" value={data?.topSportsInterests?.join(', ') || 'None'} />
             </div>
           </div>
 

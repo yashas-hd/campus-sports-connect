@@ -40,7 +40,6 @@ app.use((req, res, next) => {
       return res.sendStatus(200);
     }
     
-    console.log(typeof next);
     if (typeof next === 'function') {
       next();
     } else {

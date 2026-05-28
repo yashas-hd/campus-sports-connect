@@ -21,7 +21,6 @@ const getEvents = async (req, res) => {
 const createEvent = async (req, res) => {
   try {
     const { title, sport, date, location, description, maxParticipants, eventType } = req.body;
-    console.log("Incoming Sport:", req.body.sport);
 
     const validSport = SPORTS.find(
       s => s.toLowerCase() === (sport || '').trim().toLowerCase()
@@ -44,8 +43,14 @@ const createEvent = async (req, res) => {
     });
 
     // We can emit a socket event to all clients about the new event
-    const io = req.app.get('io');
-    io.emit('new_event', event);
+    try {
+      const io = req.app.get('io');
+      if (io) {
+        io.emit('new_event', event);
+      }
+    } catch (socketErr) {
+      console.error('Socket emission failed for new_event:', socketErr);
+    }
 
     res.status(201).json(event);
   } catch (error) {
@@ -119,7 +124,9 @@ const joinEvent = async (req, res) => {
 
         // Emit socket event to the creator's room
         const io = req.app.get('io');
-        io.to(event.creator.toString()).emit('new_notification', notification);
+        if (io) {
+          io.to(event.creator.toString()).emit('new_notification', notification);
+        }
       } catch (err) {
         console.error('Notification creation failed:', err);
       }
@@ -180,9 +187,6 @@ const applyForTryout = async (req, res) => {
       return res.status(400).json({ message: 'This event is not a tryout' });
     }
 
-    console.log("Preferred Sports:", req.user.preferredSports);
-    console.log("Event Sport:", event.sport);
-
     const normalizedSports = (req.user.preferredSports || []).map(
       sport => sport.trim().toLowerCase()
     );
@@ -213,7 +217,9 @@ const applyForTryout = async (req, res) => {
           message: `${req.user.name} applied for tryouts: ${event.title}`,
         });
         const io = req.app.get('io');
-        io.to(event.creator.toString()).emit('new_notification', notification);
+        if (io) {
+          io.to(event.creator.toString()).emit('new_notification', notification);
+        }
       } catch (err) {
         console.error('Notification creation failed:', err);
       }
@@ -288,7 +294,9 @@ const approvePlayer = async (req, res) => {
         message: `You were approved for the team: ${event.title}!`,
       });
       const io = req.app.get('io');
-      io.to(targetUserId).emit('new_notification', notification);
+      if (io) {
+        io.to(targetUserId).emit('new_notification', notification);
+      }
     } catch (err) {
       console.error('Notification creation failed:', err);
     }
@@ -340,7 +348,9 @@ const rejectPlayer = async (req, res) => {
         message: `Your application for ${event.title} was not accepted at this time.`,
       });
       const io = req.app.get('io');
-      io.to(targetUserId).emit('new_notification', notification);
+      if (io) {
+        io.to(targetUserId).emit('new_notification', notification);
+      }
     } catch (err) {
       console.error('Notification creation failed:', err);
     }
@@ -431,7 +441,9 @@ const withdrawApplication = async (req, res) => {
           message: `${req.user.name} withdrew from the team: ${event.title}`,
         });
         const io = req.app.get('io');
-        io.to(event.creator.toString()).emit('new_notification', notification);
+        if (io) {
+          io.to(event.creator.toString()).emit('new_notification', notification);
+        }
       }
     } catch (err) {
       console.error('Notification creation failed:', err);
@@ -551,7 +563,9 @@ const ratePlayer = async (req, res) => {
         message: `You received a ${rating}-star rating for ${event.title}`,
       });
       const io = req.app.get('io');
-      io.to(targetUserId.toString()).emit('new_notification', notification);
+      if (io) {
+        io.to(targetUserId.toString()).emit('new_notification', notification);
+      }
     } catch (err) {
       console.error('Notification creation failed:', err);
     }
