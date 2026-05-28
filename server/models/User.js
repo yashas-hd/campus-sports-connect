@@ -93,7 +93,7 @@ const userSchema = mongoose.Schema(
   }
 );
 
-userSchema.pre('validate', function (next) {
+userSchema.pre('validate', function () {
   if (this.preferredSports && this.preferredSports.length > 0) {
     const { SPORTS } = require('../constants/sports');
     this.preferredSports = this.preferredSports.map(sport => {
@@ -101,7 +101,6 @@ userSchema.pre('validate', function (next) {
       return validSport || sport;
     });
   }
-  next();
 });
 
 // Encrypt password using bcrypt

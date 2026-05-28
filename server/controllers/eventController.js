@@ -265,8 +265,10 @@ const approvePlayer = async (req, res) => {
     }
 
     // Update status
+    console.log("Before approval update");
     event.teamRequests[requestIndex].teamStatus = 'Approved';
 
+    console.log("Before participant push");
     if (!event.approvedPlayers.includes(targetUserId)) {
       event.approvedPlayers.push(targetUserId);
     }
@@ -275,7 +277,9 @@ const approvePlayer = async (req, res) => {
       event.participants.push(targetUserId);
     }
 
+    console.log("Before event.save()");
     await event.save();
+    console.log("After event.save()");
 
     // Add event ID into target user's joinedEvents
     const targetUser = await User.findById(targetUserId);
@@ -285,6 +289,7 @@ const approvePlayer = async (req, res) => {
     }
 
     // Notify user
+    console.log("Before notification");
     try {
       const notification = await Notification.create({
         recipient: targetUserId,
