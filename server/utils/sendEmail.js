@@ -1,43 +1,45 @@
-const nodemailer = require('nodemailer');
+const axios = require('axios');
 
 const sendEmail = async (options) => {
-  // Create a transporter
-  const transporter = nodemailer.createTransport({
-    host: "smtp-relay.brevo.com",
-    port: 2525,
-    secure: false,
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
-    },
-    tls: {
-      rejectUnauthorized: false,
-    },
-    connectionTimeout: 10000,
-    greetingTimeout: 10000,
-    socketTimeout: 10000,
-  });
-
-  // Verify connection configuration
-  try {
-    await transporter.verify();
-    console.log("Brevo SMTP connected successfully");
-  } catch (error) {
-    console.error("Brevo SMTP authentication failed:", error);
-    throw error;
+  if (!process.env.BREVO_API_KEY) {
+    throw new Error("BREVO_API_KEY environment variable is not configured");
+  }
+  if (!process.env.EMAIL_USER) {
+    throw new Error("EMAIL_USER (sender email) environment variable is not configured");
   }
 
-  // Define the email options
-  const mailOptions = {
-    from: `Campus Sports Connect <${process.env.EMAIL_USER}>`,
-    to: options.email,
+  const payload = {
+    sender: {
+      name: "Campus Sports Connect",
+      email: process.env.EMAIL_USER,
+    },
+    to: [
+      {
+        email: options.email,
+      },
+    ],
     subject: options.subject,
-    text: options.message,
-    html: options.html,
+    htmlContent: options.html || options.message,
   };
 
-  // Actually send the email
-  await transporter.sendMail(mailOptions);
+  try {
+    const response = await axios.post("https://api.brevo.com/v3/smtp/email", payload, {
+      headers: {
+        "api-key": process.env.BREVO_API_KEY,
+        "Content-Type": "application/json",
+      },
+      timeout: 10000, // 10 second timeout
+    });
+    
+    console.log("Brevo API Email sent successfully. Message ID:", response.data.messageId);
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Brevo API Email sending failed:",
+      error.response ? error.response.data : error.message
+    );
+    throw error;
+  }
 };
 
 module.exports = sendEmail;
