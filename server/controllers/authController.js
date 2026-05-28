@@ -91,7 +91,7 @@ const verifyOTP = async (req, res) => {
 
     if (user.otp !== otp) {
       user.otpAttempts += 1;
-      await user.save();
+      await user.save({ validateBeforeSave: false });
       return res.status(400).json({ message: "Invalid OTP" });
     }
 
@@ -99,7 +99,7 @@ const verifyOTP = async (req, res) => {
     user.otp = null;
     user.otpExpires = null;
     user.otpAttempts = 0;
-    await user.save();
+    await user.save({ validateBeforeSave: false });
 
     res.json({
       message: "Login successful",
@@ -141,7 +141,7 @@ const loginUser = async (req, res) => {
     user.otpExpires = Date.now() + 5 * 60 * 1000;
     user.otpAttempts = 0;
 
-    await user.save();
+    await user.save({ validateBeforeSave: false });
 
     res.status(200).json({
       message: "OTP sent successfully",
@@ -173,7 +173,7 @@ const resendOTP = async (req, res) => {
     user.otp = newOtp;
     user.otpExpires = Date.now() + 5 * 60 * 1000;
     user.otpAttempts = 0;
-    await user.save();
+    await user.save({ validateBeforeSave: false });
 
     try {
       const message = `Your new OTP for Campus Sports Connect is: ${newOtp}. It is valid for 5 minutes.`;
