@@ -21,7 +21,6 @@ const Register = () => {
     try {
       const { data } = await axios.post(`${API}/api/auth/register`, formData);
       toast.success("OTP Sent successfully!");
-      toast("Demo OTP: " + data.otp, { icon: '🔑', duration: 8000 });
       // Redirect to OTP verification
       navigate('/verify-otp', { state: { userId: data.userId, email: formData.email } });
     } catch (err) {
@@ -106,7 +105,7 @@ const Register = () => {
               disabled={loading}
               className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-bold rounded-lg text-dark-900 bg-gradient-to-r from-neon-pink to-neon-blue hover:from-neon-blue hover:to-neon-pink focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-dark-900 focus:ring-neon-pink transition-all duration-500 animate-pulse-glow hover:shadow-[0_0_25px_rgba(255,0,255,0.6)] disabled:opacity-70 disabled:cursor-not-allowed disabled:animate-none"
             >
-              {loading ? 'Registering...' : 'Join Now'}
+              {loading ? 'Sending OTP...' : 'Join Now'}
             </button>
           </div>
         </form>

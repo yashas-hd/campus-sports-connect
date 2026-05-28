@@ -52,7 +52,6 @@ const VerifyOTP = () => {
     try {
       const res = await axios.post(`${API}/api/auth/resend-otp`, { email });
       toast.success('OTP resent successfully');
-      toast("Demo OTP: " + res.data.otp, { icon: '🔑', duration: 8000 });
       setTimeLeft(300); // Reset 5 min timer
       setResendCooldown(30); // Reset 30s cooldown
     } catch (err) {

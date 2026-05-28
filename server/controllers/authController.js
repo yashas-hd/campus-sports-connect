@@ -36,26 +36,42 @@ const registerUser = async (req, res) => {
       otpAttempts: 0,
     });
 
-    // Send OTP via email (non-blocking for demo purposes)
+    // Send OTP via email
     try {
-      const message = `Your OTP for Campus Sports Connect registration is: ${otp}. It is valid for 10 minutes.`;
-      sendEmail({
+      const subject = 'Campus Sports Connect - Registration OTP';
+      const message = `Your OTP for Campus Sports Connect registration is: ${otp}. It is valid for 5 minutes.`;
+      const html = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px; background-color: #ffffff;">
+          <h2 style="color: #0f172a; border-bottom: 2px solid #00f3ff; padding-bottom: 10px;">Campus Sports Connect</h2>
+          <p style="color: #334155; font-size: 16px; line-height: 1.5;">Thank you for registering. Please use the following One-Time Password (OTP) to verify your email address:</p>
+          <div style="text-align: center; margin: 30px 0;">
+            <span style="font-family: monospace; font-size: 36px; font-weight: bold; letter-spacing: 5px; color: #00f3ff; background-color: #0f172a; padding: 12px 24px; border-radius: 6px; display: inline-block;">${otp}</span>
+          </div>
+          <p style="color: #64748b; font-size: 14px;">This code is valid for <strong>5 minutes</strong>. If you did not request this code, please ignore this email.</p>
+          <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 20px 0;" />
+          <p style="color: #94a3b8; font-size: 12px; text-align: center;">This is an automated system email. Please do not reply.</p>
+        </div>
+      `;
+
+      await sendEmail({
         email: user.email,
-        subject: 'Campus Sports Connect - Registration OTP',
+        subject,
         message,
-      }).catch(err => console.error("Email sending failed, but continuing for demo fallback:", err));
+        html
+      });
 
       return res.status(201).json({
         success: true,
-        message: 'User registered successfully',
+        message: 'User registered successfully. OTP sent to your email.',
         userId: user._id,
-        otp: otp,
       });
     } catch (error) {
-      console.error("Error during registration response formatting:", error);
+      console.error("Email sending failed during registration:", error);
+      // Clean up the created user record since registration could not complete
+      await User.findByIdAndDelete(user._id);
       return res.status(500).json({ 
         success: false,
-        message: 'Registration failed' 
+        message: 'Failed to send verification OTP email. Please check your email address and try again.' 
       });
     }
   } catch (error) {
@@ -143,11 +159,46 @@ const loginUser = async (req, res) => {
 
     await user.save({ validateBeforeSave: false });
 
-    res.status(200).json({
-      message: "OTP sent successfully",
-      otp: otp,
-      userId: user._id
-    });
+    // Send OTP via email
+    try {
+      const subject = 'Campus Sports Connect - Login OTP';
+      const message = `Your OTP for Campus Sports Connect login is: ${otp}. It is valid for 5 minutes.`;
+      const html = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px; background-color: #ffffff;">
+          <h2 style="color: #0f172a; border-bottom: 2px solid #ff00ff; padding-bottom: 10px;">Campus Sports Connect</h2>
+          <p style="color: #334155; font-size: 16px; line-height: 1.5;">You are attempting to log in. Please use the following One-Time Password (OTP) to complete your login:</p>
+          <div style="text-align: center; margin: 30px 0;">
+            <span style="font-family: monospace; font-size: 36px; font-weight: bold; letter-spacing: 5px; color: #ff00ff; background-color: #0f172a; padding: 12px 24px; border-radius: 6px; display: inline-block;">${otp}</span>
+          </div>
+          <p style="color: #64748b; font-size: 14px;">This code is valid for <strong>5 minutes</strong>. If you did not request this login, please change your password immediately.</p>
+          <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 20px 0;" />
+          <p style="color: #94a3b8; font-size: 12px; text-align: center;">This is an automated system email. Please do not reply.</p>
+        </div>
+      `;
+
+      await sendEmail({
+        email: user.email,
+        subject,
+        message,
+        html
+      });
+
+      return res.status(200).json({
+        success: true,
+        message: "OTP sent successfully. Please check your email.",
+        userId: user._id
+      });
+    } catch (emailErr) {
+      console.error("Email sending failed during login:", emailErr);
+      // Revert OTP fields to avoid leaving user in semi-state
+      user.otp = undefined;
+      user.otpExpires = undefined;
+      await user.save({ validateBeforeSave: false });
+      return res.status(500).json({
+        success: false,
+        message: "Failed to send login OTP email. Please try again."
+      });
+    }
   } catch (error) {
     console.error("Login Error:", error);
     res.status(500).json({ message: "Server error", error: error.message });
@@ -176,21 +227,36 @@ const resendOTP = async (req, res) => {
     await user.save({ validateBeforeSave: false });
 
     try {
+      const subject = 'Campus Sports Connect - New OTP';
       const message = `Your new OTP for Campus Sports Connect is: ${newOtp}. It is valid for 5 minutes.`;
+      const html = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px; background-color: #ffffff;">
+          <h2 style="color: #0f172a; border-bottom: 2px solid #39ff14; padding-bottom: 10px;">Campus Sports Connect</h2>
+          <p style="color: #334155; font-size: 16px; line-height: 1.5;">You requested a new One-Time Password (OTP). Please use the following code:</p>
+          <div style="text-align: center; margin: 30px 0;">
+            <span style="font-family: monospace; font-size: 36px; font-weight: bold; letter-spacing: 5px; color: #39ff14; background-color: #0f172a; padding: 12px 24px; border-radius: 6px; display: inline-block;">${newOtp}</span>
+          </div>
+          <p style="color: #64748b; font-size: 14px;">This code is valid for <strong>5 minutes</strong>. If you did not request a new code, please ignore this email.</p>
+          <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 20px 0;" />
+          <p style="color: #94a3b8; font-size: 12px; text-align: center;">This is an automated system email. Please do not reply.</p>
+        </div>
+      `;
+
       await sendEmail({
         email: user.email,
-        subject: 'Campus Sports Connect - New OTP',
+        subject,
         message,
+        html
       });
       res.json({
-        message: 'OTP resent successfully',
-        otp: newOtp
+        success: true,
+        message: 'OTP resent successfully. Please check your email.'
       });
     } catch (error) {
       user.otp = undefined;
       user.otpExpires = undefined;
       await user.save({ validateBeforeSave: false });
-      return res.status(500).json({ message: 'Email could not be sent' });
+      return res.status(500).json({ success: false, message: 'Email could not be sent. Please try again.' });
     }
   } catch (error) {
     res.status(500).json({ message: error.message });
