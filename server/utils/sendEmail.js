@@ -3,8 +3,7 @@ const nodemailer = require('nodemailer');
 const sendEmail = async (options) => {
   // Create a transporter
   const transporter = nodemailer.createTransport({
-    service: "gmail",
-    host: "smtp.gmail.com",
+    host: "smtp-relay.brevo.com",
     port: 587,
     secure: false,
     auth: {
@@ -12,16 +11,19 @@ const sendEmail = async (options) => {
       pass: process.env.EMAIL_PASS,
     },
     tls: {
-      rejectUnauthorized: false
-    }
+      rejectUnauthorized: false,
+    },
+    connectionTimeout: 10000,
+    greetingTimeout: 10000,
+    socketTimeout: 10000,
   });
 
   // Verify connection configuration
   try {
     await transporter.verify();
-    console.log("SMTP connected successfully");
+    console.log("Brevo SMTP connected successfully");
   } catch (error) {
-    console.error("SMTP authentication failed:", error);
+    console.error("Brevo SMTP authentication failed:", error);
     throw error;
   }
 
