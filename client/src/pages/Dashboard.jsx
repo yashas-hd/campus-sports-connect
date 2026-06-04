@@ -279,42 +279,94 @@ const Dashboard = () => {
   );
 
   return (
-    <div className="min-h-screen bg-dark-900 text-gray-100 font-sans relative">
+    <div className="min-h-screen bg-dark-900 text-gray-100 font-sans relative overflow-hidden pb-12">
+      {/* Background Blobs */}
+      <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-neon-blue/5 blur-[150px] rounded-full z-0 pointer-events-none"></div>
+      <div className="absolute top-1/3 right-1/4 w-[400px] h-[400px] bg-neon-pink/5 blur-[120px] rounded-full z-0 pointer-events-none" style={{ animationDelay: '2s' }}></div>
+
       <Navbar />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 relative z-10">
 
-        {/* Welcome Banner */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-4 bg-dark-800/60 backdrop-blur-md p-8 rounded-3xl border border-dark-700 shadow-xl">
-          <div>
-            <h1 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400 mb-2">
-              Welcome back 👋
-            </h1>
-            <p className="text-gray-400 text-lg font-medium">Find and join sports activities happening around campus.</p>
+        {/* Welcome Hero Section */}
+        <div className="relative overflow-hidden mb-8 rounded-3xl border border-dark-700 bg-gradient-to-br from-dark-800/40 via-dark-900/40 to-dark-800/10 backdrop-blur-xl p-8 md:p-12 shadow-2xl">
+          <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-neon-blue/5 blur-[120px] rounded-full -mr-20 -mt-20"></div>
+          <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-neon-pink/5 blur-[100px] rounded-full -ml-10 -mb-10"></div>
+          
+          <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+            <div>
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-neon-blue/10 border border-neon-blue/30 text-neon-blue mb-4">
+                <span className="h-1.5 w-1.5 rounded-full bg-neon-blue animate-pulse"></span>
+                Sports Network Online
+              </span>
+              <h1 className="text-4xl md:text-5xl font-black text-white tracking-tight mb-3">
+                Welcome Back, <span className="text-transparent bg-clip-text bg-gradient-to-r from-neon-blue via-neon-green to-neon-pink">{userProfile?.name || user?.name || "Athlete"}</span> 👋
+              </h1>
+              <p className="text-gray-400 text-lg max-w-xl font-medium leading-relaxed">
+                Connect with local athletes, schedule competitive tryouts, and view performance insights across campus.
+              </p>
+            </div>
+            <button
+              onClick={() => setIsCreateModalOpen(true)}
+              className="group relative px-8 py-4 font-black text-dark-900 rounded-xl overflow-hidden bg-gradient-to-r from-neon-blue via-neon-green to-neon-pink hover:shadow-[0_0_35px_rgba(0,243,255,0.5)] transition-all duration-500 flex items-center gap-2 transform active:scale-95 cursor-pointer"
+            >
+              <span className="text-xl leading-none font-bold">+</span>
+              <span className="tracking-wide">Create Event</span>
+            </button>
           </div>
-          <button
-            onClick={() => setIsCreateModalOpen(true)}
-            className="group relative px-6 py-3 font-bold text-dark-900 rounded-lg overflow-hidden bg-gradient-to-r from-neon-blue to-neon-pink hover:from-neon-pink hover:to-neon-blue transition-all duration-500 shadow-[0_0_20px_rgba(0,243,255,0.3)] hover:shadow-[0_0_30px_rgba(255,0,255,0.5)] flex items-center gap-2"
-          >
-            <span className="text-lg leading-none">+</span>
-            <span>Create Event</span>
-          </button>
+        </div>
+
+        {/* Statistics Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+          {/* Active Events Card */}
+          <div className="bg-dark-800/40 backdrop-blur-md p-6 rounded-2xl border border-dark-700 hover:border-neon-blue/40 transition-all duration-300 shadow-lg flex justify-between items-center group">
+            <div>
+              <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Active Matches</p>
+              <h3 className="text-3xl font-extrabold text-white group-hover:text-neon-blue transition-colors">
+                {events.filter(e => e && e.status !== 'completed' && e.status !== 'cancelled').length}
+              </h3>
+            </div>
+            <div className="text-3xl bg-dark-900/60 p-3 rounded-xl border border-dark-700">⚽</div>
+          </div>
+          
+          {/* Ongoing Live Matches Card */}
+          <div className="bg-dark-800/40 backdrop-blur-md p-6 rounded-2xl border border-dark-700 hover:border-neon-pink/40 transition-all duration-300 shadow-lg flex justify-between items-center group">
+            <div>
+              <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Live Operations</p>
+              <h3 className="text-3xl font-extrabold text-white group-hover:text-neon-pink transition-colors">
+                {events.filter(e => e && e.status === 'ongoing').length + ongoingEvents.length}
+              </h3>
+            </div>
+            <div className="text-3xl bg-dark-900/60 p-3 rounded-xl border border-dark-700 animate-pulse">🔥</div>
+          </div>
+
+          {/* Recommended Card */}
+          <div className="bg-dark-800/40 backdrop-blur-md p-6 rounded-2xl border border-dark-700 hover:border-neon-green/40 transition-all duration-300 shadow-lg flex justify-between items-center group">
+            <div>
+              <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Recommendations</p>
+              <h3 className="text-3xl font-extrabold text-white group-hover:text-neon-green transition-colors">
+                {recommendedEvents.length}
+              </h3>
+            </div>
+            <div className="text-3xl bg-dark-900/60 p-3 rounded-xl border border-dark-700">✨</div>
+          </div>
         </div>
 
         {/* Popular Sports Section */}
         <section className="mb-12">
-          <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
-            <span className="text-3xl">⚡</span> Popular Sports
+          <h2 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-6 flex items-center gap-2">
+            <span>⚡</span> Popular Disciplines
           </h2>
-          <div className="flex flex-wrap gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
             {SPORTS.map((sportName, index) => {
               return (
                 <div 
                   key={index} 
                   onClick={() => setSelectedSport(sportName)}
-                  className="bg-dark-800/80 backdrop-blur-sm border border-dark-700 hover:border-neon-blue/50 rounded-xl px-6 py-3 text-gray-200 font-bold hover:text-white transition-all duration-300 cursor-pointer shadow-lg hover:shadow-[0_5px_15px_rgba(0,243,255,0.2)] hover:-translate-y-1"
+                  className="bg-dark-800/30 backdrop-blur-md border border-dark-700/60 hover:border-neon-blue/40 rounded-2xl p-4 text-center text-gray-300 font-bold hover:text-white transition-all duration-300 cursor-pointer shadow-lg hover:shadow-[0_5px_20px_rgba(0,243,255,0.15)] hover:-translate-y-1 select-none"
                 >
-                  {getSportEmoji(sportName)} {sportName}
+                  <div className="text-4xl mb-2 filter drop-shadow-[0_0_8px_rgba(0,0,0,0.5)]">{getSportEmoji(sportName)}</div>
+                  <div className="text-sm tracking-wide">{sportName}</div>
                 </div>
               );
             })}
@@ -323,20 +375,25 @@ const Dashboard = () => {
 
         {/* Ongoing Events Section */}
         <section className="mb-12">
-          <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
-            <span className="text-3xl">🔥</span> Ongoing Events
+          <h2 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-6 flex items-center gap-2">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+            </span>
+            Live Operations
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {ongoingEvents.map((event, index) => (
-              <div key={index} className="bg-dark-800/80 backdrop-blur-sm rounded-2xl p-6 border border-dark-700 hover:border-orange-500/50 transition-all duration-500 hover:-translate-y-2 shadow-lg hover:shadow-[0_10px_30px_rgba(249,115,22,0.15)] flex flex-col relative overflow-hidden group">
-                <div className="absolute -right-10 -top-10 w-32 h-32 bg-orange-500/10 blur-[40px] rounded-full group-hover:bg-orange-500/20 transition-colors duration-700 z-0"></div>
+              <div key={index} className="bg-gradient-to-br from-dark-800/40 to-dark-900/40 backdrop-blur-md rounded-2xl p-6 border border-dark-700 hover:border-orange-500/50 transition-all duration-500 hover:-translate-y-1.5 shadow-lg hover:shadow-[0_10px_25px_rgba(249,115,22,0.15)] flex flex-col relative overflow-hidden group">
+                <div className="absolute -right-10 -top-10 w-32 h-32 bg-orange-500/5 blur-[40px] rounded-full group-hover:bg-orange-500/10 transition-colors duration-700 z-0"></div>
                 <div className="relative z-10 flex justify-between items-start mb-4">
-                  <h3 className="text-xl font-extrabold text-white group-hover:text-orange-400 transition-colors">{event.title}</h3>
-                  <span className={`text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider ${event.status === 'Live Now' ? 'bg-red-500/10 text-red-500 border border-red-500/30' : 'bg-orange-500/10 text-orange-500 border border-orange-500/30'}`}>
+                  <h3 className="text-lg font-black text-white group-hover:text-orange-400 transition-colors">{event.title}</h3>
+                  <span className={`text-[10px] font-bold px-2.5 py-1 rounded-md uppercase tracking-wider ${event.status === 'Live Now' ? 'bg-red-500/10 text-red-400 border border-red-500/30' : 'bg-orange-500/10 text-orange-400 border border-orange-500/30'}`}>
+                    <span className="inline-block w-1.5 h-1.5 rounded-full bg-current mr-1.5 animate-pulse"></span>
                     {event.status}
                   </span>
                 </div>
-                <div className="relative z-10 flex items-center text-sm text-gray-300 font-medium mt-auto pt-4 border-t border-dark-700">
+                <div className="relative z-10 flex items-center text-xs text-gray-400 font-bold mt-auto pt-4 border-t border-dark-700">
                   <span className="mr-2 text-orange-400">📍</span>
                   {event.location}
                 </div>
@@ -348,56 +405,56 @@ const Dashboard = () => {
         {/* Recommended Events Section */}
         {preferredSports.length > 0 && (
           <section className="mb-12">
-            <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
-              <span className="text-3xl">⭐</span> Recommended Events
+            <h2 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-6 flex items-center gap-2">
+              <span>⭐</span> Recommended Operations
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {loading ? (
                 Array(3).fill().map((_, i) => (
-                  <div key={i} className="bg-dark-800/50 rounded-2xl p-6 border border-dark-700 animate-pulse-glow flex flex-col h-64">
+                  <div key={i} className="bg-dark-800/30 backdrop-blur-md rounded-2xl p-6 border border-dark-700 animate-pulse-glow flex flex-col h-64">
                     <div className="flex justify-between mb-4">
-                      <div className="h-6 w-24 rounded-full animate-skeleton"></div>
-                      <div className="h-6 w-20 rounded animate-skeleton"></div>
+                      <div className="h-6 w-24 rounded-full bg-dark-700/50 animate-skeleton"></div>
+                      <div className="h-6 w-20 rounded bg-dark-700/50 animate-skeleton"></div>
                     </div>
-                    <div className="h-8 w-3/4 rounded mb-6 animate-skeleton"></div>
+                    <div className="h-8 w-3/4 rounded mb-6 bg-dark-700/50 animate-skeleton"></div>
                     <div className="space-y-3 mt-auto">
-                      <div className="h-4 w-1/2 rounded animate-skeleton"></div>
-                      <div className="h-4 w-2/3 rounded animate-skeleton"></div>
+                      <div className="h-4 w-1/2 rounded bg-dark-700/50 animate-skeleton"></div>
+                      <div className="h-4 w-2/3 rounded bg-dark-700/50 animate-skeleton"></div>
                     </div>
-                    <div className="h-10 w-full rounded-lg mt-6 animate-skeleton"></div>
+                    <div className="h-10 w-full rounded-lg mt-6 bg-dark-700/50 animate-skeleton"></div>
                   </div>
                 ))
               ) : recommendedEvents.length === 0 ? (
-                <div className="col-span-full text-center py-10 text-gray-400 bg-dark-800/40 backdrop-blur-md rounded-2xl border border-dark-700">
-                  <span className="text-4xl block mb-2 opacity-50">🤷‍♂️</span>
-                  No personalized recommendations yet for your favorite sports.
+                <div className="col-span-full text-center py-12 text-gray-400 bg-dark-850/40 backdrop-blur-md rounded-2xl border border-dark-700 shadow-inner">
+                  <span className="text-4xl block mb-2 opacity-55">🤷‍♂️</span>
+                  No matching recommendations found for your preferences.
                 </div>
               ) : (
                 recommendedEvents.slice(0, 3).map((event) => (
-                  <div key={event._id} className="bg-dark-800/80 backdrop-blur-sm rounded-2xl overflow-hidden border border-neon-pink/30 hover:border-neon-pink/70 transition-all duration-500 hover:-translate-y-2 shadow-[0_0_15px_rgba(255,0,255,0.1)] hover:shadow-[0_10px_30px_rgba(255,0,255,0.25)] flex flex-col group">
+                  <div key={event._id} className="bg-gradient-to-br from-dark-800/40 to-dark-900/40 backdrop-blur-md rounded-2xl overflow-hidden border border-neon-pink/20 hover:border-neon-pink/50 transition-all duration-500 hover:-translate-y-1.5 shadow-[0_0_15px_rgba(255,0,255,0.05)] hover:shadow-[0_10px_25px_rgba(255,0,255,0.15)] flex flex-col group">
                     <div className="p-6 flex-grow flex flex-col relative overflow-hidden">
-                      <div className="absolute -right-10 -bottom-10 w-40 h-40 bg-neon-pink/10 blur-[50px] rounded-full group-hover:bg-neon-pink/20 transition-colors duration-700 z-0"></div>
+                      <div className="absolute -right-10 -bottom-10 w-40 h-40 bg-neon-pink/5 blur-[50px] rounded-full group-hover:bg-neon-pink/10 transition-colors duration-700 z-0"></div>
                       
-                      <div className="relative z-10 mb-3 flex justify-between items-start">
-                        <span className={`text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider backdrop-blur-md ${getSportBadgeColor(event.sport)}`}>
-                          {event.sport}
+                      <div className="relative z-10 mb-4 flex justify-between items-start">
+                        <span className={`text-[10px] font-bold px-2.5 py-1 rounded-md uppercase tracking-wider backdrop-blur-md ${getSportBadgeColor(event.sport)}`}>
+                          {getSportEmoji(event.sport)} {event.sport}
                         </span>
-                        <span className="text-[10px] font-bold bg-neon-pink/20 text-neon-pink px-2 py-1 rounded uppercase tracking-widest border border-neon-pink/30">
+                        <span className="text-[9px] font-bold bg-neon-pink/10 text-neon-pink px-2 py-1 rounded border border-neon-pink/20 tracking-wider">
                           Recommended
                         </span>
                       </div>
 
                       <div className="relative z-10 mb-4">
-                        <h3 className="text-2xl font-extrabold text-white group-hover:text-neon-pink transition-colors line-clamp-2">{event.title}</h3>
+                        <h3 className="text-xl font-black text-white group-hover:text-neon-pink transition-colors line-clamp-2">{event.title}</h3>
                       </div>
                       
                       <div className="relative z-10 space-y-3 mb-6 flex-grow">
-                        <div className="flex items-center text-sm text-gray-300 font-medium">
-                          <span className="mr-3 text-neon-pink drop-shadow-[0_0_5px_rgba(255,0,255,0.5)]">📅</span>
+                        <div className="flex items-center text-xs text-gray-400 font-bold">
+                          <span className="mr-3 text-neon-pink">📅</span>
                           {new Date(event.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                         </div>
-                        <div className="flex items-center text-sm text-gray-300 font-medium">
-                          <span className="mr-3 text-neon-green drop-shadow-[0_0_5px_rgba(57,255,20,0.5)]">📍</span>
+                        <div className="flex items-center text-xs text-gray-400 font-bold">
+                          <span className="mr-3 text-neon-green">📍</span>
                           <span className="line-clamp-1">{event.location}</span>
                         </div>
                       </div>
@@ -405,7 +462,7 @@ const Dashboard = () => {
                       <div className="relative z-10 pt-5 border-t border-dark-700 mt-auto">
                         <Link
                           to={`/events/${event._id}`}
-                          className="block text-center w-full bg-dark-700 text-white font-bold py-3 rounded-lg hover:bg-neon-pink hover:text-dark-900 transition-all duration-300 shadow-[0_0_10px_rgba(0,0,0,0.5)] hover:shadow-[0_0_15px_rgba(255,0,255,0.4)]"
+                          className="block text-center w-full bg-dark-900/60 hover:bg-neon-pink hover:text-dark-900 border border-dark-700 hover:border-neon-pink text-white font-bold py-3 rounded-lg transition-all duration-300"
                         >
                           View Details
                         </Link>
@@ -419,11 +476,14 @@ const Dashboard = () => {
         )}
 
         {/* Radar & Search Section */}
-        <section className="mb-12 bg-dark-800/50 backdrop-blur-sm p-6 rounded-3xl border border-dark-700 shadow-xl">
-          <div className="flex flex-col md:flex-row gap-6 items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-white flex items-center gap-3 whitespace-nowrap">
-              <span className="text-3xl">🎯</span> Radar
-            </h2>
+        <section className="mb-12 bg-dark-800/20 backdrop-blur-md p-6 rounded-3xl border border-dark-700 shadow-xl">
+          <div className="flex flex-col lg:flex-row gap-6 items-start lg:items-center justify-between mb-8">
+            <div>
+              <h2 className="text-2xl font-black text-white flex items-center gap-3">
+                <span className="text-3xl">🎯</span> Operation Radar
+              </h2>
+              <p className="text-xs text-gray-500 font-bold uppercase mt-1">Scan and query current campus activities</p>
+            </div>
             <div className="relative w-full max-w-md">
               <span className="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-500">
                 🔍
@@ -433,44 +493,50 @@ const Dashboard = () => {
                 placeholder="Search sports events..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-dark-900 border border-dark-600 rounded-full py-3 pl-12 pr-4 text-white focus:outline-none focus:border-neon-blue focus:ring-1 focus:ring-neon-blue transition-all shadow-[0_0_15px_rgba(0,0,0,0.5)] placeholder-gray-500"
+                className="w-full bg-dark-900/50 border border-dark-700 rounded-xl py-3 pl-12 pr-4 text-white focus:outline-none focus:border-neon-blue focus:ring-1 focus:ring-neon-blue transition-all placeholder-gray-600 shadow-inner text-sm"
               />
             </div>
           </div>
           
-          <div className="flex flex-col lg:flex-row gap-6 justify-between items-start lg:items-center">
+          <div className="space-y-6">
             {/* Sport Category Filters */}
-            <div className="flex flex-wrap gap-2">
-              {filterSportsList.map(sport => (
-                <button
-                  key={sport}
-                  onClick={() => setFilterSport(sport)}
-                  className={`px-4 py-2 rounded-full text-sm font-bold transition-all duration-300 shadow-md ${
-                    filterSport === sport
-                      ? 'bg-neon-blue text-dark-900 shadow-[0_0_15px_rgba(0,243,255,0.4)]'
-                      : 'bg-dark-900 text-gray-400 border border-dark-600 hover:text-white hover:border-neon-blue/50'
-                  }`}
-                >
-                  {sport}
-                </button>
-              ))}
+            <div>
+              <span className="block text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-3">Disciplines</span>
+              <div className="flex flex-wrap gap-2">
+                {filterSportsList.map(sport => (
+                  <button
+                    key={sport}
+                    onClick={() => setFilterSport(sport)}
+                    className={`px-4 py-2 rounded-lg text-xs font-bold transition-all duration-300 shadow-md ${
+                      filterSport === sport
+                        ? 'bg-neon-blue text-dark-900 shadow-[0_0_15px_rgba(0,243,255,0.3)]'
+                        : 'bg-dark-900/40 text-gray-400 border border-dark-700 hover:text-white hover:border-neon-blue/40'
+                    }`}
+                  >
+                    {sport}
+                  </button>
+                ))}
+              </div>
             </div>
             
             {/* Status Filters */}
-            <div className="flex flex-wrap gap-2">
-              {filterStatusList.map(status => (
-                <button
-                  key={status}
-                  onClick={() => setFilterStatus(status)}
-                  className={`px-4 py-2 rounded-full text-sm font-bold transition-all duration-300 shadow-md ${
-                    filterStatus === status
-                      ? 'bg-neon-pink text-white shadow-[0_0_15px_rgba(255,0,255,0.4)] border border-neon-pink'
-                      : 'bg-dark-900 text-gray-400 border border-dark-600 hover:text-white hover:border-neon-pink/50'
-                  }`}
-                >
-                  {status}
-                </button>
-              ))}
+            <div>
+              <span className="block text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-3">Filter status</span>
+              <div className="flex flex-wrap gap-2">
+                {filterStatusList.map(status => (
+                  <button
+                    key={status}
+                    onClick={() => setFilterStatus(status)}
+                    className={`px-4 py-2 rounded-lg text-xs font-bold transition-all duration-300 shadow-md ${
+                      filterStatus === status
+                        ? 'bg-neon-pink text-white shadow-[0_0_15px_rgba(255,0,255,0.3)] border border-neon-pink/40'
+                        : 'bg-dark-900/40 text-gray-400 border border-dark-700 hover:text-white hover:border-neon-pink/40'
+                    }`}
+                  >
+                    {status}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         </section>
@@ -480,50 +546,50 @@ const Dashboard = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {loading ? (
               Array(6).fill().map((_, i) => (
-                <div key={i} className="bg-dark-800/50 rounded-2xl p-6 border border-dark-700 animate-pulse-glow flex flex-col h-64">
-                  <div className="h-6 w-24 rounded-full mb-4 animate-skeleton"></div>
-                  <div className="h-8 w-3/4 rounded mb-6 animate-skeleton"></div>
+                <div key={i} className="bg-dark-800/30 backdrop-blur-md rounded-2xl p-6 border border-dark-700 animate-pulse-glow flex flex-col h-64">
+                  <div className="h-6 w-24 rounded-full mb-4 bg-dark-700/50 animate-skeleton"></div>
+                  <div className="h-8 w-3/4 rounded mb-6 bg-dark-700/50 animate-skeleton"></div>
                   <div className="space-y-3 mt-auto">
-                    <div className="h-4 w-1/2 rounded animate-skeleton"></div>
-                    <div className="h-4 w-2/3 rounded animate-skeleton"></div>
+                    <div className="h-4 w-1/2 rounded bg-dark-700/50 animate-skeleton"></div>
+                    <div className="h-4 w-2/3 rounded bg-dark-700/50 animate-skeleton"></div>
                   </div>
-                  <div className="h-10 w-full rounded-lg mt-6 animate-skeleton"></div>
+                  <div className="h-10 w-full rounded-lg mt-6 bg-dark-700/50 animate-skeleton"></div>
                 </div>
               ))
             ) : filteredEvents.length === 0 ? (
-              <div className="col-span-full text-center py-12 text-gray-400 bg-dark-800/40 backdrop-blur-md rounded-3xl border border-dark-700 shadow-inner">
-                <span className="text-5xl block mb-4 opacity-50">📭</span>
-                <p className="text-xl font-bold text-white mb-2">No matching events found</p>
+              <div className="col-span-full text-center py-12 text-gray-400 bg-dark-800/30 backdrop-blur-md rounded-3xl border border-dark-700 shadow-inner">
+                <span className="text-5xl block mb-4 opacity-50 font-serif">📭</span>
+                <p className="text-xl font-black text-white mb-2">No matching events found</p>
                 <p className="text-sm">Try adjusting your search or filters.</p>
               </div>
             ) : (
               filteredEvents.map((event) => (
-                <div key={event._id} className="bg-dark-800/80 backdrop-blur-sm rounded-2xl overflow-hidden border border-dark-700 hover:border-neon-blue/50 transition-all duration-500 hover:-translate-y-2 shadow-lg hover:shadow-[0_10px_30px_rgba(0,243,255,0.15)] flex flex-col group">
+                <div key={event._id} className="bg-gradient-to-br from-dark-800/40 to-dark-900/40 backdrop-blur-md rounded-2xl overflow-hidden border border-dark-700/80 hover:border-neon-blue/40 transition-all duration-500 hover:-translate-y-1.5 shadow-lg hover:shadow-[0_10px_25px_rgba(0,243,255,0.1)] flex flex-col group">
                   <div className="p-6 flex-grow flex flex-col relative overflow-hidden">
-                    <div className="absolute -right-10 -bottom-10 w-40 h-40 bg-neon-blue/10 blur-[50px] rounded-full group-hover:bg-neon-pink/20 transition-colors duration-700 z-0"></div>
+                    <div className="absolute -right-10 -bottom-10 w-40 h-40 bg-neon-blue/5 blur-[50px] rounded-full group-hover:bg-neon-pink/5 transition-colors duration-700 z-0"></div>
                     
                     {/* Sport Badge */}
-                    <div className="relative z-10 mb-3 flex justify-between items-start">
-                      <span className={`text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider backdrop-blur-md ${getSportBadgeColor(event.sport)}`}>
+                    <div className="relative z-10 mb-4 flex justify-between items-start">
+                      <span className={`text-[10px] font-bold px-2.5 py-1 rounded-md uppercase tracking-wider backdrop-blur-md ${getSportBadgeColor(event.sport)}`}>
                         {getSportEmoji(event.sport)} {event.sport}
                       </span>
                     </div>
 
                     <div className="relative z-10 mb-4">
-                      <h3 className="text-2xl font-extrabold text-white group-hover:text-neon-blue transition-colors line-clamp-2">{event.title}</h3>
+                      <h3 className="text-xl font-black text-white group-hover:text-neon-blue transition-colors line-clamp-2">{event.title}</h3>
                     </div>
                     
                     <div className="relative z-10 space-y-3 mb-6 flex-grow">
-                      <div className="flex items-center text-sm text-gray-300 font-medium">
-                        <span className="mr-3 text-neon-pink drop-shadow-[0_0_5px_rgba(255,0,255,0.5)]">📅</span>
+                      <div className="flex items-center text-xs text-gray-400 font-bold">
+                        <span className="mr-3 text-neon-pink">📅</span>
                         {new Date(event.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                       </div>
-                      <div className="flex items-center text-sm text-gray-300 font-medium">
-                        <span className="mr-3 text-neon-green drop-shadow-[0_0_5px_rgba(57,255,20,0.5)]">📍</span>
+                      <div className="flex items-center text-xs text-gray-400 font-bold">
+                        <span className="mr-3 text-neon-green">📍</span>
                         <span className="line-clamp-1">{event.location}</span>
                       </div>
-                      <div className="flex items-center text-sm text-gray-300 font-medium">
-                        <span className="mr-3 text-neon-blue drop-shadow-[0_0_5px_rgba(0,243,255,0.5)]">👑</span>
+                      <div className="flex items-center text-xs text-gray-400 font-bold">
+                        <span className="mr-3 text-neon-blue">👑</span>
                         <span className="truncate">{event.creator?.name || 'Unknown Host'}</span>
                       </div>
                     </div>
@@ -531,10 +597,10 @@ const Dashboard = () => {
                     <div className="relative z-10 pt-5 border-t border-dark-700 mt-auto">
                       <Link
                         to={`/events/${event._id}`}
-                        className={`block w-full text-center font-bold py-3 rounded-lg transition-all duration-300 shadow-[0_0_10px_rgba(0,0,0,0.5)] ${
+                        className={`block w-full text-center font-bold py-3 rounded-lg transition-all duration-300 ${
                           event.eventType === 'Competitive Tryout' 
-                            ? 'bg-gradient-to-r from-neon-pink/80 to-orange-500/80 text-white hover:shadow-[0_0_15px_rgba(255,0,255,0.4)]' 
-                            : 'bg-dark-700 text-white hover:bg-neon-blue hover:text-dark-900 hover:shadow-[0_0_15px_rgba(0,243,255,0.4)]'
+                            ? 'bg-gradient-to-r from-neon-pink/80 to-orange-500/80 hover:from-neon-pink hover:to-orange-500 text-white shadow-[0_0_10px_rgba(255,0,255,0.2)]' 
+                            : 'bg-dark-900/60 hover:bg-neon-blue hover:text-dark-900 border border-dark-700 hover:border-neon-blue text-white'
                         }`}
                       >
                         {event.eventType === 'Competitive Tryout' ? 'View Tryout Details' : 'View Event Details'}
@@ -550,71 +616,71 @@ const Dashboard = () => {
 
       {/* Sport Details Modal */}
       {selectedSport && sportsInfo[selectedSport] && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-dark-900/80 backdrop-blur-sm animate-fade-in-up">
-          <div className="bg-dark-800 rounded-2xl w-full max-w-md shadow-[0_0_50px_rgba(0,0,0,0.5)] border border-dark-700 overflow-hidden relative group">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-dark-950/80 backdrop-blur-sm animate-fade-in-up">
+          <div className="bg-dark-800 rounded-2xl w-full max-w-md shadow-[0_0_50px_rgba(0,0,0,0.6)] border border-dark-700 overflow-hidden relative group">
             {/* Modal glow effect */}
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-2 bg-gradient-to-r from-transparent via-neon-pink to-transparent opacity-50 blur-sm"></div>
             
-            <div className="px-8 py-5 border-b border-dark-700 flex justify-between items-center bg-dark-800 z-10">
-              <h2 className="text-2xl font-bold text-white flex items-center gap-2">
-                <span className="text-neon-pink">⚡</span> {selectedSport}
+            <div className="px-8 py-5 border-b border-dark-700 flex justify-between items-center bg-dark-850 z-10">
+              <h2 className="text-xl font-black text-white flex items-center gap-2">
+                <span className="text-neon-pink">⚡</span> {selectedSport} Info
               </h2>
               <button
                 onClick={() => setSelectedSport(null)}
-                className="text-gray-500 hover:text-white hover:rotate-90 transition-all duration-300 bg-dark-900 w-8 h-8 rounded-full flex items-center justify-center"
+                className="text-gray-500 hover:text-white hover:rotate-90 transition-all duration-300 bg-dark-900 w-8 h-8 rounded-full flex items-center justify-center cursor-pointer"
               >
                 <span className="text-xl leading-none">&times;</span>
               </button>
             </div>
 
             <div className="p-8 space-y-6">
-              <div className="flex items-center gap-4 group/item hover:translate-x-2 transition-transform duration-300">
+              <div className="flex items-center gap-4 group/item hover:translate-x-1.5 transition-transform duration-300">
                 <div className="w-10 h-10 rounded-full bg-neon-blue/10 flex items-center justify-center text-neon-blue border border-neon-blue/30 shadow-[0_0_10px_rgba(0,243,255,0.2)]">
                   👥
                 </div>
                 <div>
-                  <p className="text-xs text-gray-400 font-bold uppercase tracking-wider mb-1">Players</p>
-                  <p className="text-white font-medium">{sportsInfo[selectedSport].players}</p>
+                  <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-0.5">Players</p>
+                  <p className="text-white text-sm font-semibold">{sportsInfo[selectedSport].players}</p>
                 </div>
               </div>
 
-              <div className="flex items-center gap-4 group/item hover:translate-x-2 transition-transform duration-300">
+              <div className="flex items-center gap-4 group/item hover:translate-x-1.5 transition-transform duration-300">
                 <div className="w-10 h-10 rounded-full bg-neon-green/10 flex items-center justify-center text-neon-green border border-neon-green/30 shadow-[0_0_10px_rgba(57,255,20,0.2)]">
                   ⏱️
                 </div>
                 <div>
-                  <p className="text-xs text-gray-400 font-bold uppercase tracking-wider mb-1">Duration</p>
-                  <p className="text-white font-medium">{sportsInfo[selectedSport].duration}</p>
+                  <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-0.5">Duration</p>
+                  <p className="text-white text-sm font-semibold">{sportsInfo[selectedSport].duration}</p>
                 </div>
               </div>
 
-              <div className="flex items-center gap-4 group/item hover:translate-x-2 transition-transform duration-300">
+              <div className="flex items-center gap-4 group/item hover:translate-x-1.5 transition-transform duration-300">
                 <div className="w-10 h-10 rounded-full bg-orange-500/10 flex items-center justify-center text-orange-500 border border-orange-500/30 shadow-[0_0_10px_rgba(249,115,22,0.2)]">
                   📍
                 </div>
                 <div>
-                  <p className="text-xs text-gray-400 font-bold uppercase tracking-wider mb-1">Location</p>
-                  <p className="text-white font-medium">{sportsInfo[selectedSport].location}</p>
+                  <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-0.5">Location</p>
+                  <p className="text-white text-sm font-semibold">{sportsInfo[selectedSport].location}</p>
                 </div>
               </div>
 
-              <div className="flex items-center gap-4 group/item hover:translate-x-2 transition-transform duration-300">
+              <div className="flex items-center gap-4 group/item hover:translate-x-1.5 transition-transform duration-300">
                 <div className="w-10 h-10 rounded-full bg-yellow-400/10 flex items-center justify-center text-yellow-400 border border-yellow-400/30 shadow-[0_0_10px_rgba(250,204,21,0.2)]">
                   🎒
                 </div>
                 <div>
-                  <p className="text-xs text-gray-400 font-bold uppercase tracking-wider mb-1">Equipment</p>
-                  <p className="text-white font-medium">{sportsInfo[selectedSport].equipment}</p>
+                  <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-0.5">Equipment</p>
+                  <p className="text-white text-sm font-semibold">{sportsInfo[selectedSport].equipment}</p>
                 </div>
               </div>
             </div>
 
-            <div className="px-8 py-5 border-t border-dark-700 bg-dark-800 flex justify-end">
+            <div className="px-8 py-5 border-t border-dark-700 bg-dark-850 flex justify-end">
               <button
                 onClick={() => setSelectedSport(null)}
-                className="w-full px-6 py-3 text-sm font-bold text-dark-900 bg-gradient-to-r from-neon-pink to-orange-500 rounded-lg hover:shadow-[0_0_15px_rgba(255,0,255,0.4)] transition-all duration-300"
+                className="w-full px-6 py-3 text-xs font-bold text-dark-900 bg-gradient-to-r from-neon-pink to-orange-500 rounded-lg hover:shadow-[0_0_15px_rgba(255,0,255,0.4)] transition-all duration-300 cursor-pointer"
               >
-                Awesome!
+                Dismiss Intel
               </button>
             </div>
           </div>
@@ -623,16 +689,16 @@ const Dashboard = () => {
 
       {/* Create Event Modal */}
       {isCreateModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-dark-900/80 backdrop-blur-sm animate-fade-in-up">
-          <div className="bg-dark-800 rounded-2xl w-full max-w-lg shadow-[0_0_50px_rgba(0,0,0,0.5)] border border-dark-700 overflow-hidden max-h-[90vh] flex flex-col relative">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-dark-950/80 backdrop-blur-sm animate-fade-in-up">
+          <div className="bg-dark-800 rounded-2xl w-full max-w-lg shadow-[0_0_50px_rgba(0,0,0,0.6)] border border-dark-700 overflow-hidden max-h-[95vh] flex flex-col relative">
             {/* Modal glow effect */}
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-2 bg-gradient-to-r from-transparent via-neon-blue to-transparent opacity-50 blur-sm"></div>
             
-            <div className="px-8 py-5 border-b border-dark-700 flex justify-between items-center bg-dark-800 z-10">
-              <h2 className="text-2xl font-bold text-white">Initialize Event</h2>
+            <div className="px-8 py-5 border-b border-dark-700 flex justify-between items-center bg-dark-850 z-10">
+              <h2 className="text-xl font-black text-white">Initialize Activity</h2>
               <button
                 onClick={() => setIsCreateModalOpen(false)}
-                className="text-gray-500 hover:text-white hover:rotate-90 transition-all duration-300 bg-dark-900 w-8 h-8 rounded-full flex items-center justify-center"
+                className="text-gray-500 hover:text-white hover:rotate-90 transition-all duration-300 bg-dark-900 w-8 h-8 rounded-full flex items-center justify-center cursor-pointer"
               >
                 <span className="text-xl leading-none">&times;</span>
               </button>
@@ -641,20 +707,20 @@ const Dashboard = () => {
             <div className="p-8 overflow-y-auto custom-scrollbar">
               <form id="create-event-form" onSubmit={handleCreateEvent} className="space-y-5">
                 <div>
-                  <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Event Title</label>
+                  <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2">Event Title</label>
                   <input
                     type="text"
                     name="title"
                     required
                     value={formData.title}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-3 bg-dark-900 border border-dark-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-neon-blue focus:border-neon-blue text-white transition-all placeholder-gray-600"
+                    className="w-full px-4 py-3 bg-dark-900 border border-dark-700 rounded-lg focus:outline-none focus:ring-1 focus:ring-neon-blue focus:border-neon-blue text-white transition-all placeholder-gray-700 text-sm"
                     placeholder="e.g., Midnight Basketball Pickup"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Event Type</label>
+                  <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2">Event Type</label>
                   <div className="flex gap-4">
                     <label className={`flex-1 cursor-pointer p-4 rounded-xl border transition-all duration-300 text-center ${formData.eventType === 'Casual Match' ? 'bg-neon-blue/10 border-neon-blue text-neon-blue shadow-[0_0_15px_rgba(0,243,255,0.2)]' : 'bg-dark-900 border-dark-700 text-gray-400 hover:border-gray-500'}`}>
                       <input
@@ -665,8 +731,8 @@ const Dashboard = () => {
                         onChange={handleInputChange}
                         className="hidden"
                       />
-                      <span className="font-bold block mb-1">Casual Match</span>
-                      <span className="text-xs opacity-70">Direct Join Allowed</span>
+                      <span className="font-bold block text-sm mb-1">Casual Match</span>
+                      <span className="text-[10px] opacity-70">Direct Join Allowed</span>
                     </label>
                     <label className={`flex-1 cursor-pointer p-4 rounded-xl border transition-all duration-300 text-center ${formData.eventType === 'Competitive Tryout' ? 'bg-neon-pink/10 border-neon-pink text-neon-pink shadow-[0_0_15px_rgba(255,0,255,0.2)]' : 'bg-dark-900 border-dark-700 text-gray-400 hover:border-gray-500'}`}>
                       <input
@@ -677,21 +743,21 @@ const Dashboard = () => {
                         onChange={handleInputChange}
                         className="hidden"
                       />
-                      <span className="font-bold block mb-1">Tryout / Selection</span>
-                      <span className="text-xs opacity-70">Requires Approval</span>
+                      <span className="font-bold block text-sm mb-1">Tryout / Selection</span>
+                      <span className="text-[10px] opacity-70">Requires Approval</span>
                     </label>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-5">
                   <div>
-                    <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Sport</label>
+                    <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2">Sport</label>
                     <select
                       name="sport"
                       required
                       value={formData.sport}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-3 bg-dark-900 border border-dark-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-neon-pink focus:border-neon-pink text-white transition-all [color-scheme:dark]"
+                      className="w-full px-4 py-3 bg-dark-900 border border-dark-700 rounded-lg focus:outline-none focus:ring-1 focus:ring-neon-pink focus:border-neon-pink text-white transition-all [color-scheme:dark] text-sm"
                     >
                       {SPORTS.map(sport => (
                         <option key={sport} value={sport}>{getSportEmoji(sport)} {sport}</option>
@@ -699,64 +765,64 @@ const Dashboard = () => {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Capacity</label>
+                    <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2">Capacity</label>
                     <input
                       type="number"
                       name="maxParticipants"
                       min="0"
                       value={formData.maxParticipants}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-3 bg-dark-900 border border-dark-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-neon-blue focus:border-neon-blue text-white transition-all placeholder-gray-600"
+                      className="w-full px-4 py-3 bg-dark-900 border border-dark-700 rounded-lg focus:outline-none focus:ring-1 focus:ring-neon-blue focus:border-neon-blue text-white transition-all placeholder-gray-700 text-sm"
                       placeholder="0 = unlimited"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Date & Time</label>
+                  <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2">Date & Time</label>
                   <input
                     type="datetime-local"
                     name="date"
                     required
                     value={formData.date}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-3 bg-dark-900 border border-dark-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-neon-green focus:border-neon-green text-white transition-all [color-scheme:dark]"
+                    className="w-full px-4 py-3 bg-dark-900 border border-dark-700 rounded-lg focus:outline-none focus:ring-1 focus:ring-neon-green focus:border-neon-green text-white transition-all [color-scheme:dark] text-sm"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Location</label>
+                  <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2">Location</label>
                   <input
                     type="text"
                     name="location"
                     required
                     value={formData.location}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-3 bg-dark-900 border border-dark-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-neon-blue focus:border-neon-blue text-white transition-all placeholder-gray-600"
+                    className="w-full px-4 py-3 bg-dark-900 border border-dark-700 rounded-lg focus:outline-none focus:ring-1 focus:ring-neon-blue focus:border-neon-blue text-white transition-all placeholder-gray-700 text-sm"
                     placeholder="e.g., Main Campus Court 1"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Mission Briefing</label>
+                  <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2">Mission Briefing</label>
                   <textarea
                     name="description"
                     required
                     rows="3"
                     value={formData.description}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-3 bg-dark-900 border border-dark-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-neon-pink focus:border-neon-pink text-white transition-all resize-none placeholder-gray-600"
+                    className="w-full px-4 py-3 bg-dark-900 border border-dark-700 rounded-lg focus:outline-none focus:ring-1 focus:ring-neon-pink focus:border-neon-pink text-white transition-all resize-none placeholder-gray-700 text-sm"
                     placeholder="Provide details about skill level, equipment required, etc."
                   ></textarea>
                 </div>
               </form>
             </div>
 
-            <div className="px-8 py-5 border-t border-dark-700 bg-dark-800 flex justify-end gap-4">
+            <div className="px-8 py-5 border-t border-dark-700 bg-dark-850 flex justify-end gap-4">
               <button
                 type="button"
                 onClick={() => setIsCreateModalOpen(false)}
-                className="px-6 py-2.5 text-sm font-bold text-gray-400 hover:text-white transition-colors"
+                className="px-6 py-2.5 text-xs font-bold text-gray-400 hover:text-white transition-colors cursor-pointer"
               >
                 Abort
               </button>
@@ -764,7 +830,7 @@ const Dashboard = () => {
                 type="submit"
                 form="create-event-form"
                 disabled={isSubmitting}
-                className="px-6 py-2.5 text-sm font-bold text-dark-900 bg-gradient-to-r from-neon-blue to-neon-green rounded-lg hover:shadow-[0_0_15px_rgba(57,255,20,0.4)] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-6 py-2.5 text-xs font-bold text-dark-900 bg-gradient-to-r from-neon-blue via-neon-green to-neon-pink rounded-lg hover:shadow-[0_0_15px_rgba(57,255,20,0.4)] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
               >
                 {isSubmitting ? 'Deploying...' : 'Launch Event'}
               </button>

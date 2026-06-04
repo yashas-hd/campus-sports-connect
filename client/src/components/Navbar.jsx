@@ -49,15 +49,15 @@ const Navbar = () => {
   };
 
   return (
-    <nav className={`sticky top-0 z-50 transition-all duration-300 ${scrolled ? 'bg-dark-900/80 backdrop-blur-lg border-b border-dark-700 shadow-[0_4px_30px_rgba(0,0,0,0.5)]' : 'bg-transparent'}`}>
+    <nav className={`sticky top-0 z-50 transition-all duration-300 ${scrolled ? 'bg-dark-900/60 backdrop-blur-md border-b border-dark-700/60 shadow-[0_4px_30px_rgba(0,0,0,0.2)]' : 'bg-transparent border-b border-transparent'}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-20 items-center">
           <div className="flex items-center">
             <Link to="/" className="flex flex-shrink-0 items-center gap-3 group">
-              <div className="bg-gradient-to-br from-neon-blue to-neon-green p-2.5 rounded-xl shadow-[0_0_15px_rgba(0,243,255,0.4)] group-hover:shadow-[0_0_25px_rgba(57,255,20,0.6)] transition-all duration-300">
+              <div className="bg-gradient-to-br from-neon-blue to-neon-green p-2.5 rounded-xl shadow-[0_0_15px_rgba(0,243,255,0.2)] group-hover:shadow-[0_0_20px_rgba(57,255,20,0.4)] transition-all duration-300">
                 <MdSportsBasketball className="h-7 w-7 text-dark-900" />
               </div>
-              <span className="font-extrabold text-2xl text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-300 tracking-tight group-hover:from-neon-blue group-hover:to-neon-green transition-all duration-300">
+              <span className="font-extrabold text-xl text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-200 to-gray-400 tracking-tight group-hover:from-neon-blue group-hover:to-neon-green transition-all duration-300">
                 Campus Connect
               </span>
             </Link>
@@ -65,31 +65,31 @@ const Navbar = () => {
           <div className="flex items-center space-x-6">
             {user ? (
               <>
-                <Link to="/dashboard" className="text-gray-300 hover:text-neon-blue px-3 py-2 rounded-md text-sm font-semibold transition-colors duration-200">
+                <Link to="/dashboard" className="text-gray-300 hover:text-neon-blue px-3 py-2 rounded-xl text-xs font-bold transition-all duration-300 uppercase tracking-wider cursor-pointer">
                   Dashboard
                 </Link>
-                <Link to="/analytics" className="text-gray-300 hover:text-neon-blue px-3 py-2 rounded-md text-sm font-semibold transition-colors duration-200 flex items-center gap-1">
+                <Link to="/analytics" className="text-gray-300 hover:text-neon-blue px-3 py-2 rounded-xl text-xs font-bold transition-all duration-300 flex items-center gap-1.5 uppercase tracking-wider cursor-pointer">
                   📊 Analytics
                 </Link>
                 {/* Notification Bell */}
                 <div className="relative">
                   <button 
                     onClick={() => setShowNotifications(!showNotifications)}
-                    className="relative p-2 text-gray-300 hover:text-neon-pink transition-colors focus:outline-none mt-1"
+                    className="relative p-2 text-gray-300 hover:text-neon-pink transition-colors focus:outline-none mt-1 cursor-pointer"
                   >
-                    <FaBell className="h-6 w-6" />
+                    <FaBell className="h-5 w-5" />
                     {notifications.length > 0 && (
-                      <span className="absolute top-0 right-0 inline-flex items-center justify-center w-5 h-5 text-xs font-bold leading-none text-white transform translate-x-1/4 -translate-y-1/4 bg-neon-pink rounded-full border-2 border-dark-900 shadow-[0_0_10px_rgba(255,0,255,0.5)] animate-pulse-glow">
+                      <span className="absolute top-0 right-0 inline-flex items-center justify-center w-4 h-4 text-[9px] font-bold leading-none text-dark-900 bg-neon-pink rounded-full border border-dark-900 shadow-[0_0_10px_rgba(255,0,255,0.4)] animate-pulse">
                         {notifications.length}
                       </span>
                     )}
                   </button>
-
+ 
                   {/* Notification Dropdown */}
                   {showNotifications && (
-                    <div className="absolute right-0 mt-3 w-80 bg-dark-800/95 backdrop-blur-xl border border-dark-700 rounded-2xl shadow-2xl z-50 overflow-hidden animate-fade-in-up">
-                      <div className="px-4 py-3 border-b border-dark-700 bg-dark-900/50 flex justify-between items-center">
-                        <h3 className="text-sm font-bold text-white flex items-center gap-2">
+                    <div className="absolute right-0 mt-3 w-80 bg-dark-800/80 backdrop-blur-xl border border-dark-700/80 rounded-2xl shadow-2xl z-50 overflow-hidden animate-fade-in-up">
+                      <div className="px-4 py-3 border-b border-dark-700/60 bg-dark-900/50 flex justify-between items-center">
+                        <h3 className="text-xs font-bold text-white flex items-center gap-1.5">
                           <span className="text-neon-pink">🔔</span> Notifications
                         </h3>
                         {notifications.length > 0 && (
@@ -99,7 +99,7 @@ const Navbar = () => {
                               localStorage.removeItem('campus_notifications');
                               setShowNotifications(false);
                             }}
-                            className="text-xs text-gray-400 hover:text-neon-blue transition-colors"
+                            className="text-[10px] font-bold text-gray-400 hover:text-neon-blue transition-colors cursor-pointer"
                           >
                             Clear All
                           </button>
@@ -107,20 +107,20 @@ const Navbar = () => {
                       </div>
                       <div className="max-h-80 overflow-y-auto custom-scrollbar">
                         {notifications.length === 0 ? (
-                          <div className="px-4 py-8 text-center text-gray-400 text-sm">
-                            No new notifications
+                          <div className="px-4 py-8 text-center text-gray-500 text-xs font-medium">
+                            No notifications logged.
                           </div>
                         ) : (
-                          <div className="divide-y divide-dark-700">
+                          <div className="divide-y divide-dark-700/60">
                             {notifications.map((notif) => (
-                              <div key={notif.id} className="p-4 hover:bg-dark-700/50 transition-colors group relative">
-                                <div className="flex gap-3">
-                                  <div className="h-2 w-2 mt-1.5 rounded-full bg-neon-blue flex-shrink-0 animate-pulse-glow"></div>
-                                  <p className="text-sm text-gray-300 pr-4">{notif.message}</p>
+                              <div key={notif.id} className="p-4 hover:bg-dark-700/30 transition-colors group relative">
+                                <div className="flex gap-2.5">
+                                  <div className="h-1.5 w-1.5 mt-1.5 rounded-full bg-neon-blue flex-shrink-0 animate-pulse-glow"></div>
+                                  <p className="text-xs text-gray-300 pr-5 leading-relaxed">{notif.message}</p>
                                 </div>
                                 <button 
                                   onClick={() => removeNotification(notif.id)}
-                                  className="absolute top-1/2 -translate-y-1/2 right-4 text-gray-500 hover:text-neon-pink opacity-0 group-hover:opacity-100 transition-all p-1"
+                                  className="absolute top-1/2 -translate-y-1/2 right-4 text-gray-500 hover:text-neon-pink opacity-0 group-hover:opacity-100 transition-all p-1 cursor-pointer text-xs"
                                 >
                                   ✕
                                 </button>
@@ -132,28 +132,28 @@ const Navbar = () => {
                     </div>
                   )}
                 </div>
-
+ 
                 <div className="relative group">
-                  <button className="flex items-center gap-2 focus:outline-none">
-                    <div className="h-10 w-10 rounded-full bg-dark-800 border-2 border-dark-700 group-hover:border-neon-pink flex items-center justify-center text-white font-bold transition-colors duration-300 shadow-sm">
+                  <button className="flex items-center gap-2 focus:outline-none cursor-pointer">
+                    <div className="h-9 w-9 rounded-xl bg-dark-800 border border-dark-700 group-hover:border-neon-pink flex items-center justify-center text-white text-xs font-bold transition-all duration-300 shadow-inner">
                       {user.name.charAt(0).toUpperCase()}
                     </div>
                   </button>
-                  <div className="absolute right-0 w-56 mt-3 origin-top-right bg-dark-800/95 backdrop-blur-md border border-dark-700 divide-y divide-dark-700 rounded-xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-                    <div className="px-4 py-4 border-b border-dark-700">
-                      <p className="text-xs text-gray-400 uppercase tracking-wider font-semibold mb-1">Signed in as</p>
-                      <p className="text-sm font-bold text-white truncate">{user.email}</p>
+                  <div className="absolute right-0 w-56 mt-3 origin-top-right bg-dark-800/85 backdrop-blur-md border border-dark-700/80 divide-y divide-dark-700/60 rounded-2xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                    <div className="px-4 py-4 border-b border-dark-700/60">
+                      <p className="text-[9px] text-gray-500 uppercase tracking-widest font-bold mb-1.5">Authenticated User</p>
+                      <p className="text-xs font-bold text-white truncate">{user.email}</p>
                     </div>
                     <div className="py-2">
                       <Link
                         to="/profile"
-                        className="block w-full text-left px-4 py-2.5 text-sm text-gray-300 hover:bg-dark-700 hover:text-neon-blue transition-colors"
+                        className="block w-full text-left px-4 py-2.5 text-xs text-gray-300 hover:bg-dark-700/40 hover:text-neon-blue transition-colors font-bold uppercase tracking-wider"
                       >
                         Your Profile
                       </Link>
                       <button
                         onClick={handleLogout}
-                        className="block w-full text-left px-4 py-2.5 text-sm text-red-400 hover:bg-dark-700 hover:text-red-300 transition-colors"
+                        className="block w-full text-left px-4 py-2.5 text-xs text-red-400 hover:bg-dark-700/40 hover:text-red-300 transition-colors font-bold uppercase tracking-wider cursor-pointer"
                       >
                         Sign Out
                       </button>
@@ -163,12 +163,12 @@ const Navbar = () => {
               </>
             ) : (
               <>
-                <Link to="/login" className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                <Link to="/login" className="text-gray-300 hover:text-white px-3 py-2 rounded-xl text-xs font-bold transition-all uppercase tracking-wider">
                   Login
                 </Link>
                 <Link
                   to="/register"
-                  className="bg-gradient-to-r from-neon-blue to-neon-pink text-dark-900 px-5 py-2.5 rounded-lg text-sm font-bold shadow-[0_0_15px_rgba(0,243,255,0.2)] hover:shadow-[0_0_25px_rgba(0,243,255,0.6)] animate-pulse-glow transition-all duration-300"
+                  className="bg-gradient-to-r from-neon-blue to-neon-pink text-dark-900 px-5 py-2.5 rounded-xl text-xs font-bold shadow-[0_0_15px_rgba(0,243,255,0.15)] hover:shadow-[0_0_20px_rgba(0,243,255,0.3)] transition-all duration-300 uppercase tracking-wider cursor-pointer"
                 >
                   Join Now
                 </Link>

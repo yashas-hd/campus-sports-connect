@@ -84,33 +84,37 @@ const VerifyOTP = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-dark-900 relative overflow-hidden py-12 px-4 sm:px-6 lg:px-8">
       {/* Animated Background Blobs */}
-      <div className="absolute top-10 -left-10 w-96 h-96 bg-neon-blue rounded-full mix-blend-multiply filter blur-[128px] opacity-20 animate-blob"></div>
-      <div className="absolute top-0 -right-10 w-96 h-96 bg-neon-pink rounded-full mix-blend-multiply filter blur-[128px] opacity-20 animate-blob" style={{ animationDelay: '2s' }}></div>
-      <div className="absolute -bottom-8 left-1/2 w-96 h-96 bg-neon-green rounded-full mix-blend-multiply filter blur-[128px] opacity-20 animate-blob" style={{ animationDelay: '4s' }}></div>
+      <div className="absolute top-10 -left-10 w-96 h-96 bg-neon-blue/5 rounded-full blur-[100px] pointer-events-none animate-pulse"></div>
+      <div className="absolute top-0 -right-10 w-96 h-96 bg-neon-pink/5 rounded-full blur-[100px] pointer-events-none animate-pulse" style={{ animationDelay: '2s' }}></div>
+      <div className="absolute -bottom-8 left-1/2 w-96 h-96 bg-neon-green/5 rounded-full blur-[100px] pointer-events-none animate-pulse" style={{ animationDelay: '4s' }}></div>
 
-      <div className="relative max-w-md w-full space-y-8 bg-dark-800/60 backdrop-blur-xl p-10 rounded-2xl shadow-2xl border border-dark-700 z-10 animate-fade-in-up">
+      <div className="relative max-w-md w-full space-y-8 bg-dark-800/35 backdrop-blur-md p-8 md:p-10 rounded-3xl shadow-[0_8px_32px_rgba(0,0,0,0.3)] border border-dark-700/80 z-10 animate-fade-in-up">
         <div>
-          <h2 className="mt-6 text-center text-4xl font-extrabold text-white tracking-tight">
-            Verify Email
+          <div className="flex justify-center text-3xl mb-4">🔐🔑📨</div>
+          <h2 className="text-center text-3xl md:text-4xl font-extrabold text-white tracking-tight leading-tight">
+            Verify <span className="text-transparent bg-clip-text bg-gradient-to-r from-neon-blue to-neon-pink font-extrabold">Identity</span>
           </h2>
-          <p className="mt-2 text-center text-sm text-gray-400">
-            We sent a 6-digit code to <span className="font-medium text-neon-blue">{email || 'your email'}</span>
+          <p className="mt-2 text-center text-xs text-gray-400">
+            We sent a 6-digit code to <span className="font-bold text-neon-blue">{email || 'your email'}</span>
           </p>
-          <p className="mt-1 text-center text-xs font-semibold text-gray-500">
-            Expires in {formatTime(timeLeft)}
-          </p>
+          <div className="mt-4 flex justify-center">
+            <span className="font-mono text-xs font-semibold text-neon-pink bg-dark-900/60 px-3.5 py-1.5 rounded-xl border border-dark-700/65 shadow-inner">
+              ⚡ Expiration: {formatTime(timeLeft)}
+            </span>
+          </div>
         </div>
+
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-4">
             <div>
-              <label htmlFor="otp" className="sr-only">OTP Code</label>
+              <label htmlFor="otp" className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3.5 text-center">Enter Verification Code</label>
               <input
                 id="otp"
                 name="otp"
                 type="text"
                 required
                 maxLength="6"
-                className="appearance-none rounded-lg relative block w-full px-3 py-4 bg-dark-900/50 border border-dark-700 placeholder-gray-500 text-white focus:outline-none focus:ring-2 focus:ring-neon-green focus:border-neon-green text-center text-3xl tracking-[1em] font-mono transition-all disabled:opacity-50"
+                className="w-full px-3 py-4 bg-dark-900/60 border border-dark-700/80 rounded-xl placeholder-gray-700 text-white focus:outline-none focus:ring-1 focus:ring-neon-green focus:border-neon-green text-center text-3xl tracking-[0.8em] pl-6 font-mono transition-all disabled:opacity-50"
                 placeholder="------"
                 value={otp}
                 onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
@@ -123,27 +127,27 @@ const VerifyOTP = () => {
             <button
               type="submit"
               disabled={loading || otp.length !== 6 || timeLeft === 0}
-              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-bold rounded-lg text-dark-900 bg-gradient-to-r from-neon-green to-neon-blue hover:from-neon-blue hover:to-neon-green focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-dark-900 focus:ring-neon-green transition-all duration-500 hover:shadow-[0_0_20px_rgba(57,255,20,0.4)] disabled:opacity-70 disabled:cursor-not-allowed"
+              className="w-full py-3.5 px-4 text-xs font-bold rounded-xl text-dark-900 bg-gradient-to-r from-neon-green to-neon-blue hover:shadow-[0_0_15px_rgba(57,255,20,0.3)] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-widest cursor-pointer"
             >
               {loading ? (
-                 <span className="flex items-center">
+                 <span className="flex items-center justify-center">
                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-dark-900 mr-2"></div>
-                   Verifying...
+                   Transmitting...
                  </span>
               ) : 'Verify Code'}
             </button>
           </div>
           
-          <div className="text-center mt-6 flex flex-col gap-3">
+          <div className="text-center mt-6 flex flex-col gap-3 border-t border-dark-700/60 pt-5">
             <button
               type="button"
               onClick={handleResend}
               disabled={resendCooldown > 0 || resendLoading}
-              className="text-sm font-medium text-neon-pink hover:text-neon-blue transition-colors disabled:text-gray-600 disabled:cursor-not-allowed"
+              className="text-xs font-bold text-neon-pink hover:text-neon-blue transition-colors disabled:text-gray-600 disabled:cursor-not-allowed uppercase tracking-wider cursor-pointer"
             >
-              {resendLoading ? 'Sending...' : resendCooldown > 0 ? `Resend OTP in ${resendCooldown}s` : 'Resend OTP'}
+              {resendLoading ? 'Requesting...' : resendCooldown > 0 ? `Resend Code in ${resendCooldown}s` : 'Resend Code'}
             </button>
-            <Link to="/login" className="text-sm font-medium text-gray-500 hover:text-white transition-colors">
+            <Link to="/login" className="text-xs font-bold text-gray-500 hover:text-white transition-colors uppercase tracking-wider">
               Back to Login
             </Link>
           </div>
