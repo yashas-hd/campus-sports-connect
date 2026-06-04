@@ -18,7 +18,7 @@ const ProtectedRoute = ({ children }) => {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-dark-900">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-neon-blue"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
       </div>
     );
   }
@@ -36,7 +36,7 @@ function App() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-dark-900">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-neon-blue"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
       </div>
     );
   }
@@ -55,7 +55,7 @@ function App() {
           },
           success: {
             iconTheme: {
-              primary: '#39ff14',
+              primary: '#3b82f6',
               secondary: '#1e293b',
             },
           },

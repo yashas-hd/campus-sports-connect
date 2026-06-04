@@ -4,7 +4,7 @@
 
 @layer base {
   body {
-    @apply bg-dark-900 text-gray-100 font-sans antialiased selection:bg-neon-blue selection:text-dark-900;
+    @apply bg-dark-900 text-gray-100 font-sans antialiased selection:bg-blue-600 selection:text-white;
   }
 }
 
@@ -20,5 +20,5 @@
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #00f3ff;
+  background: #2563eb;
 }
