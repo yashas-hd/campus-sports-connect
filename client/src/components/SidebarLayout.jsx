@@ -221,14 +221,14 @@ const SidebarLayout = ({ children }) => {
       {showNotifications && (
         <>
           <div 
-            className="fixed inset-0 bg-black/50 backdrop-blur-xs z-50 transition-opacity"
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9998] transition-opacity duration-300"
             onClick={() => setShowNotifications(false)}
           />
-          <div className="fixed inset-y-0 right-0 w-full max-w-md bg-slate-950 border-l border-slate-800/85 z-55 flex flex-col shadow-2xl animate-slide-in-right">
-            <div className="h-16 px-6 border-b border-slate-800/80 flex items-center justify-between bg-slate-900">
+          <div className="fixed inset-y-0 right-0 w-full sm:w-[420px] bg-slate-900 border-l border-slate-700 z-[9999] flex flex-col shadow-2xl animate-slide-in-right">
+            <div className="h-16 px-6 border-b border-slate-700 flex items-center justify-between bg-slate-950/40">
               <div className="flex items-center gap-2">
-                <span className="text-blue-500">🔔</span>
-                <h3 className="font-bold text-sm text-white">Notifications</h3>
+                <span className="text-blue-500 text-sm">🔔</span>
+                <h3 className="font-bold text-xs text-white uppercase tracking-wider">Notifications</h3>
                 {notifications.length > 0 && (
                   <span className="px-2 py-0.5 text-[9px] font-bold bg-blue-600 text-white rounded-full">
                     {notifications.length}
@@ -239,37 +239,56 @@ const SidebarLayout = ({ children }) => {
                 {notifications.length > 0 && (
                   <button 
                     onClick={clearAllNotifications}
-                    className="text-[10px] font-bold text-slate-400 hover:text-blue-400 transition-colors cursor-pointer"
+                    className="text-[10px] font-bold text-slate-400 hover:text-blue-400 transition-colors cursor-pointer uppercase tracking-wider"
                   >
-                    CLEAR ALL
+                    Clear All
                   </button>
                 )}
                 <button
                   onClick={() => setShowNotifications(false)}
-                  className="p-1 text-slate-400 hover:text-white transition-colors cursor-pointer"
+                  className="p-1.5 text-slate-400 hover:text-white transition-colors cursor-pointer bg-slate-900 border border-slate-800 rounded-lg hover:border-slate-700"
                 >
-                  <FiX className="h-5 w-5" />
+                  <FiX className="h-4 w-4" />
                 </button>
               </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-4 custom-scrollbar space-y-2.5">
+            <div className="flex-1 overflow-y-auto p-5 custom-scrollbar space-y-3 bg-slate-900">
               {notifications.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-20 text-slate-500 text-center">
-                  <FiCheckCircle className="h-10 w-10 text-slate-700 mb-3" />
-                  <p className="text-xs font-semibold">All caught up!</p>
-                  <p className="text-[10px] text-slate-600 mt-1">No pending notifications at this moment.</p>
+                <div className="flex flex-col items-center justify-center py-24 text-slate-500 text-center">
+                  <div className="w-12 h-12 rounded-full bg-slate-950 border border-slate-800 flex items-center justify-center mb-4">
+                    <FiCheckCircle className="h-5 w-5 text-slate-400" />
+                  </div>
+                  <p className="text-xs font-semibold text-white">All caught up!</p>
+                  <p className="text-[10px] text-slate-500 mt-1">No pending notifications at this moment.</p>
                 </div>
               ) : (
                 notifications.map((notif) => (
-                  <div key={notif.id} className="p-4 bg-slate-900 hover:bg-slate-900/70 border border-slate-800/60 hover:border-slate-800 rounded-xl transition-all duration-200 group relative flex gap-3">
-                    <div className="h-2 w-2 mt-1.5 rounded-full bg-blue-500 flex-shrink-0 animate-pulse"></div>
-                    <div className="flex-1 pr-6">
-                      <p className="text-xs text-slate-200 leading-relaxed font-medium">{notif.message}</p>
+                  <div key={notif.id} className="p-4 bg-slate-950 border border-slate-800/80 hover:border-slate-700 hover:bg-slate-950/60 rounded-xl transition-all duration-200 flex gap-3 items-start shadow-sm hover:shadow-md relative overflow-hidden group">
+                    {/* Left Accent Indicator Bar */}
+                    <div className="absolute left-0 top-0 bottom-0 w-1 bg-blue-600"></div>
+
+                    {/* Status Dot */}
+                    <div className="mt-1.5 flex-shrink-0">
+                      <div className="h-2 w-2 rounded-full bg-blue-500 animate-pulse"></div>
                     </div>
+
+                    {/* Content area */}
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs text-white leading-relaxed font-medium mb-1.5 break-words">
+                        {notif.message}
+                      </p>
+                      {/* Secondary timestamp text */}
+                      <span className="text-[10px] text-slate-500 font-semibold tracking-wide uppercase">
+                        {new Date(notif.id).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} • {new Date(notif.id).toLocaleDateString([], { month: 'short', day: 'numeric' })}
+                      </span>
+                    </div>
+
+                    {/* Dismiss Button */}
                     <button 
                       onClick={() => removeNotification(notif.id)}
-                      className="absolute top-3.5 right-4 text-slate-500 hover:text-red-400 transition-colors p-1 cursor-pointer text-xs"
+                      className="flex-shrink-0 p-1 text-slate-500 hover:text-red-400 hover:bg-red-500/10 rounded transition-all cursor-pointer text-xs"
+                      title="Dismiss notification"
                     >
                       <FiX className="h-3.5 w-3.5" />
                     </button>
