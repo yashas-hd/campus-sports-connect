@@ -2,7 +2,7 @@ import { useState, useEffect, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import AuthContext from '../context/AuthContext';
-import Navbar from '../components/Navbar';
+import SidebarLayout from '../components/SidebarLayout';
 import axiosInstance from '../utils/axiosInstance';
 import { SPORTS } from '../constants/sports';
 
@@ -151,51 +151,42 @@ const Profile = () => {
 
   if (loading || !profileData) {
     return (
-      <div className="min-h-screen bg-dark-900 text-slate-100 font-sans pb-12 relative overflow-hidden">
-        <Navbar />
-        <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 relative z-10">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Left Column Skeleton */}
-            <div className="lg:col-span-1 space-y-6">
-              <div className="bg-dark-800/40 rounded-2xl p-8 border border-dark-700/80 animate-pulse h-[500px]">
-                <div className="h-28 w-28 rounded-2xl mx-auto mb-6 bg-dark-900/60 animate-pulse border border-dark-700"></div>
-                <div className="h-8 w-3/4 mx-auto rounded mb-2 bg-dark-900/60 animate-pulse"></div>
-                <div className="h-4 w-1/2 mx-auto rounded mb-8 bg-dark-900/60 animate-pulse"></div>
-                <div className="h-24 w-full rounded-xl mb-6 bg-dark-900/60 animate-pulse"></div>
-                <div className="h-10 w-full rounded-xl bg-dark-900/60 animate-pulse"></div>
-              </div>
+      <SidebarLayout>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 animate-pulse">
+          {/* Left Column Skeleton */}
+          <div className="lg:col-span-1 space-y-6">
+            <div className="bg-dark-800/40 rounded-2xl p-8 border border-zinc-800 h-[500px]">
+              <div className="h-28 w-28 rounded-2xl mx-auto mb-6 bg-dark-900/60 border border-zinc-800"></div>
+              <div className="h-8 w-3/4 mx-auto rounded mb-2 bg-dark-900/60"></div>
+              <div className="h-4 w-1/2 mx-auto rounded mb-8 bg-dark-900/60"></div>
+              <div className="h-24 w-full rounded-xl mb-6 bg-dark-900/60"></div>
+              <div className="h-10 w-full rounded-xl bg-dark-900/60"></div>
             </div>
-            {/* Right Column Skeleton */}
-            <div className="lg:col-span-2 space-y-6">
-              <div className="bg-dark-800/40 rounded-2xl p-8 border border-dark-700/80 animate-pulse min-h-[500px]">
-                <div className="flex gap-4 mb-8">
-                  <div className="h-12 flex-1 rounded-xl bg-dark-900/60 animate-pulse"></div>
-                  <div className="h-12 flex-1 rounded-xl bg-dark-900/60 animate-pulse"></div>
-                </div>
-                <div className="space-y-4">
-                  {Array(3).fill().map((_, i) => (
-                    <div key={i} className="h-24 w-full rounded-2xl bg-dark-900/60 animate-pulse border border-dark-700/60"></div>
-                  ))}
-                </div>
+          </div>
+          {/* Right Column Skeleton */}
+          <div className="lg:col-span-2 space-y-6">
+            <div className="bg-dark-800/40 rounded-2xl p-8 border border-zinc-800 min-h-[500px]">
+              <div className="flex gap-4 mb-8">
+                <div className="h-12 flex-1 rounded-xl bg-dark-900/60"></div>
+                <div className="h-12 flex-1 rounded-xl bg-dark-900/60"></div>
+              </div>
+              <div className="space-y-4">
+                {Array(3).fill().map((_, i) => (
+                  <div key={i} className="h-24 w-full rounded-2xl bg-dark-900/60 border border-zinc-800"></div>
+                ))}
               </div>
             </div>
           </div>
-        </main>
-      </div>
+        </div>
+      </SidebarLayout>
     );
   }
 
   const eventsToDisplay = activeTab === 'hosting' ? (profileData?.hostedEvents || []) : (profileData?.joinedEvents || []);
 
   return (
-    <div className="min-h-screen bg-dark-900 text-slate-100 font-sans pb-12 relative overflow-hidden">
-      {/* Background Decorative Glow */}
-      <div className="absolute top-0 -left-20 w-96 h-96 bg-blue-900/5 rounded-full blur-[100px] pointer-events-none animate-pulse"></div>
-
-      <Navbar />
-      
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <SidebarLayout>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 animate-fade-in-up">
           
           {/* Left Column: Profile Info */}
           <div className="lg:col-span-1 space-y-6">
@@ -475,9 +466,8 @@ const Profile = () => {
             </div>
           </div>
  
-        </div>
-      </main>
-    </div>
+      </div>
+    </SidebarLayout>
   );
 };
  

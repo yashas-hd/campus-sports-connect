@@ -1,16 +1,29 @@
 import { useState, useEffect, useContext } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import toast from 'react-hot-toast';
 import AuthContext from '../context/AuthContext';
-import Navbar from '../components/Navbar';
+import SidebarLayout from '../components/SidebarLayout';
 import axiosInstance from '../utils/axiosInstance';
 import { SPORTS } from '../constants/sports';
-
+import { 
+  FiTrophy, 
+  FiActivity, 
+  FiStar, 
+  FiClock, 
+  FiPlus, 
+  FiMessageSquare, 
+  FiUserCheck, 
+  FiCompass, 
+  FiMapPin, 
+  FiCalendar, 
+  FiSearch, 
+  FiChevronRight 
+} from 'react-icons/fi';
 
 const API = import.meta.env.VITE_API_URL;
 
-const upcomingEvents = [
+const upcomingEventsFallback = [
   {
     title: "Cricket Tournament",
     time: "Tomorrow • 4:00 PM",
@@ -28,7 +41,7 @@ const upcomingEvents = [
   }
 ];
 
-const ongoingEvents = [
+const ongoingEventsFallback = [
   {
     title: "Basketball Match",
     status: "Live Now",
@@ -40,8 +53,6 @@ const ongoingEvents = [
     location: "Court 2"
   }
 ];
-
-
 
 const sportsInfo = {
   Cricket: {
@@ -95,6 +106,12 @@ const Dashboard = () => {
   const [filterStatus, setFilterStatus] = useState('All');
   const [userProfile, setUserProfile] = useState(null);
 
+  const [searchParams] = useSearchParams();
+  const currentTab = searchParams.get('tab') || 'all'; // 'all', 'events', 'tryouts'
+
+  const { user } = useContext(AuthContext);
+  const navigate = useNavigate();
+
   const triggerNotification = (message) => {
     const saved = JSON.parse(localStorage.getItem('campus_notifications')) || [];
     const updated = [{ id: Date.now(), message }, ...saved];
@@ -111,9 +128,6 @@ const Dashboard = () => {
     maxParticipants: 0,
     eventType: 'Casual Match',
   });
-
-  const { user } = useContext(AuthContext);
-  const navigate = useNavigate();
 
   useEffect(() => {
     if (!user) {
@@ -143,7 +157,7 @@ const Dashboard = () => {
         setUserProfile(profileRes.data);
       } catch (error) {
         console.error("Dashboard fetch error:", error);
-        toast.error('Failed to load dashboard');
+        toast.error('Failed to load dashboard data');
       } finally {
         setLoading(false);
       }
@@ -204,7 +218,7 @@ const Dashboard = () => {
       });
 
       toast.success('Event Created Successfully!', { icon: '🏆' });
-      triggerNotification(`${eventData.sport || 'Event'} Match created successfully`);
+      triggerNotification(`${eventData.sport || 'Event'} ${eventData.eventType === 'Competitive Tryout' ? 'Tryout' : 'Match'} created successfully`);
       setIsCreateModalOpen(false);
       setFormData({
         title: '',
@@ -226,12 +240,12 @@ const Dashboard = () => {
     if(!sport) return '';
     const s = sport.toLowerCase();
     if (s.includes('basket')) return 'text-amber-500 border-amber-500/20 bg-amber-500/10';
-    if (s.includes('foot') || s.includes('soccer')) return 'text-emerald-400 border-emerald-500/20 bg-emerald-500/10';
+    if (s.includes('foot') || s.includes('soccer')) return 'text-emerald-450 border-emerald-500/20 bg-emerald-500/10';
     if (s.includes('badminton')) return 'text-teal-400 border-teal-500/20 bg-teal-500/10';
     if (s.includes('volley')) return 'text-indigo-400 border-indigo-500/20 bg-indigo-500/10';
-    if (s.includes('cricket')) return 'text-blue-400 border-blue-500/20 bg-blue-500/10';
+    if (s.includes('cricket')) return 'text-blue-450 border-blue-500/20 bg-blue-500/10';
     if (s.includes('kabaddi')) return 'text-rose-400 border-rose-500/20 bg-rose-500/10';
-    return 'text-slate-400 border-slate-500/20 bg-slate-500/10';
+    return 'text-zinc-400 border-zinc-700 bg-zinc-800/40';
   };
 
   const getSportEmoji = (sport) => {
@@ -257,15 +271,81 @@ const Dashboard = () => {
     
     let statusMatch = true;
     if (filterStatus === 'Upcoming') {
-      statusMatch = event.status === 'upcoming' || !event.status; // fallback if status missing
+      statusMatch = event.status === 'upcoming' || !event.status;
     } else if (filterStatus === 'Ongoing') {
       statusMatch = event.status === 'ongoing';
     } else if (filterStatus === 'Joined') {
       statusMatch = event.participants?.some(p => p === user?._id || p?._id === user?._id) || event.creator === user?._id || event.creator?._id === user?._id;
     }
+
+    let tabMatch = true;
+    if (currentTab === 'events') {
+      tabMatch = event.eventType === 'Casual Match' || !event.eventType;
+    } else if (currentTab === 'tryouts') {
+      tabMatch = event.eventType === 'Competitive Tryout';
+    }
     
-    return searchMatch && sportMatch && statusMatch;
+    return searchMatch && sportMatch && statusMatch && tabMatch;
   });
+
+  const getRecentActivity = () => {
+    const activity = [];
+    events.forEach(e => {
+      if (!e) return;
+      if (e.comments && e.comments.length > 0) {
+        e.comments.forEach(c => {
+          activity.push({
+            id: c._id || Math.random().toString(),
+            type: 'comment',
+            user: c.user?.name || 'Athlete',
+            detail: `commented on "${e.title}"`,
+            time: new Date(c.createdAt || Date.now())
+          });
+        });
+      }
+      if (e.participants && e.participants.length > 0) {
+        e.participants.slice(0, 2).forEach(p => {
+          activity.push({
+            id: `${e._id}-join-${p._id || p}`,
+            type: 'join',
+            user: p.name || 'Athlete',
+            detail: `joined "${e.title}"`,
+            time: new Date(e.createdAt || Date.now() - 3600000 * 2)
+          });
+        });
+      }
+    });
+
+    activity.sort((a, b) => b.time - a.time);
+
+    if (activity.length === 0) {
+      return [
+        { id: 'act-1', type: 'system', user: 'System', detail: 'Sports portal online & ready.', time: new Date() },
+        { id: 'act-2', type: 'system', user: 'System', detail: 'Tryouts tracking active.', time: new Date(Date.now() - 3600000) }
+      ];
+    }
+
+    return activity.slice(0, 5);
+  };
+
+  const getUpcomingSchedule = () => {
+    const list = events
+      .filter(e => e && new Date(e.date) > new Date() && (currentTab === 'all' || (currentTab === 'events' && e.eventType !== 'Competitive Tryout') || (currentTab === 'tryouts' && e.eventType === 'Competitive Tryout')))
+      .sort((a, b) => new Date(a.date) - new Date(b.date))
+      .slice(0, 4);
+
+    if (list.length === 0) {
+      return upcomingEventsFallback.map((item, idx) => ({
+        _id: `fallback-${idx}`,
+        title: item.title,
+        date: new Date(Date.now() + 86400000 * (idx + 1)),
+        location: item.location,
+        isFallback: true
+      }));
+    }
+
+    return list;
+  };
 
   const filterSportsList = ["All", ...SPORTS];
   const filterStatusList = ["All", "Upcoming", "Ongoing", "Joined"];
@@ -278,350 +358,386 @@ const Dashboard = () => {
     (preferredSports || []).some(sport => sport && sport.trim().toLowerCase() === (event?.sport || '').trim().toLowerCase())
   );
 
+  // Compute metrics based on current tab
+  const getMetrics = () => {
+    if (currentTab === 'events') {
+      const activeMatches = events.filter(e => e && e.eventType !== 'Competitive Tryout' && e.status !== 'completed').length;
+      return [
+        { title: 'Casual Matches', value: activeMatches, icon: FiTrophy, desc: 'Active friendly fixtures' },
+        { title: 'Registered Squads', value: events.filter(e => e && e.eventType !== 'Competitive Tryout' && e.participants?.some(p => p?._id === user?._id || p === user?._id)).length, icon: FiUserCheck, desc: 'Joined sport operations' },
+        { title: 'Recommended Matches', value: recommendedEvents.filter(e => e.eventType !== 'Competitive Tryout').length, icon: FiStar, desc: 'Matching interests' }
+      ];
+    }
+    if (currentTab === 'tryouts') {
+      const activeTryouts = events.filter(e => e && e.eventType === 'Competitive Tryout' && e.status !== 'completed').length;
+      return [
+        { title: 'Active Tryouts', value: activeTryouts, icon: FiActivity, desc: 'Competitive selection gates' },
+        { title: 'Submitted Applications', value: events.filter(e => e && e.eventType === 'Competitive Tryout' && e.teamRequests?.some(r => r.user === user?._id || r.user?._id === user?._id)).length, icon: FiCompass, desc: 'Awaiting host selection' },
+        { title: 'Recommended gates', value: recommendedEvents.filter(e => e.eventType === 'Competitive Tryout').length, icon: FiStar, desc: 'Matching tryout fields' }
+      ];
+    }
+    return [
+      { title: 'Active Matches', value: events.filter(e => e && e.status !== 'completed' && e.status !== 'cancelled').length, icon: FiTrophy, desc: 'Total scheduled operations' },
+      { title: 'Live Operations', value: events.filter(e => e && e.status === 'ongoing').length + ongoingEventsFallback.length, icon: FiActivity, desc: 'Currently in progress' },
+      { title: 'Recommendations', value: recommendedEvents.length, icon: FiStar, desc: 'Based on preferred sports' }
+    ];
+  };
+
+  const currentMetrics = getMetrics();
+
   return (
-    <div className="min-h-screen bg-dark-900 text-slate-100 font-sans relative overflow-hidden pb-12">
-      {/* Background Glow */}
-      <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-blue-900/5 blur-[150px] rounded-full z-0 pointer-events-none"></div>
-
-      <Navbar />
-
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 relative z-10">
-
-        {/* Welcome Hero Section */}
-        <div className="relative overflow-hidden mb-8 rounded-2xl border border-dark-700 bg-dark-800/20 p-8 md:p-10 shadow-lg">
+    <SidebarLayout>
+      <div className="space-y-8 animate-fade-in-up">
+        
+        {/* Welcome Section */}
+        <div className="relative overflow-hidden rounded-2xl border border-zinc-800 bg-[#161619] p-6 sm:p-8">
           <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
             <div>
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-500/10 border border-blue-500/20 text-blue-450 mb-3">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-xs font-semibold bg-blue-950/40 border border-blue-900/30 text-blue-400 mb-3">
                 <span className="h-1.5 w-1.5 rounded-full bg-blue-500 animate-pulse"></span>
-                Sports Network Online
+                {currentTab === 'tryouts' ? 'COMPETITIVE OPERATIONS' : currentTab === 'events' ? 'CASUAL ATHLETICS FEED' : 'CAMPUS DASHBOARD'}
               </span>
-              <h1 className="text-3xl md:text-4xl font-extrabold text-white tracking-tight mb-2">
-                Welcome Back, <span className="text-blue-500">{userProfile?.name || user?.name || "Athlete"}</span> 👋
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight mb-2">
+                {currentTab === 'tryouts' ? 'Tryouts Selection Center' : currentTab === 'events' ? 'Casual Sports Hub' : 'Athletic Command'}{', '}
+                <span className="text-blue-500">{userProfile?.name || user?.name || "Athlete"}</span> 👋
               </h1>
-              <p className="text-slate-405 text-base max-w-xl font-normal leading-relaxed">
-                Connect with local athletes, schedule competitive tryouts, and view performance insights across campus.
+              <p className="text-zinc-400 text-sm max-w-xl font-normal leading-relaxed">
+                {currentTab === 'tryouts' 
+                  ? 'Initiate selection tryouts, manage athlete rating scorecards, and recruit top performing campus players.'
+                  : currentTab === 'events' 
+                  ? 'Connect with athletes, organize friendly matches, and build active sports communities.'
+                  : 'Manage tryouts, schedule friendly match fixtures, and review system insights across the campus network.'}
               </p>
             </div>
             <button
               onClick={() => setIsCreateModalOpen(true)}
-              className="px-6 py-3 font-semibold text-white rounded-xl bg-blue-600 hover:bg-blue-500 transition-all duration-200 flex items-center gap-2 transform active:scale-95 shadow-md shadow-blue-900/20 cursor-pointer text-sm"
+              className="px-5 py-3 font-semibold text-white rounded-xl bg-blue-600 hover:bg-blue-500 hover:scale-[1.02] active:scale-95 transition-all duration-200 flex items-center gap-2 shadow-lg shadow-blue-900/10 cursor-pointer text-xs uppercase tracking-wider"
             >
-              <span>+</span>
-              <span className="tracking-wide">Create Event</span>
+              <FiPlus className="h-4 w-4" />
+              <span>{currentTab === 'tryouts' ? 'Create Tryout' : 'Create Event'}</span>
             </button>
           </div>
         </div>
 
-        {/* Statistics Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-          {/* Active Events Card */}
-          <div className="bg-dark-800/40 p-6 rounded-xl border border-dark-700 hover:border-blue-500/40 transition-all duration-300 shadow-md flex justify-between items-center group">
-            <div>
-              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Active Matches</p>
-              <h3 className="text-2xl font-extrabold text-white group-hover:text-blue-500 transition-colors">
-                {events.filter(e => e && e.status !== 'completed' && e.status !== 'cancelled').length}
-              </h3>
-            </div>
-            <div className="text-2xl bg-dark-900/60 p-3 rounded-xl border border-dark-700">⚽</div>
-          </div>
-          
-          {/* Ongoing Live Matches Card */}
-          <div className="bg-dark-800/40 p-6 rounded-xl border border-dark-700 hover:border-blue-500/40 transition-all duration-300 shadow-md flex justify-between items-center group">
-            <div>
-              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Live Operations</p>
-              <h3 className="text-2xl font-extrabold text-white group-hover:text-blue-500 transition-colors">
-                {events.filter(e => e && e.status === 'ongoing').length + ongoingEvents.length}
-              </h3>
-            </div>
-            <div className="text-2xl bg-dark-900/60 p-3 rounded-xl border border-dark-700">🔥</div>
-          </div>
-
-          {/* Recommended Card */}
-          <div className="bg-dark-800/40 p-6 rounded-xl border border-dark-700 hover:border-blue-500/40 transition-all duration-300 shadow-md flex justify-between items-center group">
-            <div>
-              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Recommendations</p>
-              <h3 className="text-2xl font-extrabold text-white group-hover:text-blue-500 transition-colors">
-                {recommendedEvents.length}
-              </h3>
-            </div>
-            <div className="text-2xl bg-dark-900/60 p-3 rounded-xl border border-dark-700">✨</div>
-          </div>
+        {/* Key Metrics Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          {currentMetrics.map((metric, index) => {
+            const Icon = metric.icon;
+            return (
+              <div 
+                key={index} 
+                className="bg-[#161619] p-5 rounded-xl border border-zinc-800 hover:border-zinc-700/80 transition-all duration-200 flex items-center justify-between group"
+              >
+                <div>
+                  <p className="text-[10px] font-bold text-zinc-550 uppercase tracking-widest mb-1">{metric.title}</p>
+                  <h3 className="text-2xl font-extrabold text-white mb-0.5">{loading ? '...' : metric.value}</h3>
+                  <p className="text-[10px] text-zinc-500 font-medium">{metric.desc}</p>
+                </div>
+                <div className="p-3 rounded-lg bg-zinc-900 border border-zinc-800 text-zinc-450 group-hover:text-blue-450 group-hover:border-blue-900/30 transition-all duration-200">
+                  <Icon className="h-5 w-5" />
+                </div>
+              </div>
+            );
+          })}
         </div>
 
-        {/* Popular Sports Section */}
-        <section className="mb-12">
-          <h2 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4 flex items-center gap-2">
-            <span>⚡</span> Popular Disciplines
-          </h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
-            {SPORTS.map((sportName, index) => {
-              return (
-                <div 
-                  key={index} 
-                  onClick={() => setSelectedSport(sportName)}
-                  className="bg-dark-800/20 border border-dark-700/60 hover:border-blue-500/40 rounded-xl p-4 text-center text-slate-300 font-semibold hover:text-white transition-all duration-200 cursor-pointer shadow-sm hover:-translate-y-0.5 select-none"
-                >
-                  <div className="text-3xl mb-2">{getSportEmoji(sportName)}</div>
-                  <div className="text-xs tracking-wider uppercase">{sportName}</div>
-                </div>
-              );
-            })}
-          </div>
-        </section>
-
-        {/* Ongoing Events Section */}
-        <section className="mb-12">
-          <h2 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4 flex items-center gap-2">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
-            </span>
-            Live Operations
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {ongoingEvents.map((event, index) => (
-              <div key={index} className="bg-dark-800/30 p-5 rounded-xl border border-dark-700 hover:border-slate-600 transition-all duration-300 flex flex-col relative overflow-hidden group">
-                <div className="flex justify-between items-start mb-4">
-                  <h3 className="text-base font-bold text-white transition-colors">{event.title}</h3>
-                  <span className={`text-[10px] font-semibold px-2 py-0.5 rounded uppercase tracking-wider ${event.status === 'Live Now' ? 'bg-red-500/10 text-red-400 border border-red-500/20' : 'bg-blue-500/10 text-blue-400 border border-blue-500/20'}`}>
-                    <span className="inline-block w-1.5 h-1.5 rounded-full bg-current mr-1.5 animate-pulse"></span>
-                    {event.status}
-                  </span>
-                </div>
-                <div className="flex items-center text-xs text-slate-400 font-normal mt-auto pt-4 border-t border-dark-700/60">
-                  <span className="mr-1.5">📍</span>
-                  {event.location}
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* Recommended Events Section */}
-        {preferredSports.length > 0 && (
-          <section className="mb-12">
-            <h2 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4 flex items-center gap-2">
-              <span>⭐</span> Recommended Operations
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {loading ? (
-                Array(3).fill().map((_, i) => (
-                  <div key={i} className="bg-dark-800/30 rounded-xl p-6 border border-dark-700 animate-pulse-glow flex flex-col h-64">
-                    <div className="flex justify-between mb-4">
-                      <div className="h-6 w-24 rounded-full bg-dark-700/50 animate-skeleton"></div>
-                      <div className="h-6 w-20 rounded bg-dark-700/50 animate-skeleton"></div>
-                    </div>
-                    <div className="h-8 w-3/4 rounded mb-6 bg-dark-700/50 animate-skeleton"></div>
-                    <div className="space-y-3 mt-auto">
-                      <div className="h-4 w-1/2 rounded bg-dark-700/50 animate-skeleton"></div>
-                      <div className="h-4 w-2/3 rounded bg-dark-700/50 animate-skeleton"></div>
-                    </div>
-                    <div className="h-10 w-full rounded-lg mt-6 bg-dark-700/50 animate-skeleton"></div>
-                  </div>
-                ))
-              ) : recommendedEvents.length === 0 ? (
-                <div className="col-span-full text-center py-12 text-slate-400 bg-dark-800/20 rounded-xl border border-dark-700 shadow-inner">
-                  <span className="text-3xl block mb-2 opacity-50">🤷‍♂️</span>
-                  No matching recommendations found for your preferences.
-                </div>
-              ) : (
-                recommendedEvents.slice(0, 3).map((event) => (
-                  <div key={event._id} className="bg-dark-800/30 rounded-xl overflow-hidden border border-dark-700 hover:border-blue-500/40 transition-all duration-300 flex flex-col group shadow-sm">
-                    <div className="p-5 flex-grow flex flex-col relative overflow-hidden">
-                      <div className="mb-4 flex justify-between items-start">
-                        <span className={`text-[10px] font-semibold px-2 py-0.5 rounded uppercase tracking-wider ${getSportBadgeColor(event.sport)}`}>
-                          {getSportEmoji(event.sport)} {event.sport}
-                        </span>
-                        <span className="text-[9px] font-semibold bg-blue-500/10 text-blue-400 px-2 py-0.5 rounded border border-blue-500/20 tracking-wider">
-                          Recommended
-                        </span>
-                      </div>
-
-                      <div className="mb-4">
-                        <h3 className="text-base font-bold text-white transition-colors line-clamp-2">{event.title}</h3>
-                      </div>
-                      
-                      <div className="space-y-2 mb-5 flex-grow">
-                        <div className="flex items-center text-xs text-slate-400 font-normal">
-                          <span className="mr-2">📅</span>
-                          {new Date(event.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
-                        </div>
-                        <div className="flex items-center text-xs text-slate-400 font-normal">
-                          <span className="mr-2">📍</span>
-                          <span className="line-clamp-1">{event.location}</span>
-                        </div>
-                      </div>
-                      
-                      <div className="pt-4 border-t border-dark-700/60 mt-auto">
-                        <Link
-                          to={`/events/${event._id}`}
-                          className="block text-center w-full bg-dark-900/60 hover:bg-blue-600 text-white font-semibold py-2.5 rounded-lg border border-dark-700 hover:border-blue-600 transition-all duration-200 text-sm"
-                        >
-                          View Details
-                        </Link>
-                      </div>
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
-          </section>
-        )}
-
-        {/* Radar & Search Section */}
-        <section className="mb-12 bg-dark-800/10 p-6 rounded-2xl border border-dark-700 shadow-sm">
-          <div className="flex flex-col lg:flex-row gap-6 items-start lg:items-center justify-between mb-6">
-            <div>
-              <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                <span>🎯</span> Operation Radar
-              </h2>
-              <p className="text-[10px] text-slate-500 font-semibold uppercase mt-0.5">Scan and query current campus activities</p>
-            </div>
-            <div className="relative w-full max-w-md">
-              <span className="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-500">
-                🔍
-              </span>
-              <input
-                type="text"
-                placeholder="Search sports events..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-dark-900 border border-dark-700 rounded-lg py-2.5 pl-11 pr-4 text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all placeholder-slate-600 text-sm shadow-inner"
-              />
-            </div>
-          </div>
+        {/* Dashboard 2-Column Details Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           
-          <div className="space-y-4">
-            {/* Sport Category Filters */}
-            <div>
-              <span className="block text-[10px] text-slate-500 font-semibold uppercase tracking-wider mb-2">Disciplines</span>
-              <div className="flex flex-wrap gap-1.5">
-                {filterSportsList.map(sport => (
-                  <button
-                    key={sport}
-                    onClick={() => setFilterSport(sport)}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 ${
-                      filterSport === sport
-                        ? 'bg-blue-600 text-white shadow-sm'
-                        : 'bg-dark-900 text-slate-400 border border-dark-700 hover:text-white hover:border-slate-500'
-                    }`}
-                  >
-                    {sport}
-                  </button>
-                ))}
-              </div>
-            </div>
+          {/* Left Column: Operations Radar & Filters */}
+          <div className="lg:col-span-2 space-y-8">
             
-            {/* Status Filters */}
-            <div>
-              <span className="block text-[10px] text-slate-500 font-semibold uppercase tracking-wider mb-2">Filter status</span>
-              <div className="flex flex-wrap gap-1.5">
-                {filterStatusList.map(status => (
-                  <button
-                    key={status}
-                    onClick={() => setFilterStatus(status)}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 ${
-                      filterStatus === status
-                        ? 'bg-blue-600 text-white shadow-sm'
-                        : 'bg-dark-900 text-slate-400 border border-dark-700 hover:text-white hover:border-slate-500'
-                    }`}
-                  >
-                    {status}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Filtered Events List */}
-        <section className="mb-12">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {loading ? (
-              Array(6).fill().map((_, i) => (
-                <div key={i} className="bg-dark-800/30 rounded-xl p-6 border border-dark-700 animate-pulse-glow flex flex-col h-64">
-                  <div className="h-6 w-24 rounded-full mb-4 bg-dark-700/50 animate-skeleton"></div>
-                  <div className="h-8 w-3/4 rounded mb-6 bg-dark-700/50 animate-skeleton"></div>
-                  <div className="space-y-3 mt-auto">
-                    <div className="h-4 w-1/2 rounded bg-dark-700/50 animate-skeleton"></div>
-                    <div className="h-4 w-2/3 rounded bg-dark-700/50 animate-skeleton"></div>
-                  </div>
-                  <div className="h-10 w-full rounded-lg mt-6 bg-dark-700/50 animate-skeleton"></div>
+            {/* Preferred / Recommended Section (Only on main Dashboard / relevant tabs) */}
+            {currentTab === 'all' && preferredSports.length > 0 && (
+              <section className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-xs font-extrabold text-zinc-500 uppercase tracking-widest flex items-center gap-2">
+                    <span className="w-1.5 h-3 bg-blue-500 rounded-full"></span> Recommended For You
+                  </h2>
                 </div>
-              ))
-            ) : filteredEvents.length === 0 ? (
-              <div className="col-span-full text-center py-12 text-slate-400 bg-dark-800/30 rounded-2xl border border-dark-700 shadow-inner">
-                <span className="text-4xl block mb-2 opacity-50">📭</span>
-                <p className="text-base font-bold text-white mb-1">No matching events found</p>
-                <p className="text-xs">Try adjusting your search or filters.</p>
-              </div>
-            ) : (
-              filteredEvents.map((event) => (
-                <div key={event._id} className="bg-dark-800/30 rounded-xl overflow-hidden border border-dark-700 hover:border-blue-500/40 transition-all duration-300 flex flex-col group shadow-sm">
-                  <div className="p-5 flex-grow flex flex-col relative overflow-hidden">
-                    
-                    {/* Sport Badge */}
-                    <div className="mb-4 flex justify-between items-start">
-                      <span className={`text-[10px] font-semibold px-2 py-0.5 rounded uppercase tracking-wider ${getSportBadgeColor(event.sport)}`}>
-                        {getSportEmoji(event.sport)} {event.sport}
-                      </span>
-                      {event.eventType === 'Competitive Tryout' && (
-                        <span className="text-[9px] font-semibold bg-indigo-500/10 text-indigo-400 px-2 py-0.5 rounded border border-indigo-500/20 tracking-wider">
-                          Tryout
-                        </span>
-                      )}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {loading ? (
+                    Array(2).fill().map((_, i) => (
+                      <div key={i} className="bg-[#161619] rounded-xl p-5 border border-zinc-800 animate-pulse h-40"></div>
+                    ))
+                  ) : recommendedEvents.length === 0 ? (
+                    <div className="col-span-full py-8 text-center text-zinc-500 text-xs bg-[#161619] rounded-xl border border-dashed border-zinc-800">
+                      No matching events found for your preferred sports.
                     </div>
+                  ) : (
+                    recommendedEvents.slice(0, 2).map((event) => (
+                      <div key={event._id} className="bg-[#161619] rounded-xl p-5 border border-zinc-800 hover:border-zinc-700 transition-all duration-200 flex flex-col justify-between h-40">
+                        <div>
+                          <div className="flex justify-between items-start mb-2.5">
+                            <span className={`text-[9px] font-bold px-2 py-0.5 rounded border ${getSportBadgeColor(event.sport)}`}>
+                              {getSportEmoji(event.sport)} {event.sport}
+                            </span>
+                            <span className="text-[8px] font-bold bg-blue-950/40 text-blue-400 px-2 py-0.5 rounded border border-blue-900/25 uppercase tracking-wider">
+                              MATCH
+                            </span>
+                          </div>
+                          <h3 className="text-sm font-bold text-white line-clamp-1 mb-2">{event.title}</h3>
+                          <p className="text-[11px] text-zinc-400 flex items-center gap-1.5 font-medium">
+                            <FiMapPin className="h-3 w-3" />
+                            <span className="truncate">{event.location}</span>
+                          </p>
+                        </div>
+                        <div className="pt-3 border-t border-zinc-800/80 flex items-center justify-between">
+                          <span className="text-[10px] text-zinc-500 font-bold">
+                            {new Date(event.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                          </span>
+                          <Link
+                            to={`/events/${event._id}`}
+                            className="text-[10px] font-bold text-blue-400 hover:text-blue-300 flex items-center gap-1 transition-colors"
+                          >
+                            <span>DETAILS</span>
+                            <FiChevronRight className="h-3.5 w-3.5" />
+                          </Link>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </section>
+            )}
 
-                    <div className="mb-4">
-                      <h3 className="text-base font-bold text-white transition-colors line-clamp-2">{event.title}</h3>
+            {/* Popular Disciplines section (Only on main Dashboard / relevant tabs) */}
+            {currentTab === 'all' && (
+              <section className="space-y-4">
+                <h2 className="text-xs font-extrabold text-zinc-500 uppercase tracking-widest flex items-center gap-2">
+                  <span className="w-1.5 h-3 bg-blue-500 rounded-full"></span> Popular Disciplines
+                </h2>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
+                  {SPORTS.map((sportName, index) => (
+                    <div 
+                      key={index} 
+                      onClick={() => setSelectedSport(sportName)}
+                      className="bg-[#161619] border border-zinc-850 hover:border-zinc-750 rounded-xl p-3.5 text-center text-zinc-300 font-bold hover:text-white transition-all duration-200 cursor-pointer shadow-sm flex flex-col items-center justify-center select-none"
+                    >
+                      <span className="text-2xl mb-1.5">{getSportEmoji(sportName)}</span>
+                      <span className="text-[10px] tracking-wider uppercase">{sportName}</span>
                     </div>
-                    
-                    <div className="space-y-2 mb-5 flex-grow">
-                      <div className="flex items-center text-xs text-slate-400 font-normal">
-                        <span className="mr-2.5">📅</span>
-                        {new Date(event.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
-                      </div>
-                      <div className="flex items-center text-xs text-slate-400 font-normal">
-                        <span className="mr-2.5">📍</span>
-                        <span className="line-clamp-1">{event.location}</span>
-                      </div>
-                      <div className="flex items-center text-xs text-slate-400 font-normal">
-                        <span className="mr-2.5">👑</span>
-                        <span className="truncate">{event.creator?.name || 'Unknown Host'}</span>
-                      </div>
-                    </div>
-                    
-                    <div className="pt-4 border-t border-dark-700/60 mt-auto">
-                      <Link
-                        to={`/events/${event._id}`}
-                        className={`block w-full text-center font-semibold py-2.5 rounded-lg transition-all duration-200 text-sm ${
-                          event.eventType === 'Competitive Tryout' 
-                            ? 'bg-blue-600 hover:bg-blue-500 text-white shadow-sm' 
-                            : 'bg-dark-900 hover:bg-dark-800 border border-dark-700 text-slate-200'
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {/* Operations Radar & Search Card */}
+            <section className="bg-[#161619] p-5 rounded-2xl border border-zinc-800 shadow-sm space-y-5">
+              <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between border-b border-zinc-800/80 pb-4">
+                <div>
+                  <h2 className="text-sm font-extrabold text-white flex items-center gap-2 uppercase tracking-wider">
+                    <FiCompass className="h-4.5 w-4.5 text-blue-500" />
+                    <span>Operations Radar</span>
+                  </h2>
+                  <p className="text-[9px] text-zinc-550 font-bold uppercase mt-0.5">Search and filter active campus matches</p>
+                </div>
+                <div className="relative w-full md:max-w-xs">
+                  <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-zinc-500">
+                    <FiSearch className="h-4 w-4" />
+                  </span>
+                  <input
+                    type="text"
+                    placeholder="Search sports activities..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full bg-zinc-900/60 border border-zinc-800 rounded-lg py-2 pl-9 pr-4 text-white focus:outline-none focus:border-blue-600 focus:ring-0 transition-all placeholder-zinc-650 text-xs shadow-inner"
+                  />
+                </div>
+              </div>
+              
+              <div className="space-y-4.5">
+                {/* Sport Category Filters */}
+                <div>
+                  <span className="block text-[9px] text-zinc-550 font-bold uppercase tracking-wider mb-2">Disciplines</span>
+                  <div className="flex flex-wrap gap-1.5">
+                    {filterSportsList.map(sport => (
+                      <button
+                        key={sport}
+                        onClick={() => setFilterSport(sport)}
+                        className={`px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all duration-200 cursor-pointer ${
+                          filterSport === sport
+                            ? 'bg-blue-600 text-white border border-blue-600 shadow-sm'
+                            : 'bg-zinc-900 text-zinc-400 border border-zinc-800 hover:text-white hover:border-zinc-700'
                         }`}
                       >
-                        {event.eventType === 'Competitive Tryout' ? 'View Tryout Details' : 'View Event Details'}
-                      </Link>
-                    </div>
+                        {sport}
+                      </button>
+                    ))}
                   </div>
                 </div>
-              ))
-            )}
+                
+                {/* Status Filters */}
+                <div>
+                  <span className="block text-[9px] text-zinc-550 font-bold uppercase tracking-wider mb-2">Filter status</span>
+                  <div className="flex flex-wrap gap-1.5">
+                    {filterStatusList.map(status => (
+                      <button
+                        key={status}
+                        onClick={() => setFilterStatus(status)}
+                        className={`px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all duration-200 cursor-pointer ${
+                          filterStatus === status
+                            ? 'bg-blue-600 text-white border border-blue-600 shadow-sm'
+                            : 'bg-zinc-900 text-zinc-400 border border-zinc-800 hover:text-white hover:border-zinc-700'
+                        }`}
+                      >
+                        {status}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            {/* Filtered Events List */}
+            <section className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {loading ? (
+                  Array(4).fill().map((_, i) => (
+                    <div key={i} className="bg-[#161619] rounded-xl p-5 border border-zinc-800 animate-pulse h-48"></div>
+                  ))
+                ) : filteredEvents.length === 0 ? (
+                  <div className="col-span-full text-center py-16 bg-[#161619] rounded-2xl border border-zinc-800 shadow-inner">
+                    <span className="text-3xl block mb-2 opacity-50">📭</span>
+                    <p className="text-sm font-bold text-white mb-1 uppercase tracking-wide">No active matching events</p>
+                    <p className="text-xs text-zinc-500">Try adjusting your filters or query parameters.</p>
+                  </div>
+                ) : (
+                  filteredEvents.map((event) => (
+                    <div key={event._id} className="bg-[#161619] rounded-xl border border-zinc-800 hover:border-zinc-700/80 transition-all duration-200 flex flex-col justify-between group shadow-sm overflow-hidden relative">
+                      <div className="p-5 flex-1 flex flex-col justify-between">
+                        
+                        <div>
+                          {/* Sport Badge */}
+                          <div className="mb-3.5 flex justify-between items-center">
+                            <span className={`text-[9px] font-bold px-2 py-0.5 rounded border ${getSportBadgeColor(event.sport)}`}>
+                              {getSportEmoji(event.sport)} {event.sport}
+                            </span>
+                            <span className={`text-[8px] font-bold px-2 py-0.5 rounded border uppercase tracking-wider ${
+                              event.eventType === 'Competitive Tryout' 
+                                ? 'bg-indigo-950/45 text-indigo-400 border-indigo-900/30' 
+                                : 'bg-blue-950/45 text-blue-400 border-blue-900/30'
+                            }`}>
+                              {event.eventType === 'Competitive Tryout' ? 'Tryout' : 'Match'}
+                            </span>
+                          </div>
+
+                          <div className="mb-4">
+                            <h3 className="text-sm font-extrabold text-white group-hover:text-blue-450 transition-colors line-clamp-1">{event.title}</h3>
+                          </div>
+                          
+                          <div className="space-y-2 mb-4">
+                            <div className="flex items-center text-[11px] text-zinc-400 font-medium">
+                              <FiCalendar className="mr-2 h-3.5 w-3.5 text-zinc-500" />
+                              <span>{new Date(event.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
+                            </div>
+                            <div className="flex items-center text-[11px] text-zinc-400 font-medium">
+                              <FiMapPin className="mr-2 h-3.5 w-3.5 text-zinc-500" />
+                              <span className="line-clamp-1">{event.location}</span>
+                            </div>
+                            <div className="flex items-center text-[11px] text-zinc-400 font-medium">
+                              <span className="mr-2 text-xs">👑</span>
+                              <span className="truncate">Host: {event.creator?.name || 'Athlete'}</span>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="pt-4 border-t border-zinc-800/80 mt-auto flex items-center justify-between">
+                          <span className="text-[10px] text-zinc-500 font-bold">
+                            Squad: {event.participants?.length || 1} / {event.maxParticipants || '∞'}
+                          </span>
+                          <Link
+                            to={`/events/${event._id}`}
+                            className={`px-3 py-1.5 rounded-lg text-[10px] font-bold border uppercase tracking-wider transition-all duration-200 cursor-pointer ${
+                              event.eventType === 'Competitive Tryout' 
+                                ? 'bg-indigo-600/10 text-indigo-400 border-indigo-900/30 hover:bg-indigo-600 hover:text-white hover:border-indigo-650' 
+                                : 'bg-blue-600/10 text-blue-400 border-blue-900/30 hover:bg-blue-600 hover:text-white hover:border-blue-650'
+                            }`}
+                          >
+                            {event.eventType === 'Competitive Tryout' ? 'Enter Tryout' : 'View Match'}
+                          </Link>
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </section>
           </div>
-        </section>
-      </main>
+
+          {/* Right Column: Recent Activity & Upcoming Schedule */}
+          <div className="space-y-8 lg:col-span-1">
+            
+            {/* Upcoming Schedule */}
+            <section className="bg-[#161619] p-5 rounded-2xl border border-zinc-800 shadow-sm space-y-4">
+              <h2 className="text-xs font-extrabold text-zinc-500 uppercase tracking-widest flex items-center gap-2">
+                <FiClock className="h-4 w-4 text-blue-500" />
+                <span>Upcoming Events</span>
+              </h2>
+              <div className="divide-y divide-zinc-800/85 space-y-3.5">
+                {getUpcomingSchedule().map((item, idx) => (
+                  <div key={item._id || idx} className="pt-3.5 first:pt-0 flex flex-col gap-1 group">
+                    <div className="flex justify-between items-start">
+                      <h4 className="text-xs font-bold text-white group-hover:text-blue-450 transition-colors line-clamp-1 pr-4">{item.title}</h4>
+                      {item.isFallback && (
+                        <span className="text-[8px] font-bold bg-zinc-800 text-zinc-500 px-1.5 py-0.5 rounded border border-zinc-700">DEMO</span>
+                      )}
+                    </div>
+                    <div className="flex items-center justify-between text-[10px] text-zinc-500 font-bold mt-1">
+                      <span className="flex items-center gap-1">
+                        <FiCalendar className="h-3 w-3" />
+                        {new Date(item.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
+                      </span>
+                      <span className="truncate max-w-[120px] flex items-center gap-1">
+                        <FiMapPin className="h-3 w-3" />
+                        {item.location}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            {/* Recent Activity Timeline */}
+            <section className="bg-[#161619] p-5 rounded-2xl border border-zinc-800 shadow-sm space-y-4">
+              <h2 className="text-xs font-extrabold text-zinc-500 uppercase tracking-widest flex items-center gap-2">
+                <FiActivity className="h-4 w-4 text-blue-500" />
+                <span>Recent Activity</span>
+              </h2>
+              <div className="relative pl-3 border-l border-zinc-800 space-y-6">
+                {getRecentActivity().map((act) => (
+                  <div key={act.id} className="relative group">
+                    {/* Circle Indicator */}
+                    <div className="absolute -left-[17px] top-1 h-2 w-2 rounded-full border border-[#161619] bg-zinc-800 group-hover:bg-blue-600 transition-colors" />
+                    
+                    <div>
+                      <p className="text-xs text-zinc-300 leading-normal">
+                        <span className="font-bold text-white">{act.user}</span> {act.detail}
+                      </p>
+                      <p className="text-[9px] text-zinc-650 font-bold uppercase tracking-wider mt-1">
+                        {new Date(act.time).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+          </div>
+
+        </div>
+      </div>
 
       {/* Sport Details Modal */}
       {selectedSport && sportsInfo[selectedSport] && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-dark-950/80 backdrop-blur-sm animate-fade-in-up">
-          <div className="bg-dark-850 rounded-xl w-full max-w-md shadow-2xl border border-dark-700 overflow-hidden relative">
-            <div className="px-6 py-4 border-b border-dark-700 flex justify-between items-center bg-dark-900">
-              <h2 className="text-base font-bold text-white flex items-center gap-2">
-                <span className="text-blue-500">⚡</span> {selectedSport} Info
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fade-in-up">
+          <div className="bg-[#161619] rounded-xl w-full max-w-md shadow-2xl border border-zinc-800 overflow-hidden relative">
+            <div className="px-6 py-4 border-b border-zinc-800 flex justify-between items-center bg-[#121214]">
+              <h2 className="text-sm font-bold text-white flex items-center gap-2 uppercase tracking-wide">
+                <span className="text-blue-500">⚡</span> {selectedSport} General Info
               </h2>
               <button
                 onClick={() => setSelectedSport(null)}
-                className="text-slate-400 hover:text-white transition-all bg-dark-950 w-8 h-8 rounded-full flex items-center justify-center cursor-pointer"
+                className="text-zinc-400 hover:text-white transition-all bg-zinc-900 w-8 h-8 rounded-full flex items-center justify-center cursor-pointer border border-zinc-850"
               >
                 <span className="text-lg leading-none">&times;</span>
               </button>
@@ -629,50 +745,50 @@ const Dashboard = () => {
 
             <div className="p-6 space-y-4">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-400 border border-blue-500/20">
+                <div className="w-8 h-8 rounded-lg bg-zinc-900 border border-zinc-850 flex items-center justify-center text-sm">
                   👥
                 </div>
                 <div>
-                  <p className="text-[10px] text-slate-500 font-semibold uppercase tracking-wider">Players</p>
+                  <p className="text-[9px] text-zinc-550 font-bold uppercase tracking-wider">Squad Count</p>
                   <p className="text-white text-xs font-semibold">{sportsInfo[selectedSport].players}</p>
                 </div>
               </div>
 
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-400 border border-blue-500/20">
+                <div className="w-8 h-8 rounded-lg bg-zinc-900 border border-zinc-850 flex items-center justify-center text-sm">
                   ⏱️
                 </div>
                 <div>
-                  <p className="text-[10px] text-slate-500 font-semibold uppercase tracking-wider">Duration</p>
+                  <p className="text-[9px] text-zinc-550 font-bold uppercase tracking-wider">Duration Limit</p>
                   <p className="text-white text-xs font-semibold">{sportsInfo[selectedSport].duration}</p>
                 </div>
               </div>
 
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-400 border border-blue-500/20">
+                <div className="w-8 h-8 rounded-lg bg-zinc-900 border border-zinc-850 flex items-center justify-center text-sm">
                   📍
                 </div>
                 <div>
-                  <p className="text-[10px] text-slate-500 font-semibold uppercase tracking-wider">Location</p>
+                  <p className="text-[9px] text-zinc-550 font-bold uppercase tracking-wider">Arena Type</p>
                   <p className="text-white text-xs font-semibold">{sportsInfo[selectedSport].location}</p>
                 </div>
               </div>
 
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-400 border border-blue-500/20">
+                <div className="w-8 h-8 rounded-lg bg-zinc-900 border border-zinc-850 flex items-center justify-center text-sm">
                   🎒
                 </div>
                 <div>
-                  <p className="text-[10px] text-slate-500 font-semibold uppercase tracking-wider">Equipment</p>
+                  <p className="text-[9px] text-zinc-550 font-bold uppercase tracking-wider">Equipment Requirements</p>
                   <p className="text-white text-xs font-semibold">{sportsInfo[selectedSport].equipment}</p>
                 </div>
               </div>
             </div>
 
-            <div className="px-6 py-4 border-t border-dark-700 bg-dark-900 flex justify-end">
+            <div className="px-6 py-4 border-t border-zinc-800 bg-[#121214] flex justify-end">
               <button
                 onClick={() => setSelectedSport(null)}
-                className="w-full px-4 py-2.5 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-500 rounded-lg transition-all duration-200 cursor-pointer"
+                className="w-full px-4 py-2 text-xs font-bold text-white bg-blue-600 hover:bg-blue-500 rounded-lg transition-all duration-200 cursor-pointer uppercase tracking-wider"
               >
                 Dismiss Details
               </button>
@@ -683,13 +799,13 @@ const Dashboard = () => {
 
       {/* Create Event Modal */}
       {isCreateModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-dark-950/80 backdrop-blur-sm animate-fade-in-up">
-          <div className="bg-dark-850 rounded-xl w-full max-w-lg shadow-2xl border border-dark-700 overflow-hidden max-h-[95vh] flex flex-col relative">
-            <div className="px-6 py-4 border-b border-dark-700 flex justify-between items-center bg-dark-900 z-10">
-              <h2 className="text-base font-bold text-white">Create New Event</h2>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fade-in-up">
+          <div className="bg-[#161619] rounded-xl w-full max-w-lg shadow-2xl border border-zinc-800 overflow-hidden max-h-[90vh] flex flex-col relative">
+            <div className="px-6 py-4 border-b border-zinc-800 flex justify-between items-center bg-[#121214] z-10">
+              <h2 className="text-xs font-extrabold text-white uppercase tracking-wider">Create New Athletic Event</h2>
               <button
                 onClick={() => setIsCreateModalOpen(false)}
-                className="text-slate-400 hover:text-white transition-all bg-dark-950 w-8 h-8 rounded-full flex items-center justify-center cursor-pointer"
+                className="text-zinc-400 hover:text-white transition-all bg-zinc-900 w-8 h-8 rounded-full flex items-center justify-center cursor-pointer border border-zinc-850"
               >
                 <span className="text-lg leading-none">&times;</span>
               </button>
@@ -698,22 +814,22 @@ const Dashboard = () => {
             <div className="p-6 overflow-y-auto custom-scrollbar">
               <form id="create-event-form" onSubmit={handleCreateEvent} className="space-y-4">
                 <div>
-                  <label className="block text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Event Title</label>
+                  <label className="block text-[9px] font-bold text-zinc-550 uppercase tracking-wider mb-1.5">Event Title</label>
                   <input
                     type="text"
                     name="title"
                     required
                     value={formData.title}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-2 bg-dark-900 border border-dark-700 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-white transition-all placeholder-slate-600 text-sm"
-                    placeholder="e.g., Midnight Basketball Pickup"
+                    className="w-full px-3 py-2 bg-zinc-900/65 border border-zinc-800 rounded-lg focus:outline-none focus:border-blue-650 text-white transition-all placeholder-zinc-700 text-xs"
+                    placeholder="e.g., Weekend Friendly Football"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Event Type</label>
-                  <div className="flex gap-4">
-                    <label className={`flex-1 cursor-pointer p-3.5 rounded-lg border transition-all duration-200 text-center ${formData.eventType === 'Casual Match' ? 'bg-blue-500/10 border-blue-500 text-blue-400' : 'bg-dark-900 border-dark-700 text-slate-400 hover:border-slate-550'}`}>
+                  <label className="block text-[9px] font-bold text-zinc-550 uppercase tracking-wider mb-1.5">Event Mode / Selection Type</label>
+                  <div className="flex gap-3">
+                    <label className={`flex-1 cursor-pointer p-3 rounded-lg border transition-all duration-200 text-center ${formData.eventType === 'Casual Match' ? 'bg-blue-950/20 border-blue-600/40 text-blue-400' : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:border-zinc-750'}`}>
                       <input
                         type="radio"
                         name="eventType"
@@ -722,10 +838,10 @@ const Dashboard = () => {
                         onChange={handleInputChange}
                         className="hidden"
                       />
-                      <span className="font-bold block text-sm mb-0.5">Casual Match</span>
-                      <span className="text-[10px] opacity-70">Direct Join Allowed</span>
+                      <span className="font-bold block text-xs mb-0.5">Casual Match</span>
+                      <span className="text-[9px] opacity-70">Direct Squad RSVP</span>
                     </label>
-                    <label className={`flex-1 cursor-pointer p-3.5 rounded-lg border transition-all duration-200 text-center ${formData.eventType === 'Competitive Tryout' ? 'bg-indigo-500/10 border-indigo-500 text-indigo-400' : 'bg-dark-900 border-dark-700 text-slate-400 hover:border-slate-550'}`}>
+                    <label className={`flex-1 cursor-pointer p-3 rounded-lg border transition-all duration-200 text-center ${formData.eventType === 'Competitive Tryout' ? 'bg-indigo-950/20 border-indigo-600/40 text-indigo-400' : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:border-zinc-750'}`}>
                       <input
                         type="radio"
                         name="eventType"
@@ -734,21 +850,21 @@ const Dashboard = () => {
                         onChange={handleInputChange}
                         className="hidden"
                       />
-                      <span className="font-bold block text-sm mb-0.5">Tryout / Selection</span>
-                      <span className="text-[10px] opacity-70">Requires Approval</span>
+                      <span className="font-bold block text-xs mb-0.5">Tryout / Selection</span>
+                      <span className="text-[9px] opacity-70">Requires Approval</span>
                     </label>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Sport</label>
+                    <label className="block text-[9px] font-bold text-zinc-550 uppercase tracking-wider mb-1.5">Sport</label>
                     <select
                       name="sport"
                       required
                       value={formData.sport}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 bg-dark-900 border border-dark-700 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-white transition-all [color-scheme:dark] text-sm"
+                      className="w-full px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-lg focus:outline-none focus:border-blue-650 text-white transition-all [color-scheme:dark] text-xs"
                     >
                       {SPORTS.map(sport => (
                         <option key={sport} value={sport}>{getSportEmoji(sport)} {sport}</option>
@@ -756,64 +872,64 @@ const Dashboard = () => {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Capacity</label>
+                    <label className="block text-[9px] font-bold text-zinc-550 uppercase tracking-wider mb-1.5">Max Participants</label>
                     <input
                       type="number"
                       name="maxParticipants"
                       min="0"
                       value={formData.maxParticipants}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 bg-dark-900 border border-dark-700 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-white transition-all placeholder-slate-600 text-sm"
+                      className="w-full px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-lg focus:outline-none focus:border-blue-655 text-white transition-all placeholder-zinc-700 text-xs"
                       placeholder="0 = unlimited"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Date & Time</label>
+                  <label className="block text-[9px] font-bold text-zinc-550 uppercase tracking-wider mb-1.5">Date & Time</label>
                   <input
                     type="datetime-local"
                     name="date"
                     required
                     value={formData.date}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-2 bg-dark-900 border border-dark-700 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-white transition-all [color-scheme:dark] text-sm"
+                    className="w-full px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-lg focus:outline-none focus:border-blue-655 text-white transition-all [color-scheme:dark] text-xs"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Location</label>
+                  <label className="block text-[9px] font-bold text-zinc-550 uppercase tracking-wider mb-1.5">Arena location</label>
                   <input
                     type="text"
                     name="location"
                     required
                     value={formData.location}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-2 bg-dark-900 border border-dark-700 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-white transition-all placeholder-slate-600 text-sm"
-                    placeholder="e.g., Main Campus Court 1"
+                    className="w-full px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-lg focus:outline-none focus:border-blue-655 text-white transition-all placeholder-zinc-700 text-xs"
+                    placeholder="e.g., Main Arena, Turf 1"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Event Description</label>
+                  <label className="block text-[9px] font-bold text-zinc-550 uppercase tracking-wider mb-1.5">Event Description</label>
                   <textarea
                     name="description"
                     required
                     rows="3"
                     value={formData.description}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-2 bg-dark-900 border border-dark-700 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-white transition-all resize-none placeholder-slate-600 text-sm"
-                    placeholder="Provide details about skill level, equipment required, etc."
+                    className="w-full px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-lg focus:outline-none focus:border-blue-655 text-white transition-all resize-none placeholder-zinc-700 text-xs"
+                    placeholder="Specify requirements, gear, and athlete skill levels..."
                   ></textarea>
                 </div>
               </form>
             </div>
 
-            <div className="px-6 py-4 border-t border-dark-700 bg-dark-900 flex justify-end gap-3">
+            <div className="px-6 py-4 border-t border-zinc-800 bg-[#121214] flex justify-end gap-3">
               <button
                 type="button"
                 onClick={() => setIsCreateModalOpen(false)}
-                className="px-4 py-2 text-xs font-semibold text-slate-400 hover:text-white transition-colors cursor-pointer"
+                className="px-4 py-2 text-xs font-bold text-zinc-450 hover:text-white transition-colors cursor-pointer uppercase tracking-wider"
               >
                 Cancel
               </button>
@@ -821,7 +937,7 @@ const Dashboard = () => {
                 type="submit"
                 form="create-event-form"
                 disabled={isSubmitting}
-                className="px-5 py-2 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-500 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                className="px-5 py-2 text-xs font-bold text-white bg-blue-600 hover:bg-blue-500 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer uppercase tracking-wider"
               >
                 {isSubmitting ? 'Creating...' : 'Create Event'}
               </button>
@@ -829,7 +945,7 @@ const Dashboard = () => {
           </div>
         </div>
       )}
-    </div>
+    </SidebarLayout>
   );
 };
 

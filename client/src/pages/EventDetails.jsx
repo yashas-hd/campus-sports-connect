@@ -3,7 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import toast from 'react-hot-toast';
 import AuthContext from '../context/AuthContext';
-import Navbar from '../components/Navbar';
+import SidebarLayout from '../components/SidebarLayout';
 import axiosInstance from '../utils/axiosInstance';
 
 const API = import.meta.env.VITE_API_URL;
@@ -220,31 +220,30 @@ const EventDetails = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-dark-900 font-sans flex flex-col relative overflow-hidden">
-        <Navbar />
-        <div className="flex-1 flex justify-center items-center relative z-10">
+      <SidebarLayout>
+        <div className="min-h-[50vh] flex flex-col justify-center items-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+          <p className="text-xs text-zinc-500 font-bold uppercase tracking-wider mt-4">Retrieving Operation Specs...</p>
         </div>
-      </div>
+      </SidebarLayout>
     );
   }
 
   if (error || !event) {
     return (
-      <div className="min-h-screen bg-dark-900 font-sans flex flex-col relative overflow-hidden">
-        <Navbar />
-        <div className="flex-1 flex justify-center items-center p-4 relative z-10">
-          <div className="bg-dark-800/40 p-10 rounded-2xl border border-red-500/30 text-center max-w-md w-full relative overflow-hidden">
-            <div className="absolute top-0 left-0 w-full h-1 bg-red-600"></div>
-            <span className="text-5xl block mb-6">⚠️</span>
-            <h2 className="text-xl font-bold text-white mb-2 tracking-tight">Operation Failed</h2>
-            <p className="text-slate-400 mb-8 text-sm">{error || 'Event data corrupted or not found'}</p>
-            <Link to="/dashboard" className="bg-dark-800 border border-dark-700/80 text-white px-6 py-3 rounded-lg text-xs font-bold hover:text-blue-500 hover:border-blue-500/40 transition-all duration-200 inline-block cursor-pointer">
-              Return to Base
+      <SidebarLayout>
+        <div className="min-h-[50vh] flex justify-center items-center p-4">
+          <div className="bg-dark-800/20 p-10 rounded-2xl border border-red-550/20 text-center max-w-md w-full relative overflow-hidden">
+            <div className="absolute top-0 left-0 w-full h-1 bg-red-650"></div>
+            <span className="text-4xl block mb-5">⚠️</span>
+            <h2 className="text-lg font-bold text-white mb-1 uppercase tracking-wider">Operation Retrieval Failed</h2>
+            <p className="text-zinc-400 mb-8 text-xs font-medium">{error || 'Event specifications not found'}</p>
+            <Link to="/dashboard" className="bg-zinc-900 border border-zinc-800 text-white px-5 py-2.5 rounded-lg text-xs font-bold hover:text-blue-550 hover:border-blue-500 transition-all duration-200 inline-block cursor-pointer uppercase tracking-wider">
+              Return to Radar
             </Link>
           </div>
         </div>
-      </div>
+      </SidebarLayout>
     );
   }
 
@@ -258,13 +257,8 @@ const EventDetails = () => {
   const isApproved = event?.approvedPlayers?.some(p => p?._id === user?._id || p === user?._id) || false;
 
   return (
-    <div className="min-h-screen bg-dark-900 text-slate-100 font-sans pb-12 relative overflow-hidden">
-      {/* Background Decorative Glow */}
-      <div className="absolute top-0 -left-20 w-96 h-96 bg-blue-900/5 rounded-full blur-[100px] pointer-events-none animate-pulse"></div>
-
-      <Navbar />
-      
-      <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 relative z-10">
+    <SidebarLayout>
+      <div className="max-w-5xl mx-auto animate-fade-in-up">
         <Link to="/dashboard" className="inline-flex items-center text-xs font-bold text-slate-400 hover:text-blue-550 mb-6 transition-colors uppercase tracking-wider cursor-pointer">
           &larr; Return to Radar
         </Link>
@@ -602,9 +596,9 @@ const EventDetails = () => {
               </div>
             </div>
           </div>
-        </div>
-      </main>
-    </div>
+      </div>
+      </div>
+    </SidebarLayout>
   );
 };
 
