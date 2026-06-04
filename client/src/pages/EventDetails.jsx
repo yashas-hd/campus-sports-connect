@@ -202,7 +202,7 @@ const EventDetails = () => {
     if (s.includes('badminton')) return 'text-teal-400 border-teal-500/20 bg-teal-500/10';
     if (s.includes('volley')) return 'text-indigo-400 border-indigo-500/20 bg-indigo-500/10';
     if (s.includes('cricket')) return 'text-blue-400 border-blue-500/20 bg-blue-500/10';
-    if (s.includes('kabaddi')) return 'text-rose-450 border-rose-500/20 bg-rose-500/10';
+    if (s.includes('kabaddi')) return 'text-rose-400 border-rose-500/20 bg-rose-500/10';
     return 'text-slate-400 border-slate-500/20 bg-slate-500/10';
   };
 
@@ -296,7 +296,7 @@ const EventDetails = () => {
                   </h2>
                   <div className="space-y-3">
                     <div className="flex items-start bg-dark-900/45 p-4 rounded-xl border border-dark-700/50 hover:border-slate-700 transition-colors">
-                      <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-dark-800 border border-dark-700 flex items-center justify-center text-lg text-blue-450">
+                      <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-dark-800 border border-dark-700 flex items-center justify-center text-lg text-blue-500">
                         📅
                       </div>
                       <div className="ml-4">
@@ -311,7 +311,7 @@ const EventDetails = () => {
                     </div>
                     
                     <div className="flex items-start bg-dark-900/45 p-4 rounded-xl border border-dark-700/50 hover:border-slate-700 transition-colors">
-                      <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-dark-800 border border-dark-700 flex items-center justify-center text-lg text-blue-450">
+                      <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-dark-800 border border-dark-700 flex items-center justify-center text-lg text-blue-500">
                         📍
                       </div>
                       <div className="ml-4">
@@ -321,7 +321,7 @@ const EventDetails = () => {
                     </div>
  
                     <div className="flex items-start bg-dark-900/45 p-4 rounded-xl border border-dark-700/50 hover:border-slate-700 transition-colors">
-                      <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-dark-800 border border-dark-700 flex items-center justify-center text-lg text-blue-450">
+                      <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-dark-800 border border-dark-700 flex items-center justify-center text-lg text-blue-500">
                         👑
                       </div>
                       <div className="ml-4">
@@ -422,7 +422,7 @@ const EventDetails = () => {
                             <div className="min-w-0 flex-1">
                               <p className="text-xs font-bold text-white truncate">
                                 {p.name} 
-                                {p._id === event.creator?._id && <span className="text-[8px] bg-blue-600/10 border border-blue-500/20 text-blue-450 px-1.5 py-0.5 rounded ml-1.5 uppercase tracking-wider font-semibold">Host</span>}
+                                {p._id === event.creator?._id && <span className="text-[8px] bg-blue-600/10 border border-blue-500/20 text-blue-500 px-1.5 py-0.5 rounded ml-1.5 uppercase tracking-wider font-semibold">Host</span>}
                               </p>
                               <p className="text-[9px] text-slate-500 truncate mt-0.5">{p.college}</p>
                             </div>
@@ -440,7 +440,7 @@ const EventDetails = () => {
                         </div>
                         
                         {isCompetitiveTryout && p._id !== event.creator?._id && (
-                          <div className="w-full">
+                           <div className="w-full">
                             <PlayerRating 
                               reqData={event.teamRequests?.find(r => r.user?._id === p._id || r.user === p._id)} 
                               isCreator={isCreator} 
@@ -459,7 +459,7 @@ const EventDetails = () => {
                       {!isCompetitiveTryout ? (
                         isParticipating ? (
                           <div className="space-y-2">
-                            <div className="w-full py-2.5 px-4 rounded-lg text-xs font-bold uppercase tracking-wider text-center bg-emerald-500/10 border border-emerald-500/20 text-emerald-450">
+                            <div className="w-full py-2.5 px-4 rounded-lg text-xs font-bold uppercase tracking-wider text-center bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
                               ✓ Enlisted
                             </div>
                             <button
@@ -525,7 +525,7 @@ const EventDetails = () => {
                   )}
                   {isCreator && (
                     <div className="space-y-2">
-                      <div className="w-full py-2.5 px-4 rounded-lg text-xs font-semibold text-blue-450 bg-blue-500/5 text-center border border-blue-500/10 uppercase tracking-wider">
+                      <div className="w-full py-2.5 px-4 rounded-lg text-xs font-semibold text-blue-500 bg-blue-500/5 text-center border border-blue-500/10 uppercase tracking-wider">
                         You are Commander
                       </div>
                       <button
@@ -578,7 +578,7 @@ const EventDetails = () => {
                 ) : (
                   event.comments?.map((comment, idx) => (
                     <div key={comment._id || idx} className="bg-dark-800/20 p-4 rounded-xl border border-dark-700/50 hover:border-slate-700 transition-colors flex gap-4">
-                      <div className="h-8 w-8 rounded bg-dark-900 border border-dark-700 flex items-center justify-center text-blue-450 font-bold uppercase flex-shrink-0 text-xs shadow-inner">
+                      <div className="h-8 w-8 rounded bg-dark-900 border border-dark-700 flex items-center justify-center text-blue-500 font-bold uppercase flex-shrink-0 text-xs shadow-inner">
                         {comment.user?.name ? comment.user.name.charAt(0) : '?'}
                       </div>
                       <div className="flex-1 min-w-0">

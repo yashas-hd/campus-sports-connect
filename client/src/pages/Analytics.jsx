@@ -15,7 +15,7 @@ import {
   Legend 
 } from 'recharts';
 import { 
-  FiTrophy, 
+  FiAward, 
   FiActivity, 
   FiFileText, 
   FiCheckCircle, 
@@ -58,7 +58,7 @@ const Analytics = () => {
 
   // Map metrics to icons
   const metrics = [
-    { title: 'Total Events', value: data?.totalEvents, icon: FiTrophy, desc: 'Fixtures organized' },
+    { title: 'Total Events', value: data?.totalEvents, icon: FiAward, desc: 'Fixtures organized' },
     { title: 'Competitive Tryouts', value: data?.totalTryouts, icon: FiActivity, desc: 'Selection gateways' },
     { title: 'Total Applications', value: data?.totalApplications, icon: FiFileText, desc: 'Athlete submissions' },
     { title: 'Approved Players', value: data?.totalApprovedPlayers, icon: FiCheckCircle, desc: 'Active selections' },
@@ -87,14 +87,14 @@ const Analytics = () => {
             return (
               <div 
                 key={idx} 
-                className="bg-[#161619] p-5 rounded-xl border border-zinc-800 hover:border-zinc-700/80 transition-all duration-200 flex items-center justify-between group shadow-sm"
+                className="bg-slate-900/40 p-5 rounded-xl border border-slate-800 hover:border-slate-700/80 transition-all duration-200 flex items-center justify-between group shadow-sm"
               >
                 <div>
-                  <p className="text-[10px] font-bold text-zinc-550 uppercase tracking-widest mb-1.5">{m.title}</p>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">{m.title}</p>
                   <h3 className="text-2xl font-extrabold text-white mb-0.5">{m.value !== undefined ? m.value : '-'}</h3>
-                  <p className="text-[10px] text-zinc-500 font-medium">{m.desc}</p>
+                  <p className="text-[10px] text-slate-500 font-medium">{m.desc}</p>
                 </div>
-                <div className="p-3 rounded-lg bg-zinc-900 border border-zinc-800 text-zinc-450 group-hover:text-blue-450 group-hover:border-blue-900/30 transition-all duration-200">
+                <div className="p-3 rounded-lg bg-slate-950 border border-slate-800 text-slate-400 group-hover:text-blue-500 group-hover:border-blue-500/30 transition-all duration-200">
                   <Icon className="h-5 w-5" />
                 </div>
               </div>
@@ -105,19 +105,19 @@ const Analytics = () => {
         {/* Charts Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Distribution Chart */}
-          <div className="bg-[#161619] p-6 rounded-2xl border border-zinc-800 shadow-sm flex flex-col justify-between">
-            <div className="flex justify-between items-center border-b border-zinc-800/80 pb-4 mb-6">
+          <div className="bg-slate-900/40 p-6 rounded-2xl border border-slate-800 shadow-sm flex flex-col justify-between">
+            <div className="flex justify-between items-center border-b border-slate-800/80 pb-4 mb-6">
               <div>
                 <h3 className="text-xs font-bold text-white uppercase tracking-wider">Sport Distribution</h3>
-                <p className="text-[9px] text-zinc-500 font-bold uppercase mt-0.5">Active match operations by field</p>
+                <p className="text-[9px] text-slate-500 font-bold uppercase mt-0.5">Active match operations by field</p>
               </div>
-              <span className="text-[9px] font-bold bg-blue-950/30 text-blue-400 px-2 py-0.5 rounded border border-blue-900/20 tracking-wider">LIVE SYNC</span>
+              <span className="text-[9px] font-bold bg-blue-500/10 text-blue-400 px-2 py-0.5 rounded border border-blue-500/20 tracking-wider">LIVE SYNC</span>
             </div>
             
             <div className="h-72 w-full relative">
               {(!data?.barChartData || data.barChartData.length === 0 || data.barChartData.every(d => d.value === 0)) ? (
-                <div className="absolute inset-0 flex flex-col justify-center items-center text-zinc-500 text-xs bg-zinc-900/35 rounded-xl border border-dashed border-zinc-800">
-                  <FiInfo className="h-6 w-6 text-zinc-650 mb-2" />
+                <div className="absolute inset-0 flex flex-col justify-center items-center text-slate-500 text-xs bg-slate-950 border border-dashed border-slate-800 rounded-xl">
+                  <FiInfo className="h-6 w-6 text-slate-600 mb-2" />
                   No events organized yet.
                 </div>
               ) : (
@@ -129,11 +129,11 @@ const Analytics = () => {
                         <stop offset="100%" stopColor="#2563eb" stopOpacity={0.15} />
                       </linearGradient>
                     </defs>
-                    <XAxis dataKey="name" stroke="#52525b" fontSize={10} tickLine={false} axisLine={false} />
-                    <YAxis stroke="#52525b" fontSize={10} tickLine={false} axisLine={false} />
+                    <XAxis dataKey="name" stroke="#64748b" fontSize={10} tickLine={false} axisLine={false} />
+                    <YAxis stroke="#64748b" fontSize={10} tickLine={false} axisLine={false} />
                     <Tooltip 
                       cursor={{ fill: 'rgba(255,255,255,0.02)' }} 
-                      contentStyle={{ backgroundColor: '#161619', border: '1px solid #27272a', borderRadius: '8px', color: '#fff', fontSize: '11px' }} 
+                      contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #334155', borderRadius: '8px', color: '#fff', fontSize: '11px' }} 
                     />
                     <Bar dataKey="value" fill="url(#sportBarGradient)" radius={[4, 4, 0, 0]} />
                   </BarChart>
@@ -143,19 +143,19 @@ const Analytics = () => {
           </div>
 
           {/* Success Rate Chart */}
-          <div className="bg-[#161619] p-6 rounded-2xl border border-zinc-800 shadow-sm flex flex-col justify-between">
-            <div className="flex justify-between items-center border-b border-zinc-800/80 pb-4 mb-6">
+          <div className="bg-slate-900/40 p-6 rounded-2xl border border-slate-800 shadow-sm flex flex-col justify-between">
+            <div className="flex justify-between items-center border-b border-slate-800/80 pb-4 mb-6">
               <div>
                 <h3 className="text-xs font-bold text-white uppercase tracking-wider">Application success rate</h3>
-                <p className="text-[9px] text-zinc-500 font-bold uppercase mt-0.5">Approved vs rejected tryouts</p>
+                <p className="text-[9px] text-slate-500 font-bold uppercase mt-0.5">Approved vs rejected tryouts</p>
               </div>
-              <span className="text-[9px] font-bold bg-zinc-900 text-zinc-400 px-2 py-0.5 rounded border border-zinc-800 tracking-wider">RATIO</span>
+              <span className="text-[9px] font-bold bg-slate-950 text-slate-400 px-2 py-0.5 rounded border border-slate-800 tracking-wider">RATIO</span>
             </div>
 
             <div className="h-72 w-full relative">
               {(!data?.pieChartData || data.pieChartData.length === 0 || data.pieChartData.every(d => d.value === 0)) ? (
-                <div className="absolute inset-0 flex flex-col justify-center items-center text-zinc-500 text-xs bg-zinc-900/35 rounded-xl border border-dashed border-zinc-800">
-                  <FiInfo className="h-6 w-6 text-zinc-650 mb-2" />
+                <div className="absolute inset-0 flex flex-col justify-center items-center text-slate-500 text-xs bg-slate-955 border border-dashed border-slate-800 rounded-xl">
+                  <FiInfo className="h-6 w-6 text-slate-600 mb-2" />
                   No applications recorded yet.
                 </div>
               ) : (
@@ -179,12 +179,12 @@ const Analytics = () => {
                         />
                       ))}
                     </Pie>
-                    <Tooltip contentStyle={{ backgroundColor: '#161619', border: '1px solid #27272a', borderRadius: '8px', color: '#fff', fontSize: '11px' }} />
+                    <Tooltip contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #334155', borderRadius: '8px', color: '#fff', fontSize: '11px' }} />
                     <Legend 
                       verticalAlign="bottom" 
                       height={36} 
                       iconType="circle" 
-                      wrapperStyle={{ fontSize: '10px', color: '#71717a', textTransform: 'uppercase', fontWeight: 'bold' }} 
+                      wrapperStyle={{ fontSize: '10px', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 'bold' }} 
                     />
                   </PieChart>
                 </ResponsiveContainer>
@@ -196,8 +196,8 @@ const Analytics = () => {
         {/* Insights & Comparison Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Key Insights List */}
-          <div className="bg-[#161619] p-6 rounded-2xl border border-zinc-800 shadow-sm flex flex-col justify-between lg:col-span-1">
-            <div className="border-b border-zinc-800/80 pb-4 mb-4">
+          <div className="bg-slate-900/40 p-6 rounded-2xl border border-slate-800 shadow-sm flex flex-col justify-between lg:col-span-1">
+            <div className="border-b border-slate-800/80 pb-4 mb-4">
               <h3 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
                 <span>💡</span> Key platform Insights
               </h3>
@@ -214,8 +214,8 @@ const Analytics = () => {
           </div>
 
           {/* Academic Impact Comparison Table */}
-          <div className="bg-[#161619] p-6 rounded-2xl border border-zinc-800 shadow-sm lg:col-span-2 overflow-hidden flex flex-col justify-between">
-            <div className="border-b border-zinc-800/80 pb-4 mb-4">
+          <div className="bg-slate-900/40 p-6 rounded-2xl border border-slate-800 shadow-sm lg:col-span-2 overflow-hidden flex flex-col justify-between">
+            <div className="border-b border-slate-800/80 pb-4 mb-4">
               <h3 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
                 <span>📈</span> System Impact Analysis
               </h3>
@@ -224,13 +224,13 @@ const Analytics = () => {
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="border-b border-zinc-800 bg-zinc-900/40">
-                    <th className="p-3.5 text-[10px] font-bold text-zinc-450 uppercase tracking-widest">Parameter</th>
-                    <th className="p-3.5 text-[10px] font-bold text-zinc-450 uppercase tracking-widest">Traditional Method</th>
-                    <th className="p-3.5 text-[10px] font-bold text-blue-450 uppercase tracking-widest bg-blue-950/10">Platform System</th>
+                  <tr className="border-b border-slate-800 bg-slate-950/40">
+                    <th className="p-3.5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Parameter</th>
+                    <th className="p-3.5 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Traditional Method</th>
+                    <th className="p-3.5 text-[10px] font-bold text-blue-500 uppercase tracking-widest bg-blue-500/5">Platform System</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-zinc-800/60">
+                <tbody className="divide-y divide-slate-800/60">
                   <ComparisonRow 
                     param="Team Selection" 
                     traditional="Random / Offline Signup" 
@@ -259,19 +259,19 @@ const Analytics = () => {
 
 // Sub-components helpers
 const InsightRow = ({ label, value }) => (
-  <div className="bg-zinc-900/35 p-3 rounded-lg border border-zinc-800/40 hover:border-zinc-800 hover:bg-zinc-900/60 flex justify-between items-center transition-all duration-200 group">
-    <span className="text-[11px] text-zinc-400 font-semibold group-hover:text-zinc-200 transition-colors">{label}</span>
-    <span className="text-[10px] font-bold text-blue-450 bg-zinc-900 px-2 py-0.5 rounded border border-zinc-800/80 shadow-inner group-hover:border-zinc-700 transition-all duration-200">
+  <div className="bg-slate-950 p-3 rounded-lg border border-slate-800/60 hover:border-slate-700 hover:bg-slate-900/60 flex justify-between items-center transition-all duration-200 group">
+    <span className="text-[11px] text-slate-400 font-semibold group-hover:text-slate-200 transition-colors">{label}</span>
+    <span className="text-[10px] font-bold text-blue-500 bg-slate-950 px-2 py-0.5 rounded border border-slate-800/80 shadow-inner group-hover:border-slate-700 transition-all duration-200">
       {value !== undefined ? value : '-'}
     </span>
   </div>
 );
 
 const ComparisonRow = ({ param, traditional, modern }) => (
-  <tr className="hover:bg-zinc-900/30 transition-colors group">
+  <tr className="hover:bg-slate-900/30 transition-colors group">
     <td className="p-3.5 text-xs font-bold text-zinc-200">{param}</td>
-    <td className="p-3.5 text-xs text-zinc-500 font-medium">{traditional}</td>
-    <td className="p-3.5 text-xs font-extrabold text-blue-450 bg-blue-950/5 border-l-2 border-blue-600/30 pl-5">
+    <td className="p-3.5 text-xs text-slate-400 font-medium">{traditional}</td>
+    <td className="p-3.5 text-xs font-extrabold text-blue-500 bg-blue-500/5 border-l-2 border-blue-600/30 pl-5">
       {modern}
     </td>
   </tr>

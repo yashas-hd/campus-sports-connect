@@ -95,7 +95,7 @@ const Login = () => {
         <div className="border-t border-dark-700/60 pt-5 text-center">
           <p className="text-xs text-slate-400">
             New to the League?{' '}
-            <Link to="/register" className="font-semibold text-blue-500 hover:text-blue-450 transition-colors duration-200">
+            <Link to="/register" className="font-semibold text-blue-500 hover:text-blue-400 transition-colors duration-200">
               Create an account
             </Link>
           </p>

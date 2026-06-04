@@ -242,7 +242,7 @@ const Profile = () => {
                         </div>
                         <div className="bg-dark-900/40 p-3.5 rounded-xl border border-dark-700/60 shadow-inner">
                           <span className="block text-[8px] text-slate-500 uppercase tracking-wider mb-1.5">Tier / Rank</span>
-                          <span className="text-xs text-blue-450 font-bold">{profileData?.experienceLevel || 'Beginner'}</span>
+                          <span className="text-xs text-blue-500 font-bold">{profileData?.experienceLevel || 'Beginner'}</span>
                         </div>
                       </div>
                     </div>
@@ -425,7 +425,7 @@ const Profile = () => {
                         : "You haven't enlisted in any operations yet."}
                     </p>
                     {activeTab === 'hosting' && (
-                      <Link to="/dashboard" className="inline-flex items-center justify-center px-4 py-2 rounded-lg text-xs font-semibold text-blue-450 border border-blue-500/30 hover:bg-blue-500/5 transition-all duration-200 cursor-pointer">
+                      <Link to="/dashboard" className="inline-flex items-center justify-center px-4 py-2 rounded-lg text-xs font-semibold text-blue-500 border border-blue-500/30 hover:bg-blue-500/5 transition-all duration-200 cursor-pointer">
                         Initialize One Now &rarr;
                       </Link>
                     )}

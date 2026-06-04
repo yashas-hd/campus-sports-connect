@@ -7,7 +7,7 @@ import SidebarLayout from '../components/SidebarLayout';
 import axiosInstance from '../utils/axiosInstance';
 import { SPORTS } from '../constants/sports';
 import { 
-  FiTrophy, 
+  FiAward, 
   FiActivity, 
   FiStar, 
   FiClock, 
@@ -240,10 +240,10 @@ const Dashboard = () => {
     if(!sport) return '';
     const s = sport.toLowerCase();
     if (s.includes('basket')) return 'text-amber-500 border-amber-500/20 bg-amber-500/10';
-    if (s.includes('foot') || s.includes('soccer')) return 'text-emerald-450 border-emerald-500/20 bg-emerald-500/10';
+    if (s.includes('foot') || s.includes('soccer')) return 'text-emerald-400 border-emerald-500/20 bg-emerald-500/10';
     if (s.includes('badminton')) return 'text-teal-400 border-teal-500/20 bg-teal-500/10';
     if (s.includes('volley')) return 'text-indigo-400 border-indigo-500/20 bg-indigo-500/10';
-    if (s.includes('cricket')) return 'text-blue-450 border-blue-500/20 bg-blue-500/10';
+    if (s.includes('cricket')) return 'text-blue-500 border-blue-500/20 bg-blue-500/10';
     if (s.includes('kabaddi')) return 'text-rose-400 border-rose-500/20 bg-rose-500/10';
     return 'text-zinc-400 border-zinc-700 bg-zinc-800/40';
   };
@@ -363,7 +363,7 @@ const Dashboard = () => {
     if (currentTab === 'events') {
       const activeMatches = events.filter(e => e && e.eventType !== 'Competitive Tryout' && e.status !== 'completed').length;
       return [
-        { title: 'Casual Matches', value: activeMatches, icon: FiTrophy, desc: 'Active friendly fixtures' },
+        { title: 'Casual Matches', value: activeMatches, icon: FiAward, desc: 'Active friendly fixtures' },
         { title: 'Registered Squads', value: events.filter(e => e && e.eventType !== 'Competitive Tryout' && e.participants?.some(p => p?._id === user?._id || p === user?._id)).length, icon: FiUserCheck, desc: 'Joined sport operations' },
         { title: 'Recommended Matches', value: recommendedEvents.filter(e => e.eventType !== 'Competitive Tryout').length, icon: FiStar, desc: 'Matching interests' }
       ];
@@ -377,7 +377,7 @@ const Dashboard = () => {
       ];
     }
     return [
-      { title: 'Active Matches', value: events.filter(e => e && e.status !== 'completed' && e.status !== 'cancelled').length, icon: FiTrophy, desc: 'Total scheduled operations' },
+      { title: 'Active Matches', value: events.filter(e => e && e.status !== 'completed' && e.status !== 'cancelled').length, icon: FiAward, desc: 'Total scheduled operations' },
       { title: 'Live Operations', value: events.filter(e => e && e.status === 'ongoing').length + ongoingEventsFallback.length, icon: FiActivity, desc: 'Currently in progress' },
       { title: 'Recommendations', value: recommendedEvents.length, icon: FiStar, desc: 'Based on preferred sports' }
     ];
@@ -390,10 +390,11 @@ const Dashboard = () => {
       <div className="space-y-8 animate-fade-in-up">
         
         {/* Welcome Section */}
-        <div className="relative overflow-hidden rounded-2xl border border-zinc-800 bg-[#161619] p-6 sm:p-8">
+        <div className="relative overflow-hidden rounded-2xl border border-slate-800 bg-slate-900/40 p-6 sm:p-8">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-blue-600/5 rounded-full blur-3xl pointer-events-none"></div>
           <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
             <div>
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-xs font-semibold bg-blue-950/40 border border-blue-900/30 text-blue-400 mb-3">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-xs font-semibold bg-blue-500/10 border border-blue-500/20 text-blue-400 mb-3">
                 <span className="h-1.5 w-1.5 rounded-full bg-blue-500 animate-pulse"></span>
                 {currentTab === 'tryouts' ? 'COMPETITIVE OPERATIONS' : currentTab === 'events' ? 'CASUAL ATHLETICS FEED' : 'CAMPUS DASHBOARD'}
               </span>
@@ -401,7 +402,7 @@ const Dashboard = () => {
                 {currentTab === 'tryouts' ? 'Tryouts Selection Center' : currentTab === 'events' ? 'Casual Sports Hub' : 'Athletic Command'}{', '}
                 <span className="text-blue-500">{userProfile?.name || user?.name || "Athlete"}</span> 👋
               </h1>
-              <p className="text-zinc-400 text-sm max-w-xl font-normal leading-relaxed">
+              <p className="text-slate-400 text-sm max-w-xl font-normal leading-relaxed">
                 {currentTab === 'tryouts' 
                   ? 'Initiate selection tryouts, manage athlete rating scorecards, and recruit top performing campus players.'
                   : currentTab === 'events' 
@@ -411,7 +412,7 @@ const Dashboard = () => {
             </div>
             <button
               onClick={() => setIsCreateModalOpen(true)}
-              className="px-5 py-3 font-semibold text-white rounded-xl bg-blue-600 hover:bg-blue-500 hover:scale-[1.02] active:scale-95 transition-all duration-200 flex items-center gap-2 shadow-lg shadow-blue-900/10 cursor-pointer text-xs uppercase tracking-wider"
+              className="px-5 py-3 font-semibold text-white rounded-xl bg-blue-600 hover:bg-blue-500 hover:scale-[1.02] active:scale-95 transition-all duration-200 flex items-center gap-2 shadow-lg shadow-blue-600/10 cursor-pointer text-xs uppercase tracking-wider animate-pulse-glow"
             >
               <FiPlus className="h-4 w-4" />
               <span>{currentTab === 'tryouts' ? 'Create Tryout' : 'Create Event'}</span>
@@ -426,14 +427,14 @@ const Dashboard = () => {
             return (
               <div 
                 key={index} 
-                className="bg-[#161619] p-5 rounded-xl border border-zinc-800 hover:border-zinc-700/80 transition-all duration-200 flex items-center justify-between group"
+                className="bg-slate-900/40 p-5 rounded-xl border border-slate-800 hover:border-slate-700/80 transition-all duration-200 flex items-center justify-between group shadow-sm"
               >
                 <div>
-                  <p className="text-[10px] font-bold text-zinc-550 uppercase tracking-widest mb-1">{metric.title}</p>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">{metric.title}</p>
                   <h3 className="text-2xl font-extrabold text-white mb-0.5">{loading ? '...' : metric.value}</h3>
-                  <p className="text-[10px] text-zinc-500 font-medium">{metric.desc}</p>
+                  <p className="text-[10px] text-slate-500 font-medium">{metric.desc}</p>
                 </div>
-                <div className="p-3 rounded-lg bg-zinc-900 border border-zinc-800 text-zinc-450 group-hover:text-blue-450 group-hover:border-blue-900/30 transition-all duration-200">
+                <div className="p-3 rounded-lg bg-slate-950 border border-slate-800 text-slate-400 group-hover:text-blue-500 group-hover:border-blue-500/30 transition-all duration-200">
                   <Icon className="h-5 w-5" />
                 </div>
               </div>
@@ -451,39 +452,39 @@ const Dashboard = () => {
             {currentTab === 'all' && preferredSports.length > 0 && (
               <section className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-xs font-extrabold text-zinc-500 uppercase tracking-widest flex items-center gap-2">
+                  <h2 className="text-xs font-extrabold text-slate-400 uppercase tracking-widest flex items-center gap-2">
                     <span className="w-1.5 h-3 bg-blue-500 rounded-full"></span> Recommended For You
                   </h2>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {loading ? (
                     Array(2).fill().map((_, i) => (
-                      <div key={i} className="bg-[#161619] rounded-xl p-5 border border-zinc-800 animate-pulse h-40"></div>
+                      <div key={i} className="bg-slate-900/40 rounded-xl p-5 border border-slate-800 animate-pulse h-40"></div>
                     ))
                   ) : recommendedEvents.length === 0 ? (
-                    <div className="col-span-full py-8 text-center text-zinc-500 text-xs bg-[#161619] rounded-xl border border-dashed border-zinc-800">
+                    <div className="col-span-full py-8 text-center text-slate-500 text-xs bg-slate-900/40 rounded-xl border border-dashed border-slate-800">
                       No matching events found for your preferred sports.
                     </div>
                   ) : (
                     recommendedEvents.slice(0, 2).map((event) => (
-                      <div key={event._id} className="bg-[#161619] rounded-xl p-5 border border-zinc-800 hover:border-zinc-700 transition-all duration-200 flex flex-col justify-between h-40">
+                      <div key={event._id} className="bg-slate-900/40 rounded-xl p-5 border border-slate-800 hover:border-slate-700 transition-all duration-200 flex flex-col justify-between h-40">
                         <div>
                           <div className="flex justify-between items-start mb-2.5">
                             <span className={`text-[9px] font-bold px-2 py-0.5 rounded border ${getSportBadgeColor(event.sport)}`}>
                               {getSportEmoji(event.sport)} {event.sport}
                             </span>
-                            <span className="text-[8px] font-bold bg-blue-950/40 text-blue-400 px-2 py-0.5 rounded border border-blue-900/25 uppercase tracking-wider">
+                            <span className="text-[8px] font-bold bg-blue-500/10 text-blue-400 px-2 py-0.5 rounded border border-blue-500/20 uppercase tracking-wider">
                               MATCH
                             </span>
                           </div>
                           <h3 className="text-sm font-bold text-white line-clamp-1 mb-2">{event.title}</h3>
-                          <p className="text-[11px] text-zinc-400 flex items-center gap-1.5 font-medium">
+                          <p className="text-[11px] text-slate-400 flex items-center gap-1.5 font-medium">
                             <FiMapPin className="h-3 w-3" />
                             <span className="truncate">{event.location}</span>
                           </p>
                         </div>
-                        <div className="pt-3 border-t border-zinc-800/80 flex items-center justify-between">
-                          <span className="text-[10px] text-zinc-500 font-bold">
+                        <div className="pt-3 border-t border-slate-800/80 flex items-center justify-between">
+                          <span className="text-[10px] text-slate-500 font-bold">
                             {new Date(event.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                           </span>
                           <Link
@@ -504,15 +505,15 @@ const Dashboard = () => {
             {/* Popular Disciplines section (Only on main Dashboard / relevant tabs) */}
             {currentTab === 'all' && (
               <section className="space-y-4">
-                <h2 className="text-xs font-extrabold text-zinc-500 uppercase tracking-widest flex items-center gap-2">
-                  <span className="w-1.5 h-3 bg-blue-500 rounded-full"></span> Popular Disciplines
+                <h2 className="text-xs font-extrabold text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                  <span className="w-1.5 h-3 bg-blue-500 rounded-full"></span> Recommended Sports
                 </h2>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
                   {SPORTS.map((sportName, index) => (
                     <div 
                       key={index} 
                       onClick={() => setSelectedSport(sportName)}
-                      className="bg-[#161619] border border-zinc-850 hover:border-zinc-750 rounded-xl p-3.5 text-center text-zinc-300 font-bold hover:text-white transition-all duration-200 cursor-pointer shadow-sm flex flex-col items-center justify-center select-none"
+                      className="bg-slate-900/40 border border-slate-800 hover:border-slate-700 rounded-xl p-3.5 text-center text-slate-350 font-bold hover:text-white transition-all duration-200 cursor-pointer shadow-sm flex flex-col items-center justify-center select-none"
                     >
                       <span className="text-2xl mb-1.5">{getSportEmoji(sportName)}</span>
                       <span className="text-[10px] tracking-wider uppercase">{sportName}</span>
@@ -523,17 +524,17 @@ const Dashboard = () => {
             )}
 
             {/* Operations Radar & Search Card */}
-            <section className="bg-[#161619] p-5 rounded-2xl border border-zinc-800 shadow-sm space-y-5">
-              <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between border-b border-zinc-800/80 pb-4">
+            <section className="bg-slate-900/40 p-5 rounded-2xl border border-slate-800 shadow-sm space-y-5">
+              <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between border-b border-slate-800/80 pb-4">
                 <div>
                   <h2 className="text-sm font-extrabold text-white flex items-center gap-2 uppercase tracking-wider">
                     <FiCompass className="h-4.5 w-4.5 text-blue-500" />
                     <span>Operations Radar</span>
                   </h2>
-                  <p className="text-[9px] text-zinc-550 font-bold uppercase mt-0.5">Search and filter active campus matches</p>
+                  <p className="text-[9px] text-slate-400 font-bold uppercase mt-0.5">Search and filter active campus matches</p>
                 </div>
                 <div className="relative w-full md:max-w-xs">
-                  <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-zinc-500">
+                  <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-500">
                     <FiSearch className="h-4 w-4" />
                   </span>
                   <input
@@ -541,7 +542,7 @@ const Dashboard = () => {
                     placeholder="Search sports activities..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full bg-zinc-900/60 border border-zinc-800 rounded-lg py-2 pl-9 pr-4 text-white focus:outline-none focus:border-blue-600 focus:ring-0 transition-all placeholder-zinc-650 text-xs shadow-inner"
+                    className="w-full bg-slate-950 border border-slate-800 rounded-lg py-2 pl-9 pr-4 text-white focus:outline-none focus:border-blue-500 focus:ring-0 transition-all placeholder-slate-500 text-xs shadow-inner"
                   />
                 </div>
               </div>
@@ -549,7 +550,7 @@ const Dashboard = () => {
               <div className="space-y-4.5">
                 {/* Sport Category Filters */}
                 <div>
-                  <span className="block text-[9px] text-zinc-550 font-bold uppercase tracking-wider mb-2">Disciplines</span>
+                  <span className="block text-[9px] text-slate-400 font-bold uppercase tracking-wider mb-2">Disciplines</span>
                   <div className="flex flex-wrap gap-1.5">
                     {filterSportsList.map(sport => (
                       <button
@@ -558,7 +559,7 @@ const Dashboard = () => {
                         className={`px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all duration-200 cursor-pointer ${
                           filterSport === sport
                             ? 'bg-blue-600 text-white border border-blue-600 shadow-sm'
-                            : 'bg-zinc-900 text-zinc-400 border border-zinc-800 hover:text-white hover:border-zinc-700'
+                            : 'bg-slate-950 text-slate-400 border border-slate-800 hover:text-white hover:border-slate-700'
                         }`}
                       >
                         {sport}
@@ -569,7 +570,7 @@ const Dashboard = () => {
                 
                 {/* Status Filters */}
                 <div>
-                  <span className="block text-[9px] text-zinc-550 font-bold uppercase tracking-wider mb-2">Filter status</span>
+                  <span className="block text-[9px] text-slate-400 font-bold uppercase tracking-wider mb-2">Filter status</span>
                   <div className="flex flex-wrap gap-1.5">
                     {filterStatusList.map(status => (
                       <button
@@ -578,7 +579,7 @@ const Dashboard = () => {
                         className={`px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all duration-200 cursor-pointer ${
                           filterStatus === status
                             ? 'bg-blue-600 text-white border border-blue-600 shadow-sm'
-                            : 'bg-zinc-900 text-zinc-400 border border-zinc-800 hover:text-white hover:border-zinc-700'
+                            : 'bg-slate-950 text-slate-400 border border-slate-800 hover:text-white hover:border-slate-700'
                         }`}
                       >
                         {status}
@@ -594,17 +595,17 @@ const Dashboard = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {loading ? (
                   Array(4).fill().map((_, i) => (
-                    <div key={i} className="bg-[#161619] rounded-xl p-5 border border-zinc-800 animate-pulse h-48"></div>
+                    <div key={i} className="bg-slate-900/40 rounded-xl p-5 border border-slate-800 animate-pulse h-48"></div>
                   ))
                 ) : filteredEvents.length === 0 ? (
-                  <div className="col-span-full text-center py-16 bg-[#161619] rounded-2xl border border-zinc-800 shadow-inner">
+                  <div className="col-span-full text-center py-16 bg-slate-900/40 rounded-2xl border border-slate-800 shadow-inner">
                     <span className="text-3xl block mb-2 opacity-50">📭</span>
                     <p className="text-sm font-bold text-white mb-1 uppercase tracking-wide">No active matching events</p>
-                    <p className="text-xs text-zinc-500">Try adjusting your filters or query parameters.</p>
+                    <p className="text-xs text-slate-500">Try adjusting your filters or query parameters.</p>
                   </div>
                 ) : (
                   filteredEvents.map((event) => (
-                    <div key={event._id} className="bg-[#161619] rounded-xl border border-zinc-800 hover:border-zinc-700/80 transition-all duration-200 flex flex-col justify-between group shadow-sm overflow-hidden relative">
+                    <div key={event._id} className="bg-slate-900/40 rounded-xl border border-slate-800 hover:border-slate-700/80 transition-all duration-200 flex flex-col justify-between group shadow-sm overflow-hidden relative">
                       <div className="p-5 flex-1 flex flex-col justify-between">
                         
                         <div>
@@ -623,35 +624,35 @@ const Dashboard = () => {
                           </div>
 
                           <div className="mb-4">
-                            <h3 className="text-sm font-extrabold text-white group-hover:text-blue-450 transition-colors line-clamp-1">{event.title}</h3>
+                            <h3 className="text-sm font-extrabold text-white group-hover:text-blue-500 transition-colors line-clamp-1">{event.title}</h3>
                           </div>
                           
                           <div className="space-y-2 mb-4">
-                            <div className="flex items-center text-[11px] text-zinc-400 font-medium">
-                              <FiCalendar className="mr-2 h-3.5 w-3.5 text-zinc-500" />
+                            <div className="flex items-center text-[11px] text-slate-400 font-medium">
+                              <FiCalendar className="mr-2 h-3.5 w-3.5 text-slate-500" />
                               <span>{new Date(event.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
                             </div>
-                            <div className="flex items-center text-[11px] text-zinc-400 font-medium">
-                              <FiMapPin className="mr-2 h-3.5 w-3.5 text-zinc-500" />
+                            <div className="flex items-center text-[11px] text-slate-400 font-medium">
+                              <FiMapPin className="mr-2 h-3.5 w-3.5 text-slate-500" />
                               <span className="line-clamp-1">{event.location}</span>
                             </div>
-                            <div className="flex items-center text-[11px] text-zinc-400 font-medium">
+                            <div className="flex items-center text-[11px] text-slate-400 font-medium">
                               <span className="mr-2 text-xs">👑</span>
                               <span className="truncate">Host: {event.creator?.name || 'Athlete'}</span>
                             </div>
                           </div>
                         </div>
                         
-                        <div className="pt-4 border-t border-zinc-800/80 mt-auto flex items-center justify-between">
-                          <span className="text-[10px] text-zinc-500 font-bold">
+                        <div className="pt-4 border-t border-slate-800/80 mt-auto flex items-center justify-between">
+                          <span className="text-[10px] text-slate-550 font-bold">
                             Squad: {event.participants?.length || 1} / {event.maxParticipants || '∞'}
                           </span>
                           <Link
                             to={`/events/${event._id}`}
                             className={`px-3 py-1.5 rounded-lg text-[10px] font-bold border uppercase tracking-wider transition-all duration-200 cursor-pointer ${
                               event.eventType === 'Competitive Tryout' 
-                                ? 'bg-indigo-600/10 text-indigo-400 border-indigo-900/30 hover:bg-indigo-600 hover:text-white hover:border-indigo-650' 
-                                : 'bg-blue-600/10 text-blue-400 border-blue-900/30 hover:bg-blue-600 hover:text-white hover:border-blue-650'
+                                ? 'bg-indigo-600/10 text-indigo-400 border-indigo-900/30 hover:bg-indigo-600 hover:text-white hover:border-indigo-600' 
+                                : 'bg-blue-600/10 text-blue-400 border-blue-900/30 hover:bg-blue-600 hover:text-white hover:border-blue-600'
                             }`}
                           >
                             {event.eventType === 'Competitive Tryout' ? 'Enter Tryout' : 'View Match'}
@@ -669,21 +670,21 @@ const Dashboard = () => {
           <div className="space-y-8 lg:col-span-1">
             
             {/* Upcoming Schedule */}
-            <section className="bg-[#161619] p-5 rounded-2xl border border-zinc-800 shadow-sm space-y-4">
-              <h2 className="text-xs font-extrabold text-zinc-500 uppercase tracking-widest flex items-center gap-2">
+            <section className="bg-slate-900/40 p-5 rounded-2xl border border-slate-800 shadow-sm space-y-4">
+              <h2 className="text-xs font-extrabold text-slate-400 uppercase tracking-widest flex items-center gap-2">
                 <FiClock className="h-4 w-4 text-blue-500" />
                 <span>Upcoming Events</span>
               </h2>
-              <div className="divide-y divide-zinc-800/85 space-y-3.5">
+              <div className="divide-y divide-slate-800/80 space-y-3.5">
                 {getUpcomingSchedule().map((item, idx) => (
                   <div key={item._id || idx} className="pt-3.5 first:pt-0 flex flex-col gap-1 group">
                     <div className="flex justify-between items-start">
-                      <h4 className="text-xs font-bold text-white group-hover:text-blue-450 transition-colors line-clamp-1 pr-4">{item.title}</h4>
+                      <h4 className="text-xs font-bold text-white group-hover:text-blue-500 transition-colors line-clamp-1 pr-4">{item.title}</h4>
                       {item.isFallback && (
-                        <span className="text-[8px] font-bold bg-zinc-800 text-zinc-500 px-1.5 py-0.5 rounded border border-zinc-700">DEMO</span>
+                        <span className="text-[8px] font-bold bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded border border-slate-700">DEMO</span>
                       )}
                     </div>
-                    <div className="flex items-center justify-between text-[10px] text-zinc-500 font-bold mt-1">
+                    <div className="flex items-center justify-between text-[10px] text-slate-500 font-bold mt-1">
                       <span className="flex items-center gap-1">
                         <FiCalendar className="h-3 w-3" />
                         {new Date(item.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
@@ -699,22 +700,22 @@ const Dashboard = () => {
             </section>
 
             {/* Recent Activity Timeline */}
-            <section className="bg-[#161619] p-5 rounded-2xl border border-zinc-800 shadow-sm space-y-4">
-              <h2 className="text-xs font-extrabold text-zinc-500 uppercase tracking-widest flex items-center gap-2">
+            <section className="bg-slate-900/40 p-5 rounded-2xl border border-slate-800 shadow-sm space-y-4">
+              <h2 className="text-xs font-extrabold text-slate-400 uppercase tracking-widest flex items-center gap-2">
                 <FiActivity className="h-4 w-4 text-blue-500" />
                 <span>Recent Activity</span>
               </h2>
-              <div className="relative pl-3 border-l border-zinc-800 space-y-6">
+              <div className="relative pl-3 border-l border-slate-800 space-y-6">
                 {getRecentActivity().map((act) => (
                   <div key={act.id} className="relative group">
                     {/* Circle Indicator */}
-                    <div className="absolute -left-[17px] top-1 h-2 w-2 rounded-full border border-[#161619] bg-zinc-800 group-hover:bg-blue-600 transition-colors" />
+                    <div className="absolute -left-[17px] top-1 h-2 w-2 rounded-full border border-[#0f172a] bg-slate-800 group-hover:bg-blue-600 transition-colors" />
                     
                     <div>
-                      <p className="text-xs text-zinc-300 leading-normal">
+                      <p className="text-xs text-slate-350 leading-normal">
                         <span className="font-bold text-white">{act.user}</span> {act.detail}
                       </p>
-                      <p className="text-[9px] text-zinc-650 font-bold uppercase tracking-wider mt-1">
+                      <p className="text-[9px] text-slate-500 font-bold uppercase tracking-wider mt-1">
                         {new Date(act.time).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
                       </p>
                     </div>
@@ -730,14 +731,14 @@ const Dashboard = () => {
       {/* Sport Details Modal */}
       {selectedSport && sportsInfo[selectedSport] && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fade-in-up">
-          <div className="bg-[#161619] rounded-xl w-full max-w-md shadow-2xl border border-zinc-800 overflow-hidden relative">
-            <div className="px-6 py-4 border-b border-zinc-800 flex justify-between items-center bg-[#121214]">
+          <div className="bg-slate-900 rounded-xl w-full max-w-md shadow-2xl border border-slate-800 overflow-hidden relative">
+            <div className="px-6 py-4 border-b border-slate-800 flex justify-between items-center bg-slate-950">
               <h2 className="text-sm font-bold text-white flex items-center gap-2 uppercase tracking-wide">
                 <span className="text-blue-500">⚡</span> {selectedSport} General Info
               </h2>
               <button
                 onClick={() => setSelectedSport(null)}
-                className="text-zinc-400 hover:text-white transition-all bg-zinc-900 w-8 h-8 rounded-full flex items-center justify-center cursor-pointer border border-zinc-850"
+                className="text-slate-400 hover:text-white transition-all bg-slate-950 w-8 h-8 rounded-full flex items-center justify-center cursor-pointer border border-slate-800"
               >
                 <span className="text-lg leading-none">&times;</span>
               </button>
@@ -745,47 +746,47 @@ const Dashboard = () => {
 
             <div className="p-6 space-y-4">
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-zinc-900 border border-zinc-850 flex items-center justify-center text-sm">
+                <div className="w-8 h-8 rounded-lg bg-slate-950 border border-slate-800 flex items-center justify-center text-sm">
                   👥
                 </div>
                 <div>
-                  <p className="text-[9px] text-zinc-550 font-bold uppercase tracking-wider">Squad Count</p>
+                  <p className="text-[9px] text-slate-400 font-bold uppercase tracking-wider">Squad Count</p>
                   <p className="text-white text-xs font-semibold">{sportsInfo[selectedSport].players}</p>
                 </div>
               </div>
 
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-zinc-900 border border-zinc-850 flex items-center justify-center text-sm">
+                <div className="w-8 h-8 rounded-lg bg-slate-950 border border-slate-800 flex items-center justify-center text-sm">
                   ⏱️
                 </div>
                 <div>
-                  <p className="text-[9px] text-zinc-550 font-bold uppercase tracking-wider">Duration Limit</p>
+                  <p className="text-[9px] text-slate-400 font-bold uppercase tracking-wider">Duration Limit</p>
                   <p className="text-white text-xs font-semibold">{sportsInfo[selectedSport].duration}</p>
                 </div>
               </div>
 
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-zinc-900 border border-zinc-850 flex items-center justify-center text-sm">
+                <div className="w-8 h-8 rounded-lg bg-slate-950 border border-slate-800 flex items-center justify-center text-sm">
                   📍
                 </div>
                 <div>
-                  <p className="text-[9px] text-zinc-550 font-bold uppercase tracking-wider">Arena Type</p>
+                  <p className="text-[9px] text-slate-400 font-bold uppercase tracking-wider">Arena Type</p>
                   <p className="text-white text-xs font-semibold">{sportsInfo[selectedSport].location}</p>
                 </div>
               </div>
 
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-zinc-900 border border-zinc-850 flex items-center justify-center text-sm">
+                <div className="w-8 h-8 rounded-lg bg-slate-950 border border-slate-800 flex items-center justify-center text-sm">
                   🎒
                 </div>
                 <div>
-                  <p className="text-[9px] text-zinc-550 font-bold uppercase tracking-wider">Equipment Requirements</p>
+                  <p className="text-[9px] text-slate-400 font-bold uppercase tracking-wider">Equipment Requirements</p>
                   <p className="text-white text-xs font-semibold">{sportsInfo[selectedSport].equipment}</p>
                 </div>
               </div>
             </div>
 
-            <div className="px-6 py-4 border-t border-zinc-800 bg-[#121214] flex justify-end">
+            <div className="px-6 py-4 border-t border-slate-800 bg-slate-950 flex justify-end">
               <button
                 onClick={() => setSelectedSport(null)}
                 className="w-full px-4 py-2 text-xs font-bold text-white bg-blue-600 hover:bg-blue-500 rounded-lg transition-all duration-200 cursor-pointer uppercase tracking-wider"
@@ -800,12 +801,12 @@ const Dashboard = () => {
       {/* Create Event Modal */}
       {isCreateModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fade-in-up">
-          <div className="bg-[#161619] rounded-xl w-full max-w-lg shadow-2xl border border-zinc-800 overflow-hidden max-h-[90vh] flex flex-col relative">
-            <div className="px-6 py-4 border-b border-zinc-800 flex justify-between items-center bg-[#121214] z-10">
+          <div className="bg-slate-900 rounded-xl w-full max-w-lg shadow-2xl border border-slate-800 overflow-hidden max-h-[90vh] flex flex-col relative">
+            <div className="px-6 py-4 border-b border-slate-800 flex justify-between items-center bg-slate-950 z-10">
               <h2 className="text-xs font-extrabold text-white uppercase tracking-wider">Create New Athletic Event</h2>
               <button
                 onClick={() => setIsCreateModalOpen(false)}
-                className="text-zinc-400 hover:text-white transition-all bg-zinc-900 w-8 h-8 rounded-full flex items-center justify-center cursor-pointer border border-zinc-850"
+                className="text-slate-400 hover:text-white transition-all bg-slate-950 w-8 h-8 rounded-full flex items-center justify-center cursor-pointer border border-slate-800"
               >
                 <span className="text-lg leading-none">&times;</span>
               </button>
@@ -814,22 +815,22 @@ const Dashboard = () => {
             <div className="p-6 overflow-y-auto custom-scrollbar">
               <form id="create-event-form" onSubmit={handleCreateEvent} className="space-y-4">
                 <div>
-                  <label className="block text-[9px] font-bold text-zinc-550 uppercase tracking-wider mb-1.5">Event Title</label>
+                  <label className="block text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Event Title</label>
                   <input
                     type="text"
                     name="title"
                     required
                     value={formData.title}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-2 bg-zinc-900/65 border border-zinc-800 rounded-lg focus:outline-none focus:border-blue-650 text-white transition-all placeholder-zinc-700 text-xs"
+                    className="w-full px-3 py-2 bg-slate-955 border border-slate-800 rounded-lg focus:outline-none focus:border-blue-500 text-white transition-all placeholder-slate-600 text-xs"
                     placeholder="e.g., Weekend Friendly Football"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-[9px] font-bold text-zinc-550 uppercase tracking-wider mb-1.5">Event Mode / Selection Type</label>
+                  <label className="block text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Event Mode / Selection Type</label>
                   <div className="flex gap-3">
-                    <label className={`flex-1 cursor-pointer p-3 rounded-lg border transition-all duration-200 text-center ${formData.eventType === 'Casual Match' ? 'bg-blue-950/20 border-blue-600/40 text-blue-400' : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:border-zinc-750'}`}>
+                    <label className={`flex-1 cursor-pointer p-3 rounded-lg border transition-all duration-200 text-center ${formData.eventType === 'Casual Match' ? 'bg-blue-500/5 border-blue-500/30 text-blue-400' : 'bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-700'}`}>
                       <input
                         type="radio"
                         name="eventType"
@@ -841,7 +842,7 @@ const Dashboard = () => {
                       <span className="font-bold block text-xs mb-0.5">Casual Match</span>
                       <span className="text-[9px] opacity-70">Direct Squad RSVP</span>
                     </label>
-                    <label className={`flex-1 cursor-pointer p-3 rounded-lg border transition-all duration-200 text-center ${formData.eventType === 'Competitive Tryout' ? 'bg-indigo-950/20 border-indigo-600/40 text-indigo-400' : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:border-zinc-750'}`}>
+                    <label className={`flex-1 cursor-pointer p-3 rounded-lg border transition-all duration-200 text-center ${formData.eventType === 'Competitive Tryout' ? 'bg-indigo-500/5 border-indigo-500/30 text-indigo-400' : 'bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-700'}`}>
                       <input
                         type="radio"
                         name="eventType"
@@ -858,13 +859,13 @@ const Dashboard = () => {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-[9px] font-bold text-zinc-550 uppercase tracking-wider mb-1.5">Sport</label>
+                    <label className="block text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Sport</label>
                     <select
                       name="sport"
                       required
                       value={formData.sport}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-lg focus:outline-none focus:border-blue-650 text-white transition-all [color-scheme:dark] text-xs"
+                      className="w-full px-3 py-2 bg-slate-955 border border-slate-800 rounded-lg focus:outline-none focus:border-blue-500 text-white transition-all [color-scheme:dark] text-xs"
                     >
                       {SPORTS.map(sport => (
                         <option key={sport} value={sport}>{getSportEmoji(sport)} {sport}</option>
@@ -872,64 +873,64 @@ const Dashboard = () => {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-[9px] font-bold text-zinc-550 uppercase tracking-wider mb-1.5">Max Participants</label>
+                    <label className="block text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Max Participants</label>
                     <input
                       type="number"
                       name="maxParticipants"
                       min="0"
                       value={formData.maxParticipants}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-lg focus:outline-none focus:border-blue-655 text-white transition-all placeholder-zinc-700 text-xs"
+                      className="w-full px-3 py-2 bg-slate-955 border border-slate-800 rounded-lg focus:outline-none focus:border-blue-500 text-white transition-all placeholder-slate-600 text-xs"
                       placeholder="0 = unlimited"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-[9px] font-bold text-zinc-550 uppercase tracking-wider mb-1.5">Date & Time</label>
+                  <label className="block text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Date & Time</label>
                   <input
                     type="datetime-local"
                     name="date"
                     required
                     value={formData.date}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-lg focus:outline-none focus:border-blue-655 text-white transition-all [color-scheme:dark] text-xs"
+                    className="w-full px-3 py-2 bg-slate-955 border border-slate-800 rounded-lg focus:outline-none focus:border-blue-500 text-white transition-all [color-scheme:dark] text-xs"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-[9px] font-bold text-zinc-550 uppercase tracking-wider mb-1.5">Arena location</label>
+                  <label className="block text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Arena location</label>
                   <input
                     type="text"
                     name="location"
                     required
                     value={formData.location}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-lg focus:outline-none focus:border-blue-655 text-white transition-all placeholder-zinc-700 text-xs"
+                    className="w-full px-3 py-2 bg-slate-955 border border-slate-800 rounded-lg focus:outline-none focus:border-blue-500 text-white transition-all placeholder-slate-600 text-xs"
                     placeholder="e.g., Main Arena, Turf 1"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-[9px] font-bold text-zinc-550 uppercase tracking-wider mb-1.5">Event Description</label>
+                  <label className="block text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Event Description</label>
                   <textarea
                     name="description"
                     required
                     rows="3"
                     value={formData.description}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-lg focus:outline-none focus:border-blue-655 text-white transition-all resize-none placeholder-zinc-700 text-xs"
+                    className="w-full px-3 py-2 bg-slate-955 border border-slate-800 rounded-lg focus:outline-none focus:border-blue-500 text-white transition-all resize-none placeholder-slate-600 text-xs"
                     placeholder="Specify requirements, gear, and athlete skill levels..."
                   ></textarea>
                 </div>
               </form>
             </div>
 
-            <div className="px-6 py-4 border-t border-zinc-800 bg-[#121214] flex justify-end gap-3">
+            <div className="px-6 py-4 border-t border-slate-800 bg-slate-955 flex justify-end gap-3">
               <button
                 type="button"
                 onClick={() => setIsCreateModalOpen(false)}
-                className="px-4 py-2 text-xs font-bold text-zinc-450 hover:text-white transition-colors cursor-pointer uppercase tracking-wider"
+                className="px-4 py-2 text-xs font-bold text-slate-400 hover:text-white transition-colors cursor-pointer uppercase tracking-wider"
               >
                 Cancel
               </button>
