@@ -86,7 +86,7 @@ const VerifyOTP = () => {
       {/* Background Glow */}
       <div className="absolute top-10 -left-10 w-96 h-96 bg-blue-900/5 rounded-full blur-[100px] pointer-events-none animate-pulse"></div>
 
-      <div className="relative max-w-md w-full space-y-6 bg-dark-800/20 p-8 rounded-2xl border border-dark-700 z-10 shadow-sm animate-fade-in-up">
+      <div className="relative max-w-md w-full space-y-6 bg-slate-900/40 p-8 rounded-2xl border border-slate-800 z-10 shadow-sm animate-fade-in-up">
         <div>
           <div className="flex justify-center text-2xl mb-3">🔑📨</div>
           <h2 className="text-center text-2xl font-extrabold text-white tracking-tight leading-tight">
@@ -112,7 +112,7 @@ const VerifyOTP = () => {
                 type="text"
                 required
                 maxLength="6"
-                className="w-full px-3 py-3 bg-dark-900 border border-dark-700 rounded-lg placeholder-slate-650 text-white focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-center text-2xl tracking-[0.6em] pl-5 font-mono transition-all disabled:opacity-50"
+                className="w-full px-3 py-3 bg-slate-950 border border-slate-800 rounded-lg placeholder-slate-500 text-slate-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-center text-2xl tracking-[0.6em] pl-5 font-mono transition-all disabled:opacity-50 shadow-inner"
                 placeholder="------"
                 value={otp}
                 onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
@@ -136,7 +136,7 @@ const VerifyOTP = () => {
             </button>
           </div>
           
-          <div className="text-center mt-5 flex flex-col gap-2.5 border-t border-dark-700/60 pt-5">
+          <div className="text-center mt-5 flex flex-col gap-2.5 border-t border-slate-800/60 pt-5">
             <button
               type="button"
               onClick={handleResend}

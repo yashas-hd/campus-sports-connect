@@ -822,7 +822,7 @@ const Dashboard = () => {
                     required
                     value={formData.title}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-2 bg-slate-955 border border-slate-800 rounded-lg focus:outline-none focus:border-blue-500 text-white transition-all placeholder-slate-600 text-xs"
+                    className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg focus:outline-none focus:border-blue-500 text-white transition-all placeholder-slate-500 text-xs"
                     placeholder="e.g., Weekend Friendly Football"
                   />
                 </div>
@@ -865,7 +865,7 @@ const Dashboard = () => {
                       required
                       value={formData.sport}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 bg-slate-955 border border-slate-800 rounded-lg focus:outline-none focus:border-blue-500 text-white transition-all [color-scheme:dark] text-xs"
+                      className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg focus:outline-none focus:border-blue-500 text-white transition-all [color-scheme:dark] text-xs"
                     >
                       {SPORTS.map(sport => (
                         <option key={sport} value={sport}>{getSportEmoji(sport)} {sport}</option>
@@ -880,7 +880,7 @@ const Dashboard = () => {
                       min="0"
                       value={formData.maxParticipants}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 bg-slate-955 border border-slate-800 rounded-lg focus:outline-none focus:border-blue-500 text-white transition-all placeholder-slate-600 text-xs"
+                      className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg focus:outline-none focus:border-blue-500 text-white transition-all placeholder-slate-500 text-xs"
                       placeholder="0 = unlimited"
                     />
                   </div>
@@ -894,7 +894,7 @@ const Dashboard = () => {
                     required
                     value={formData.date}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-2 bg-slate-955 border border-slate-800 rounded-lg focus:outline-none focus:border-blue-500 text-white transition-all [color-scheme:dark] text-xs"
+                    className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg focus:outline-none focus:border-blue-500 text-white transition-all [color-scheme:dark] text-xs"
                   />
                 </div>
 
@@ -906,7 +906,7 @@ const Dashboard = () => {
                     required
                     value={formData.location}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-2 bg-slate-955 border border-slate-800 rounded-lg focus:outline-none focus:border-blue-500 text-white transition-all placeholder-slate-600 text-xs"
+                    className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg focus:outline-none focus:border-blue-500 text-white transition-all placeholder-slate-500 text-xs"
                     placeholder="e.g., Main Arena, Turf 1"
                   />
                 </div>
@@ -919,14 +919,14 @@ const Dashboard = () => {
                     rows="3"
                     value={formData.description}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-2 bg-slate-955 border border-slate-800 rounded-lg focus:outline-none focus:border-blue-500 text-white transition-all resize-none placeholder-slate-600 text-xs"
+                    className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg focus:outline-none focus:border-blue-500 text-white transition-all resize-none placeholder-slate-500 text-xs"
                     placeholder="Specify requirements, gear, and athlete skill levels..."
                   ></textarea>
                 </div>
               </form>
             </div>
 
-            <div className="px-6 py-4 border-t border-slate-800 bg-slate-955 flex justify-end gap-3">
+            <div className="px-6 py-4 border-t border-slate-800 bg-slate-900 flex justify-end gap-3">
               <button
                 type="button"
                 onClick={() => setIsCreateModalOpen(false)}

@@ -154,7 +154,7 @@ const Analytics = () => {
 
             <div className="h-72 w-full relative">
               {(!data?.pieChartData || data.pieChartData.length === 0 || data.pieChartData.every(d => d.value === 0)) ? (
-                <div className="absolute inset-0 flex flex-col justify-center items-center text-slate-500 text-xs bg-slate-955 border border-dashed border-slate-800 rounded-xl">
+                <div className="absolute inset-0 flex flex-col justify-center items-center text-slate-500 text-xs bg-slate-950 border border-dashed border-slate-800 rounded-xl">
                   <FiInfo className="h-6 w-6 text-slate-600 mb-2" />
                   No applications recorded yet.
                 </div>

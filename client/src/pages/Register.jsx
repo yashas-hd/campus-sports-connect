@@ -36,7 +36,7 @@ const Register = () => {
       {/* Background Glow */}
       <div className="absolute top-10 -left-10 w-96 h-96 bg-blue-900/5 rounded-full blur-[100px] pointer-events-none animate-pulse"></div>
 
-      <div className="relative max-w-md w-full space-y-6 bg-dark-800/20 p-8 rounded-2xl border border-dark-700 z-10 shadow-sm animate-fade-in-up">
+      <div className="relative max-w-md w-full space-y-6 bg-slate-900/40 p-8 rounded-2xl border border-slate-800 z-10 shadow-sm animate-fade-in-up">
         <div>
           <div className="flex justify-center text-2xl mb-3">🏆⚽</div>
           <h2 className="text-center text-2xl font-extrabold text-white tracking-tight leading-tight">
@@ -55,7 +55,7 @@ const Register = () => {
                 name="name"
                 type="text"
                 required
-                className="w-full px-3 py-2 bg-dark-900 border border-dark-700 rounded-lg placeholder-slate-650 text-white focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm"
+                className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg placeholder-slate-500 text-slate-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm shadow-inner"
                 placeholder="Full Name"
                 value={formData.name}
                 onChange={handleChange}
@@ -68,7 +68,7 @@ const Register = () => {
                 name="email"
                 type="email"
                 required
-                className="w-full px-3 py-2 bg-dark-900 border border-dark-700 rounded-lg placeholder-slate-650 text-white focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm"
+                className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg placeholder-slate-500 text-slate-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm shadow-inner"
                 placeholder="you@university.edu"
                 value={formData.email}
                 onChange={handleChange}
@@ -81,7 +81,7 @@ const Register = () => {
                 name="college"
                 type="text"
                 required
-                className="w-full px-3 py-2 bg-dark-900 border border-dark-700 rounded-lg placeholder-slate-650 text-white focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm"
+                className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg placeholder-slate-500 text-slate-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm shadow-inner"
                 placeholder="e.g. Stanford University"
                 value={formData.college}
                 onChange={handleChange}
@@ -95,7 +95,7 @@ const Register = () => {
                 type="password"
                 required
                 minLength="6"
-                className="w-full px-3 py-2 bg-dark-900 border border-dark-700 rounded-lg placeholder-slate-650 text-white focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm"
+                className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg placeholder-slate-500 text-slate-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm shadow-inner"
                 placeholder="••••••••"
                 value={formData.password}
                 onChange={handleChange}
@@ -114,7 +114,7 @@ const Register = () => {
           </div>
         </form>
 
-        <div className="border-t border-dark-700/60 pt-5 text-center">
+        <div className="border-t border-slate-800/60 pt-5 text-center">
           <p className="text-xs text-slate-400">
             Already registered?{' '}
             <Link to="/login" className="font-semibold text-blue-500 hover:text-blue-400 transition-colors duration-200">

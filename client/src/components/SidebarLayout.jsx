@@ -225,7 +225,7 @@ const SidebarLayout = ({ children }) => {
             onClick={() => setShowNotifications(false)}
           />
           <div className="fixed inset-y-0 right-0 w-full max-w-md bg-slate-950 border-l border-slate-800/85 z-55 flex flex-col shadow-2xl animate-slide-in-right">
-            <div className="h-16 px-6 border-b border-slate-800/80 flex items-center justify-between bg-slate-900/60">
+            <div className="h-16 px-6 border-b border-slate-800/80 flex items-center justify-between bg-slate-900">
               <div className="flex items-center gap-2">
                 <span className="text-blue-500">🔔</span>
                 <h3 className="font-bold text-sm text-white">Notifications</h3>
@@ -262,10 +262,10 @@ const SidebarLayout = ({ children }) => {
                 </div>
               ) : (
                 notifications.map((notif) => (
-                  <div key={notif.id} className="p-4 bg-slate-900/40 hover:bg-slate-900/70 border border-slate-800/60 hover:border-slate-800 rounded-xl transition-all duration-200 group relative flex gap-3">
+                  <div key={notif.id} className="p-4 bg-slate-900 hover:bg-slate-900/70 border border-slate-800/60 hover:border-slate-800 rounded-xl transition-all duration-200 group relative flex gap-3">
                     <div className="h-2 w-2 mt-1.5 rounded-full bg-blue-500 flex-shrink-0 animate-pulse"></div>
                     <div className="flex-1 pr-6">
-                      <p className="text-xs text-slate-350 leading-relaxed font-medium">{notif.message}</p>
+                      <p className="text-xs text-slate-200 leading-relaxed font-medium">{notif.message}</p>
                     </div>
                     <button 
                       onClick={() => removeNotification(notif.id)}

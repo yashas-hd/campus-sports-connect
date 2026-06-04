@@ -263,10 +263,10 @@ const EventDetails = () => {
           &larr; Return to Radar
         </Link>
  
-        <div className="bg-dark-800/20 rounded-2xl overflow-hidden shadow-sm border border-dark-700">
+        <div className="bg-slate-900/40 rounded-2xl overflow-hidden shadow-sm border border-slate-800">
           {/* Header Banner */}
-          <div className="min-h-56 bg-dark-850 p-8 md:p-10 flex flex-col justify-end relative overflow-hidden border-b border-dark-700">
-            <div className="absolute inset-0 bg-gradient-to-t from-dark-900/90 to-transparent z-10"></div>
+          <div className="min-h-56 bg-slate-950/80 p-8 md:p-10 flex flex-col justify-end relative overflow-hidden border-b border-slate-800">
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 to-transparent z-10"></div>
             
             <div className="relative z-20 animate-fade-in-up">
               <span className={`inline-block mb-3 border text-[10px] font-semibold px-2.5 py-0.5 rounded uppercase tracking-wider ${getSportBadgeColor(event.sport)}`}>
@@ -339,7 +339,7 @@ const EventDetails = () => {
                 
                 {/* Host Review Panel */}
                 {isCreator && isCompetitiveTryout && (
-                  <div className="bg-dark-900/40 p-5 rounded-xl border border-dark-700 shadow-sm">
+                  <div className="bg-slate-900/40 p-5 rounded-xl border border-slate-800 shadow-sm">
                     <h3 className="font-bold text-white text-sm mb-4 flex items-center gap-2">
                       <span>📋</span> Review Board ({event.teamRequests?.filter(r => r.teamStatus === 'Pending').length || 0})
                     </h3>
@@ -349,7 +349,7 @@ const EventDetails = () => {
                     ) : (
                       <div className="space-y-3.5 max-h-96 overflow-y-auto custom-scrollbar pr-1">
                         {event.teamRequests?.map(req => (
-                          <div key={req._id} className="bg-dark-850 p-3 rounded-lg border border-dark-700 transition-colors">
+                          <div key={req._id} className="bg-slate-950/80 p-3 rounded-lg border border-slate-800 transition-colors">
                             <div className="flex justify-between items-start mb-2">
                               <div>
                                 <h4 className="text-xs font-bold text-white">{req.user?.name}</h4>
@@ -360,7 +360,7 @@ const EventDetails = () => {
                               {req.teamStatus === 'Rejected' && <span className="text-[8px] font-semibold px-2 py-0.5 rounded bg-red-500/10 text-red-500 border border-red-500/20">Rejected</span>}
                             </div>
                             
-                            <div className="grid grid-cols-2 gap-2 mb-3 mt-2 bg-dark-900 p-2 rounded-md border border-dark-700/60">
+                            <div className="grid grid-cols-2 gap-2 mb-3 mt-2 bg-slate-950 p-2 rounded-md border border-slate-800/80">
                               <div>
                                 <span className="block text-[8px] text-slate-500 uppercase tracking-wider">Sports</span>
                                 <span className="text-[9px] text-slate-300 font-semibold truncate block max-w-[70px]">{req.user?.preferredSports?.join(', ') || 'N/A'}</span>
@@ -400,12 +400,12 @@ const EventDetails = () => {
                   </div>
                 )}
  
-                <div className="bg-dark-900/40 p-5 rounded-xl border border-dark-700 shadow-sm">
+                <div className="bg-slate-900/40 p-5 rounded-xl border border-slate-800 shadow-sm">
                   <div className="flex justify-between items-center mb-5">
                     <h3 className="font-bold text-white text-sm tracking-wide">
                       {isCompetitiveTryout ? '⭐ Team Roster' : 'Active Squad'}
                     </h3>
-                    <span className="text-[10px] font-semibold bg-dark-800 px-2 py-0.5 rounded text-slate-350 border border-dark-700 flex items-center gap-1.5">
+                    <span className="text-[10px] font-semibold bg-slate-950 px-2 py-0.5 rounded text-slate-350 border border-slate-800 flex items-center gap-1.5">
                       <span className="w-1.5 h-1.5 rounded-full bg-blue-600"></span>
                       {event.participants?.length} / {event.maxParticipants || '∞'}
                     </span>
@@ -413,10 +413,10 @@ const EventDetails = () => {
                   
                   <div className="space-y-2 mb-5 max-h-72 overflow-y-auto custom-scrollbar pr-1">
                     {event.participants?.map(p => (
-                      <div key={p._id} className="flex flex-col gap-2 bg-dark-800/30 p-3 rounded-lg border border-dark-700 hover:border-slate-700 transition-colors">
+                      <div key={p._id} className="flex flex-col gap-2 bg-slate-950/40 p-3 rounded-lg border border-slate-800 hover:border-slate-700 transition-colors">
                         <div className="flex justify-between items-start w-full">
                           <div className="flex items-center gap-3 min-w-0 flex-1">
-                            <div className="h-8 w-8 rounded bg-dark-950 border border-dark-700 flex items-center justify-center text-slate-300 text-xs font-bold uppercase flex-shrink-0 shadow-inner">
+                            <div className="h-8 w-8 rounded bg-slate-950 border border-slate-800 flex items-center justify-center text-slate-300 text-xs font-bold uppercase flex-shrink-0 shadow-inner">
                               {p.name.charAt(0)}
                             </div>
                             <div className="min-w-0 flex-1">
@@ -465,7 +465,7 @@ const EventDetails = () => {
                             <button
                               onClick={handleWithdraw}
                               disabled={processingActionId === 'withdraw'}
-                              className="w-full py-2 px-4 rounded-lg text-[10px] font-bold transition-all duration-200 uppercase tracking-wider bg-dark-900 border border-dark-700 text-slate-400 hover:text-red-550 hover:border-red-550/40 hover:bg-red-550/5 disabled:opacity-50 cursor-pointer"
+                              className="w-full py-2 px-4 rounded-lg text-[10px] font-bold transition-all duration-200 uppercase tracking-wider bg-slate-900 border border-slate-800 text-slate-400 hover:text-red-550 hover:border-red-550/40 hover:bg-red-550/5 disabled:opacity-50 cursor-pointer"
                             >
                               {processingActionId === 'withdraw' ? 'Leaving...' : '🚪 Leave Match'}
                             </button>
@@ -476,7 +476,7 @@ const EventDetails = () => {
                             disabled={isFull || processingActionId === 'rsvp'}
                             className={`w-full py-3 px-4 rounded-lg text-xs font-semibold shadow-sm transition-all duration-250 uppercase tracking-wider cursor-pointer ${
                               isFull
-                                ? 'bg-dark-750 text-slate-500 cursor-not-allowed border border-dark-700'
+                                ? 'bg-slate-950 text-slate-500 cursor-not-allowed border border-slate-800'
                                 : 'bg-blue-600 hover:bg-blue-500 text-white'
                             }`}
                           >
@@ -501,7 +501,7 @@ const EventDetails = () => {
                               <button
                                 onClick={handleWithdraw}
                                 disabled={processingActionId === 'withdraw'}
-                                className="w-full py-2 px-4 rounded-lg text-[10px] font-bold transition-all duration-200 uppercase tracking-wider bg-dark-900 border border-dark-700 text-slate-400 hover:text-red-550 hover:border-red-550/40 hover:bg-red-550/5 disabled:opacity-50 cursor-pointer"
+                                className="w-full py-2 px-4 rounded-lg text-[10px] font-bold transition-all duration-200 uppercase tracking-wider bg-slate-900 border border-slate-800 text-slate-400 hover:text-red-550 hover:border-red-550/40 hover:bg-red-550/5 disabled:opacity-50 cursor-pointer"
                               >
                                 {processingActionId === 'withdraw' ? 'Processing...' : (isApproved ? '🚪 Leave Team' : '❌ Withdraw Tryout')}
                               </button>
@@ -513,7 +513,7 @@ const EventDetails = () => {
                             disabled={isFull || processingActionId === 'apply'}
                             className={`w-full py-3 px-4 rounded-lg text-xs font-semibold shadow-sm transition-all duration-250 uppercase tracking-wider cursor-pointer ${
                               isFull
-                                ? 'bg-dark-750 text-slate-500 cursor-not-allowed border border-dark-700'
+                                ? 'bg-slate-950 text-slate-500 cursor-not-allowed border border-slate-800'
                                 : 'bg-blue-600 hover:bg-blue-500 text-white'
                             }`}
                           >
@@ -554,7 +554,7 @@ const EventDetails = () => {
                     value={commentText}
                     onChange={(e) => setCommentText(e.target.value)}
                     placeholder="Join the conversation..."
-                    className="w-full bg-dark-800 border border-dark-700 rounded-lg p-3 text-white placeholder-slate-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 resize-none transition-all duration-200 text-sm"
+                    className="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 resize-none transition-all duration-200 text-sm shadow-inner"
                     rows="3"
                     required
                   ></textarea>
@@ -656,7 +656,7 @@ const PlayerRating = ({ reqData, isCreator, userId, onRate, processingActionId }
             value={feedback}
             onChange={(e) => setFeedback(e.target.value)}
             placeholder="Technical details & feedback (optional)..."
-            className="w-full bg-dark-900 border border-dark-700/60 rounded-lg p-2 text-[11px] text-white placeholder-slate-600 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none transition-all duration-200"
+            className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-[11px] text-slate-100 placeholder-slate-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none transition-all duration-200 shadow-inner"
             rows="2"
           />
           <div className="flex justify-end gap-2">

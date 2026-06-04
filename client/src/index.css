@@ -6,6 +6,34 @@
   body {
     @apply bg-dark-900 text-gray-100 font-sans antialiased selection:bg-blue-600 selection:text-white;
   }
+
+  /* Make all text-based inputs, textareas, and select menus standard dark slate with readable text and contrast */
+  input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]):not([type="file"]):not([type="range"]),
+  textarea,
+  select {
+    @apply bg-slate-950 border border-slate-800 text-slate-100 placeholder-slate-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all !important;
+  }
+
+  /* Ensure dropdown options have solid dark backgrounds and light text in all browsers */
+  select option {
+    background-color: #020617 !important;
+    color: #f1f5f9 !important;
+  }
+
+  /* Autofill styling override to prevent browsers from turning backgrounds white and text invisible */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover, 
+  input:-webkit-autofill:focus, 
+  textarea:-webkit-autofill,
+  textarea:-webkit-autofill:hover,
+  textarea:-webkit-autofill:focus,
+  select:-webkit-autofill,
+  select:-webkit-autofill:hover,
+  select:-webkit-autofill:focus {
+    -webkit-text-fill-color: #f1f5f9 !important;
+    -webkit-box-shadow: 0 0 0px 1000px #020617 inset !important;
+    transition: background-color 5000s ease-in-out 0s;
+  }
 }
 
 /* Custom scrollbar for a premium feel */

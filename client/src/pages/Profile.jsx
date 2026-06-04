@@ -236,11 +236,11 @@ const Profile = () => {
                             )}
                           </div>
                         </div>
-                        <div className="bg-dark-900/40 p-3.5 rounded-xl border border-dark-700/60 shadow-inner">
+                        <div className="bg-slate-900/40 p-3.5 rounded-xl border border-slate-800 shadow-inner">
                           <span className="block text-[8px] text-slate-500 uppercase tracking-wider mb-1.5">Position</span>
                           <span className="text-xs text-slate-300 font-semibold">{profileData?.preferredPosition || 'N/A'}</span>
                         </div>
-                        <div className="bg-dark-900/40 p-3.5 rounded-xl border border-dark-700/60 shadow-inner">
+                        <div className="bg-slate-900/40 p-3.5 rounded-xl border border-slate-800 shadow-inner">
                           <span className="block text-[8px] text-slate-500 uppercase tracking-wider mb-1.5">Tier / Rank</span>
                           <span className="text-xs text-blue-500 font-bold">{profileData?.experienceLevel || 'Beginner'}</span>
                         </div>
@@ -250,7 +250,7 @@ const Profile = () => {
                   
                   <button 
                     onClick={() => setIsEditing(true)}
-                    className="mt-8 w-full bg-dark-850 hover:bg-dark-750 text-white border border-dark-700 hover:border-blue-500/40 px-4 py-2.5 rounded-lg text-xs font-semibold transition-all duration-200 cursor-pointer uppercase tracking-wider"
+                    className="mt-8 w-full bg-slate-900 hover:bg-slate-800 text-white border border-slate-800 hover:border-blue-500/40 px-4 py-2.5 rounded-lg text-xs font-semibold transition-all duration-200 cursor-pointer uppercase tracking-wider"
                   >
                     Edit Credentials
                   </button>
@@ -265,7 +265,7 @@ const Profile = () => {
                       required
                       value={formData.name}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 bg-dark-900 border border-dark-700 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-white transition-all text-xs"
+                      className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-white transition-all text-xs"
                     />
                   </div>
                   <div>
@@ -275,7 +275,7 @@ const Profile = () => {
                       rows="4"
                       value={formData.bio}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 bg-dark-900 border border-dark-700 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-white transition-all text-xs resize-none"
+                      className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-white transition-all text-xs resize-none"
                     ></textarea>
                   </div>
                   <div>
@@ -285,7 +285,7 @@ const Profile = () => {
                       name="sportsInterests"
                       value={formData.sportsInterests}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 bg-dark-900 border border-dark-700 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-white transition-all text-xs"
+                      className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-white transition-all text-xs"
                       placeholder="e.g., Basketball, Tennis"
                     />
                   </div>
@@ -303,7 +303,7 @@ const Profile = () => {
                               className={`px-2.5 py-1 rounded border text-[10px] font-semibold transition-all cursor-pointer ${
                                 isSelected 
                                   ? 'bg-blue-600/15 text-blue-400 border-blue-500/40 shadow-sm' 
-                                  : 'bg-dark-900 text-slate-400 border-dark-700/60 hover:border-slate-500'
+                                  : 'bg-slate-950 text-slate-400 border-slate-800/80 hover:border-slate-500'
                               }`}
                             >
                               {getSportEmoji(sport)} {sport}
@@ -319,7 +319,7 @@ const Profile = () => {
                         name="preferredPosition"
                         value={formData.preferredPosition}
                         onChange={handleInputChange}
-                        className="w-full px-3 py-2 bg-dark-900 border border-dark-700 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-white transition-all text-xs"
+                        className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-white transition-all text-xs"
                         placeholder="e.g., Striker"
                       />
                     </div>
@@ -329,7 +329,7 @@ const Profile = () => {
                         name="experienceLevel"
                         value={formData.experienceLevel}
                         onChange={handleInputChange}
-                        className="w-full px-3 py-2 bg-dark-900 border border-dark-700 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-white transition-all text-xs [color-scheme:dark]"
+                        className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-white transition-all text-xs [color-scheme:dark]"
                       >
                         <option value="Beginner">Beginner</option>
                         <option value="Intermediate">Intermediate</option>
@@ -341,7 +341,7 @@ const Profile = () => {
                     <button
                       type="button"
                       onClick={() => setIsEditing(false)}
-                      className="flex-1 px-4 py-2.5 text-xs font-semibold text-slate-300 bg-dark-800 border border-dark-700 rounded-lg hover:bg-dark-750 hover:text-white transition-all cursor-pointer uppercase tracking-wider"
+                      className="flex-1 px-4 py-2.5 text-xs font-semibold text-slate-300 bg-slate-900 border border-slate-800 rounded-lg hover:bg-slate-800 hover:text-white transition-all cursor-pointer uppercase tracking-wider"
                     >
                       Abort
                     </button>
@@ -357,7 +357,7 @@ const Profile = () => {
             </div>
 
             {/* Favorite Sports Section */}
-            <div className="bg-dark-800/30 p-6 rounded-2xl shadow-sm border border-dark-700 relative overflow-hidden">
+            <div className="bg-slate-900/40 p-6 rounded-2xl shadow-sm border border-slate-800 relative overflow-hidden">
               <h2 className="text-base font-bold text-white mb-2 flex items-center gap-2">
                 <span>⚡</span> Preferences
               </h2>
@@ -374,7 +374,7 @@ const Profile = () => {
                       className={`px-2.5 py-1 rounded text-xs font-semibold transition-all duration-200 border cursor-pointer ${
                         isSelected
                           ? 'bg-blue-600/15 text-blue-400 border-blue-500/40 shadow-sm'
-                          : 'bg-dark-900 text-slate-400 border-dark-700/80 hover:text-white hover:border-slate-500'
+                          : 'bg-slate-950 text-slate-400 border-slate-800/80 hover:text-white hover:border-slate-500'
                       }`}
                     >
                       {getSportEmoji(sport)} {sport}
@@ -385,7 +385,7 @@ const Profile = () => {
               <button
                 onClick={handleSaveFavorites}
                 disabled={isSavingFavorites}
-                className="w-full bg-dark-850 hover:bg-blue-600 text-white hover:text-white border border-dark-700 hover:border-blue-600 px-4 py-2.5 rounded-lg text-xs font-semibold transition-all duration-200 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer uppercase tracking-wider"
+                className="w-full bg-slate-900 hover:bg-blue-600 text-white hover:text-white border border-slate-800 hover:border-blue-600 px-4 py-2.5 rounded-lg text-xs font-semibold transition-all duration-200 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer uppercase tracking-wider"
               >
                 {isSavingFavorites ? 'Saving Preferences...' : 'Save Preferences'}
               </button>
@@ -394,12 +394,12 @@ const Profile = () => {
  
           {/* Right Column: Events */}
           <div className="lg:col-span-2 space-y-6">
-            <div className="bg-dark-800/30 rounded-2xl shadow-sm border border-dark-700 overflow-hidden">
-              <div className="flex border-b border-dark-700/85 bg-dark-900/40 p-2 rounded-t-2xl gap-2">
+            <div className="bg-slate-900/40 rounded-2xl shadow-sm border border-slate-800 overflow-hidden">
+              <div className="flex border-b border-slate-800 bg-slate-950 p-2 rounded-t-2xl gap-2">
                 <button
                   onClick={() => setActiveTab('hosting')}
                   className={`flex-1 py-3 text-xs md:text-sm font-semibold text-center rounded-xl transition-all duration-200 uppercase tracking-wider cursor-pointer ${
-                    activeTab === 'hosting' ? 'text-blue-400 bg-dark-800 border border-blue-500/20 shadow-sm' : 'text-slate-500 hover:text-slate-350'
+                    activeTab === 'hosting' ? 'text-blue-400 bg-slate-900 border border-blue-500/20 shadow-sm' : 'text-slate-500 hover:text-slate-350'
                   }`}
                 >
                   Deployed Ops ({profileData?.hostedEvents?.length || 0})
@@ -407,7 +407,7 @@ const Profile = () => {
                 <button
                   onClick={() => setActiveTab('joined')}
                   className={`flex-1 py-3 text-xs md:text-sm font-semibold text-center rounded-xl transition-all duration-200 uppercase tracking-wider cursor-pointer ${
-                    activeTab === 'joined' ? 'text-blue-400 bg-dark-800 border border-blue-500/20 shadow-sm' : 'text-slate-500 hover:text-slate-350'
+                    activeTab === 'joined' ? 'text-blue-400 bg-slate-900 border border-blue-500/20 shadow-sm' : 'text-slate-500 hover:text-slate-350'
                   }`}
                 >
                   Joined Squads ({profileData?.joinedEvents?.length || 0})
