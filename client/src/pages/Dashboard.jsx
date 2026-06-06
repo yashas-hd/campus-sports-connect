@@ -125,7 +125,7 @@ const Dashboard = () => {
     date: '',
     location: '',
     description: '',
-    maxParticipants: 0,
+    maxParticipants: 1,
     eventType: 'Casual Match',
   });
 
@@ -194,6 +194,16 @@ const Dashboard = () => {
     };
   }, [user, navigate]);
 
+  const getMinDateTime = () => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+  };
+
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -202,10 +212,31 @@ const Dashboard = () => {
     e.preventDefault();
     setIsSubmitting(true);
 
+    // Frontend Date Validation
+    if (!formData.date) {
+      toast.error('Please select a valid current or future date.');
+      setIsSubmitting(false);
+      return;
+    }
+    const selectedDate = new Date(formData.date);
+    if (selectedDate < new Date(Date.now() - 5 * 60 * 1000)) {
+      toast.error('Please select a valid current or future date.');
+      setIsSubmitting(false);
+      return;
+    }
+
+    // Frontend Capacity Validation
+    const capacity = parseInt(formData.maxParticipants);
+    if (isNaN(capacity) || capacity < 1) {
+      toast.error('Capacity must be at least 1.');
+      setIsSubmitting(false);
+      return;
+    }
+
     try {
       const eventData = {
         ...formData,
-        maxParticipants: formData.maxParticipants ? parseInt(formData.maxParticipants) : 0
+        maxParticipants: capacity
       };
 
       const { data } = await axiosInstance.post('/api/events', eventData);
@@ -226,7 +257,7 @@ const Dashboard = () => {
         date: '',
         location: '',
         description: '',
-        maxParticipants: 0,
+        maxParticipants: 1,
         eventType: 'Casual Match',
       });
     } catch (err) {
@@ -877,11 +908,11 @@ const Dashboard = () => {
                     <input
                       type="number"
                       name="maxParticipants"
-                      min="0"
+                      min="1"
+                      step="1"
                       value={formData.maxParticipants}
                       onChange={handleInputChange}
                       className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg focus:outline-none focus:border-blue-500 text-white transition-all placeholder-slate-500 text-xs"
-                      placeholder="0 = unlimited"
                     />
                   </div>
                 </div>
@@ -892,6 +923,7 @@ const Dashboard = () => {
                     type="datetime-local"
                     name="date"
                     required
+                    min={getMinDateTime()}
                     value={formData.date}
                     onChange={handleInputChange}
                     className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg focus:outline-none focus:border-blue-500 text-white transition-all [color-scheme:dark] text-xs"

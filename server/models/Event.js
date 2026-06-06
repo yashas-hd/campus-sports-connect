@@ -14,6 +14,16 @@ const eventSchema = mongoose.Schema(
     date: {
       type: Date,
       required: [true, 'Please add a date and time for the event'],
+      validate: {
+        validator: function(v) {
+          if (this.isNew || this.isModified('date')) {
+            // Allow a 5-minute clock skew buffer
+            return v >= new Date(Date.now() - 5 * 60 * 1000);
+          }
+          return true;
+        },
+        message: 'Please select a valid current or future date.'
+      }
     },
     location: {
       type: String,
@@ -74,7 +84,16 @@ const eventSchema = mongoose.Schema(
     ],
     maxParticipants: {
       type: Number,
-      default: 0, // 0 means unlimited
+      default: 1,
+      validate: {
+        validator: function(v) {
+          if (this.isNew || this.isModified('maxParticipants')) {
+            return v >= 1;
+          }
+          return true;
+        },
+        message: 'Capacity must be at least 1.'
+      }
     },
     status: {
       type: String,

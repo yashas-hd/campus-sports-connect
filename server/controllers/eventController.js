@@ -30,13 +30,28 @@ const createEvent = async (req, res) => {
       return res.status(400).json({ message: 'Invalid sport selected' });
     }
 
+    // Date Validation: Enforce current or future date
+    if (!date) {
+      return res.status(400).json({ message: 'Please select a valid current or future date.' });
+    }
+    const eventDate = new Date(date);
+    if (isNaN(eventDate.getTime()) || eventDate < new Date(Date.now() - 5 * 60 * 1000)) {
+      return res.status(400).json({ message: 'Please select a valid current or future date.' });
+    }
+
+    // Capacity Validation: Enforce minimum capacity of 1
+    const capacity = Number(maxParticipants);
+    if (isNaN(capacity) || capacity < 1) {
+      return res.status(400).json({ message: 'Capacity must be at least 1.' });
+    }
+
     const event = await Event.create({
       title,
       sport: validSport,
       date,
       location,
       description,
-      maxParticipants,
+      maxParticipants: capacity,
       eventType: eventType || 'Casual Match',
       creator: req.user._id,
       participants: [req.user._id], // Creator is automatically a participant
