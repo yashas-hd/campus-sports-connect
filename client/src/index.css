@@ -11,13 +11,36 @@
   input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]):not([type="file"]):not([type="range"]),
   textarea,
   select {
-    @apply bg-slate-950 border border-slate-800 text-slate-100 placeholder-slate-500 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all !important;
+    background-color: #0f172a !important; /* bg-slate-900 */
+    color: #ffffff !important; /* text-white */
+    border-color: #1e293b !important; /* border-slate-800 */
+    caret-color: #ffffff !important; /* Ensure cursor remains visible */
+    transition: all 0.2s ease-in-out !important;
+  }
+
+  /* Custom placeholder styling for all text inputs and textareas */
+  input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]):not([type="file"]):not([type="range"])::placeholder,
+  textarea::placeholder {
+    color: #94a3b8 !important; /* placeholder:text-slate-400 */
+    opacity: 1 !important;
+  }
+
+  /* Enforce consistent dark background and white text on focus */
+  input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]):not([type="file"]):not([type="range"]):focus,
+  textarea:focus,
+  select:focus {
+    background-color: #0f172a !important; /* bg-slate-900 */
+    color: #ffffff !important; /* text-white */
+    border-color: #3b82f6 !important; /* focus:border-blue-500 */
+    box-shadow: 0 0 0 1px #3b82f6 !important; /* focus:ring-1 focus:ring-blue-500 */
+    outline: none !important;
+    caret-color: #ffffff !important;
   }
 
   /* Ensure dropdown options have solid dark backgrounds and light text in all browsers */
   select option {
-    background-color: #020617 !important;
-    color: #f1f5f9 !important;
+    background-color: #0f172a !important;
+    color: #ffffff !important;
   }
 
   /* Autofill styling override to prevent browsers from turning backgrounds white and text invisible */
@@ -30,8 +53,9 @@
   select:-webkit-autofill,
   select:-webkit-autofill:hover,
   select:-webkit-autofill:focus {
-    -webkit-text-fill-color: #f1f5f9 !important;
-    -webkit-box-shadow: 0 0 0px 1000px #020617 inset !important;
+    -webkit-text-fill-color: #ffffff !important;
+    -webkit-box-shadow: 0 0 0px 1000px #0f172a inset !important;
+    caret-color: #ffffff !important;
     transition: background-color 5000s ease-in-out 0s;
   }
 }

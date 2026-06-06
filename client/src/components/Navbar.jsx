@@ -87,8 +87,8 @@ const Navbar = () => {
  
                   {/* Notification Dropdown */}
                   {showNotifications && (
-                    <div className="absolute right-0 mt-3 w-80 bg-slate-900 border border-slate-800 rounded-xl shadow-lg z-50 overflow-hidden animate-fade-in-up">
-                      <div className="px-4 py-2.5 border-b border-slate-800 bg-slate-950 flex justify-between items-center">
+                    <div className="absolute right-0 mt-3 w-80 bg-slate-950/95 backdrop-blur-xl border border-slate-800 rounded-xl shadow-lg z-50 overflow-hidden animate-fade-in-up">
+                      <div className="px-4 py-2.5 border-b border-slate-800 bg-slate-950/40 flex justify-between items-center">
                         <h3 className="text-xs font-semibold text-white flex items-center gap-1.5">
                           🔔 Notifications
                         </h3>

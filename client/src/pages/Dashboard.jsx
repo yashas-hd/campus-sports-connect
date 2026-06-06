@@ -412,7 +412,7 @@ const Dashboard = () => {
             </div>
             <button
               onClick={() => setIsCreateModalOpen(true)}
-              className="px-5 py-3 font-semibold text-white rounded-xl bg-blue-600 hover:bg-blue-500 hover:scale-[1.02] active:scale-95 transition-all duration-200 flex items-center gap-2 shadow-lg shadow-blue-600/10 cursor-pointer text-xs uppercase tracking-wider animate-pulse-glow"
+              className="px-5 py-2.5 font-semibold text-white rounded-lg bg-blue-600 hover:bg-blue-500 hover:scale-[1.01] active:scale-[0.99] transition-all duration-200 flex items-center gap-2 cursor-pointer text-xs uppercase tracking-wider shadow-sm"
             >
               <FiPlus className="h-4 w-4" />
               <span>{currentTab === 'tryouts' ? 'Create Tryout' : 'Create Event'}</span>
@@ -730,7 +730,7 @@ const Dashboard = () => {
 
       {/* Sport Details Modal */}
       {selectedSport && sportsInfo[selectedSport] && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fade-in-up">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in-up">
           <div className="bg-slate-900 rounded-xl w-full max-w-md shadow-2xl border border-slate-800 overflow-hidden relative">
             <div className="px-6 py-4 border-b border-slate-800 flex justify-between items-center bg-slate-950">
               <h2 className="text-sm font-bold text-white flex items-center gap-2 uppercase tracking-wide">
@@ -800,7 +800,7 @@ const Dashboard = () => {
 
       {/* Create Event Modal */}
       {isCreateModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fade-in-up">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in-up">
           <div className="bg-slate-900 rounded-xl w-full max-w-lg shadow-2xl border border-slate-800 overflow-hidden max-h-[90vh] flex flex-col relative">
             <div className="px-6 py-4 border-b border-slate-800 flex justify-between items-center bg-slate-950 z-10">
               <h2 className="text-xs font-extrabold text-white uppercase tracking-wider">Create New Athletic Event</h2>

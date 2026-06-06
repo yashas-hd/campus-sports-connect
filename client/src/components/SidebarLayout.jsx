@@ -224,8 +224,8 @@ const SidebarLayout = ({ children }) => {
             className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9998] transition-opacity duration-300"
             onClick={() => setShowNotifications(false)}
           />
-          <div className="fixed inset-y-0 right-0 w-full sm:w-[420px] bg-slate-900 border-l border-slate-700 z-[9999] flex flex-col shadow-2xl animate-slide-in-right">
-            <div className="h-16 px-6 border-b border-slate-700 flex items-center justify-between bg-slate-950/40">
+          <div className="fixed inset-y-0 right-0 w-full sm:w-[420px] bg-slate-950/95 backdrop-blur-xl border-l border-slate-800 z-[9999] flex flex-col shadow-2xl animate-slide-in-right">
+            <div className="h-16 px-6 border-b border-slate-800 flex items-center justify-between bg-slate-950/40">
               <div className="flex items-center gap-2">
                 <span className="text-blue-500 text-sm">🔔</span>
                 <h3 className="font-bold text-xs text-white uppercase tracking-wider">Notifications</h3>
@@ -246,14 +246,14 @@ const SidebarLayout = ({ children }) => {
                 )}
                 <button
                   onClick={() => setShowNotifications(false)}
-                  className="p-1.5 text-slate-400 hover:text-white transition-colors cursor-pointer bg-slate-900 border border-slate-800 rounded-lg hover:border-slate-700"
+                  className="p-1.5 text-slate-400 hover:text-white transition-colors cursor-pointer bg-slate-950/60 border border-slate-800 rounded-lg hover:border-slate-700"
                 >
                   <FiX className="h-4 w-4" />
                 </button>
               </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-5 custom-scrollbar space-y-3 bg-slate-900">
+            <div className="flex-1 overflow-y-auto p-5 custom-scrollbar space-y-3 bg-transparent">
               {notifications.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-24 text-slate-500 text-center">
                   <div className="w-12 h-12 rounded-full bg-slate-950 border border-slate-800 flex items-center justify-center mb-4">
